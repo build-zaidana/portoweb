@@ -1,0 +1,364 @@
+---
+/**
+ * Contact (PRD §5, F5). Netlify Forms: the static HTML form is detected at deploy time,
+ * so there is no backend. It works without JavaScript (POST → /contact/thanks); with
+ * JavaScript it sends in place and shows the result without leaving the page.
+ *
+ * Left: the logistics Rian needs to decide (role, time zone, proof, CV).
+ * Right: the form. Email and social links appear only once they exist (src/lib/site.ts).
+ */
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Button from "../components/ui/Button.astro";
+import { contact, profile } from "../lib/site";
+
+const topics = [
+  { value: "role", label: "A remote role" },
+  { value: "project", label: "A project together" },
+  { value: "hello", label: "Just saying hi" },
+];
+---
+
+<BaseLayout
+  title="Contact"
+  description="Get in touch with Zaidana about remote internships, junior roles, or a chat about fullstack and AI."
+>
+  <div class="page wrap">
+    <section class="info" aria-labelledby="contact-title">
+      <h1 id="contact-title" class="page-title">
+        Let's talk
+      </h1>
+      <p class="lead">
+        Hiring for a remote internship or junior role, building something in education or AI, or just want to
+        talk tech? Send a note and I'll reply by email.
+      </p>
+
+      <dl class="facts">
+        <div>
+          <dt>Looking for</dt>
+          <dd>{profile.seeking}</dd>
+        </div>
+        <div>
+          <dt>Time zone</dt>
+          <dd>
+            {profile.timezone}, {profile.country}
+          </dd>
+        </div>
+        {contact.email && (
+          <div>
+            <dt>Email</dt>
+            <dd>
+              <a class="link" href={`mailto:${contact.email}`}>
+                {contact.email}
+              </a>
+            </dd>
+          </div>
+        )}
+        <div>
+          <dt>Code</dt>
+          <dd>
+            <a class="link" href={profile.github.href} target="_blank" rel="noopener">
+              {profile.github.label}
+              <span class="sr-only"> (opens in a new tab)</span>
+            </a>
+          </dd>
+        </div>
+        {contact.social.map((item) => (
+          <div>
+            <dt>{item.label}</dt>
+            <dd>
+              <a class="link" href={item.href} target="_blank" rel="noopener">
+                {item.href.replace(/^https?:\/\//, "")}
+                <span class="sr-only"> (opens in a new tab)</span>
+              </a>
+            </dd>
+          </div>
+        ))}
+        <div>
+          <dt>CV</dt>
+          <dd>
+            <a class="link" href={profile.cv.href} download>
+              Download CV (PDF{profile.cv.placeholder ? ", placeholder" : ""})
+            </a>
+          </dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="form-card" aria-labelledby="form-title">
+      <h2 id="form-title" class="form-title">
+        Send a message
+      </h2>
+
+      <form
+        class="form"
+        name="contact"
+        method="POST"
+        action="/contact/thanks"
+        data-netlify="true"
+        netlify-honeypot="company"
+        data-contact-form
+        data-astro-reload
+      >
+        <input type="hidden" name="form-name" value="contact" />
+        <p class="honeypot" aria-hidden="true">
+          <label>
+            Leave this empty <input name="company" tabindex="-1" autocomplete="off" />
+          </label>
+        </p>
+
+        <div class="field">
+          <label class="field-label" for="contact-name">
+            Name
+          </label>
+          <input class="input" id="contact-name" name="name" autocomplete="name" required maxlength="100" />
+          <p class="field-error">Please tell me your name.</p>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="contact-email">
+            Email
+          </label>
+          <input
+            class="input"
+            id="contact-email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            required
+            aria-describedby="contact-email-hint"
+          />
+          <p class="field-hint" id="contact-email-hint">
+            I'll reply to this address.
+          </p>
+          <p class="field-error">Enter an email address like name@example.com.</p>
+        </div>
+
+        <fieldset class="topics">
+          <legend class="field-label">
+            What's it about? <span class="optional">Optional</span>
+          </legend>
+          <div class="chips">
+            {topics.map((topic) => (
+              <label class="chip">
+                <input class="sr-only" type="radio" name="topic" value={topic.label} />
+                <span>{topic.label}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <div class="field">
+          <label class="field-label" for="contact-message">
+            Message
+          </label>
+          <textarea
+            class="input"
+            id="contact-message"
+            name="message"
+            required
+            minlength="10"
+            maxlength="5000"
+          ></textarea>
+          <p class="field-error">Write a short message (at least 10 characters).</p>
+        </div>
+
+        <div class="submit-row">
+          <Button type="submit" variant="primary" size="lg" data-submit>
+            Send message
+          </Button>
+          <p class="status" role="status" aria-live="polite" data-status></p>
+        </div>
+      </form>
+
+      <div class="sent" data-sent hidden tabindex="-1">
+        <h3 class="sent-title">Thanks, your message is on its way.</h3>
+        <p>I'll reply to the email address you gave. If it's about a role, a link to the job post helps.</p>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  /** Sends the Netlify form in place. Without JS (or if this fails to load) the normal POST still works. */
+  function initContactForm() {
+    const form = document.querySelector<HTMLFormElement>("[data-contact-form]");
+    const sent = document.querySelector<HTMLElement>("[data-sent]");
+    const status = form?.querySelector<HTMLElement>("[data-status]");
+    const button = form?.querySelector<HTMLButtonElement>("[data-submit]");
+    if (!form || !sent || !status || !button) return;
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      button.disabled = true;
+      button.setAttribute("aria-busy", "true");
+      status.textContent = "Sending…";
+      try {
+        const body = new URLSearchParams(new FormData(form) as unknown as Record<string, string>).toString();
+        const response = await fetch("/", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body,
+        });
+        if (!response.ok) throw new Error(String(response.status));
+        form.hidden = true;
+        sent.hidden = false;
+        sent.focus();
+      } catch {
+        status.textContent = "It didn't send. Please try again in a moment.";
+        button.disabled = false;
+        button.removeAttribute("aria-busy");
+      }
+    });
+  }
+  document.addEventListener("astro:page-load", initContactForm);
+</script>
+
+<style>
+  .page {
+    display: grid;
+    gap: clamp(2.5rem, 2rem + 3vw, 5rem);
+    padding-block: clamp(2.5rem, 1.5rem + 4vw, 5rem) clamp(4rem, 3rem + 4vw, 7rem);
+  }
+  @media (min-width: 64rem) {
+    .page {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 32rem);
+      align-items: start;
+    }
+  }
+
+  .info {
+    display: grid;
+    gap: 1.5rem;
+    align-content: start;
+  }
+  .lead {
+    max-inline-size: 42ch;
+    font-size: var(--text-step-1);
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+  .facts {
+    display: grid;
+    margin-block-start: 1rem;
+    border-block-start: 1px solid var(--line);
+  }
+  .facts > div {
+    display: grid;
+    grid-template-columns: 8rem minmax(0, 1fr);
+    gap: 1rem;
+    padding-block: 0.9rem;
+    border-block-end: 1px solid var(--line);
+  }
+  .facts dt {
+    color: var(--ink-soft);
+  }
+  .facts dd {
+    overflow-wrap: anywhere;
+  }
+
+  .form-card {
+    padding: clamp(1.5rem, 1rem + 2vw, 2.25rem);
+    border-radius: var(--radius-xl);
+    background-color: var(--surface);
+  }
+  .form-title {
+    margin-block-end: 1.5rem;
+    font-size: var(--text-step-2);
+    line-height: var(--text-step-2--line-height);
+  }
+  .form {
+    display: grid;
+    gap: 1.25rem;
+  }
+  .honeypot {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .topics {
+    display: grid;
+    gap: 0.6rem;
+    border: 0;
+  }
+  .optional {
+    color: var(--ink-soft);
+    font-weight: 400;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.5rem;
+    padding-inline: 1rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    background-color: var(--surface-raised);
+    font-size: var(--text-step--1);
+    cursor: pointer;
+    transition:
+      background-color var(--dur-2) var(--ease-out),
+      border-color var(--dur-2) var(--ease-out),
+      color var(--dur-2) var(--ease-out),
+      scale var(--dur-1) var(--ease-out);
+  }
+  .chip:hover {
+    border-color: color-mix(in oklab, var(--ink) 45%, transparent);
+  }
+  .chip:active {
+    scale: 0.97;
+  }
+  .chip:has(:checked) {
+    border-color: var(--ink);
+    background-color: var(--ink);
+    color: var(--paper);
+  }
+  .chip:has(:focus-visible) {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .submit-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    margin-block-start: 0.5rem;
+  }
+  .status {
+    color: var(--ink-soft);
+    font-size: var(--text-step--1);
+  }
+
+  .sent {
+    display: grid;
+    gap: 0.75rem;
+    animation: sent-in var(--dur-4) var(--ease-out);
+  }
+  .sent[hidden] {
+    display: none;
+  }
+  .sent:focus {
+    outline: none;
+  }
+  .sent-title {
+    font-size: var(--text-step-2);
+    line-height: var(--text-step-2--line-height);
+  }
+  .sent p {
+    color: var(--ink-soft);
+  }
+  @keyframes sent-in {
+    from {
+      opacity: 0;
+      translate: 0 0.5rem;
+    }
+  }
+</style>
