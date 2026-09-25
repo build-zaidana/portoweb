@@ -24,6 +24,10 @@ export default defineConfig({
     shikiConfig: { theme: "css-variables", wrap: false },
   },
 
+  // CSS is small (≈15 KB gzipped per page), so it ships inside the HTML: no render-blocking
+  // stylesheet requests before first paint on slow mobile networks (Phase 6 trace: −2.3 s).
+  build: { inlineStylesheets: "always" },
+
   // The floating dev toolbar would appear in every review screenshot.
   devToolbar: { enabled: false },
 
