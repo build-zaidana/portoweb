@@ -1,0 +1,173 @@
+---
+/**
+ * Article. One reading column; everything else steps back.
+ * Ends with the newsletter (people subscribe right after something useful, PRD §5)
+ * and links to the neighbouring posts.
+ */
+import type { GetStaticPaths } from "astro";
+import { render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Newsletter from "../../components/Newsletter.astro";
+import SampleBadge from "../../components/ui/SampleBadge.astro";
+import BackLink from "../../components/ui/BackLink.astro";
+import { getWriting } from "../../lib/content";
+import { formatDate, isoDate, readingTime } from "../../lib/format";
+
+export const getStaticPaths = (async () => {
+  const posts = await getWriting(); // newest first
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    props: { post, newer: posts[i - 1], older: posts[i + 1] },
+  }));
+}) satisfies GetStaticPaths;
+
+const { post, newer, older } = Astro.props;
+const { title, description, publishedAt, updatedAt, tags, sample } = post.data;
+const { Content } = await render(post);
+---
+
+<BaseLayout title={title} description={description} ogType="article">
+  <article class="article wrap">
+    <header class="head">
+      <BackLink href="/writing">All writing</BackLink>
+      <p class="meta">
+        <time datetime={isoDate(publishedAt)}>{formatDate(publishedAt)}</time>
+        <span aria-hidden="true">·</span>
+        <span>{readingTime(post.body)}</span>
+        {sample && <SampleBadge />}
+      </p>
+      <h1 class="title">{title}</h1>
+      <p class="dek">{description}</p>
+      {(updatedAt || tags.length > 0) && (
+        <p class="sub">
+          {updatedAt && (
+            <span>
+              Updated <time datetime={isoDate(updatedAt)}>{formatDate(updatedAt)}</time>
+            </span>
+          )}
+          {tags.length > 0 && (
+            <span>Filed under {tags.map((tag) => tag.replaceAll("-", " ")).join(", ")}</span>
+          )}
+        </p>
+      )}
+    </header>
+
+    <div class="markdown content">
+      <Content />
+    </div>
+  </article>
+
+  <div class="after wrap">
+    <Newsletter context="article" />
+
+    {(older || newer) && (
+      <nav class="neighbours" aria-label="More writing">
+        {older && (
+          <a class="neighbour" href={`/writing/${older.id}`}>
+            <span class="kicker">Older</span>
+            <span class="neighbour-title">{older.data.title}</span>
+          </a>
+        )}
+        {newer && (
+          <a class="neighbour is-newer" href={`/writing/${newer.id}`}>
+            <span class="kicker">Newer</span>
+            <span class="neighbour-title">{newer.data.title}</span>
+          </a>
+        )}
+      </nav>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .article {
+    display: grid;
+    justify-items: center;
+    padding-block: clamp(2rem, 1.5rem + 3vw, 4rem) clamp(3rem, 2rem + 4vw, 5rem);
+  }
+  .head,
+  .content {
+    inline-size: 100%;
+    /* rem, not ch: the header and body use different font sizes but share one column. */
+    max-inline-size: 42rem;
+  }
+  .head {
+    display: grid;
+    gap: 1rem;
+    padding-block-end: 2.5rem;
+    margin-block-end: 2.5rem;
+    border-block-end: 1px solid var(--line);
+  }
+  .meta,
+  .sub {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    color: var(--ink-soft);
+    font-size: var(--text-step--1);
+  }
+  .meta {
+    gap: 0.5rem;
+  }
+  .title {
+    font-size: var(--text-step-4);
+    line-height: var(--text-step-4--line-height);
+  }
+  .dek {
+    font-size: var(--text-step-1);
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+
+  .after {
+    display: grid;
+    gap: 2rem;
+    padding-block-end: clamp(4rem, 3rem + 4vw, 7rem);
+  }
+  .neighbours {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 48rem) {
+    .neighbours {
+      grid-template-columns: 1fr 1fr;
+    }
+    .is-newer {
+      grid-column: 2;
+      text-align: end;
+    }
+  }
+  .neighbour {
+    display: grid;
+    gap: 0.35rem;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-lg);
+    color: inherit;
+    text-decoration: none;
+    transition:
+      border-color var(--dur-2) var(--ease-out),
+      background-color var(--dur-2) var(--ease-out),
+      transform var(--dur-4) var(--ease-spring);
+  }
+  @media (hover: hover) {
+    .neighbour:hover {
+      border-color: transparent;
+      background-color: var(--surface);
+      transform: translateY(-2px);
+    }
+  }
+  .neighbour:active {
+    transform: scale(0.99);
+  }
+  .kicker {
+    color: var(--ink-soft);
+    font-size: var(--text-step--1);
+  }
+  .neighbour-title {
+    font-family: var(--font-display);
+    font-size: var(--text-step-2);
+    line-height: var(--text-step-2--line-height);
+  }
+</style>
