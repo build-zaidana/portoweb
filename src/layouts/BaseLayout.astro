@@ -8,6 +8,7 @@ import { ClientRouter } from "astro:transitions";
 import ThemeScript from "../components/ThemeScript.astro";
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
+import SketchFilter from "../components/ui/SketchFilter.astro";
 import { site } from "../lib/site";
 import "../styles/global.css";
 
@@ -62,6 +63,7 @@ const ogImage = image ? new URL(image, Astro.site).href : undefined;
     <ClientRouter />
   </head>
   <body>
+    <SketchFilter />
     <a class="skip-link" href="#main">
       Skip to content
     </a>
@@ -74,7 +76,16 @@ const ogImage = image ? new URL(image, Astro.site).href : undefined;
 </html>
 
 <style>
-  .skip-link {
+  /* Visually hidden until focused with the keyboard (clip pattern, robust in print and capture tools). */
+  .skip-link:not(:focus-visible) {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .skip-link:focus-visible {
     position: fixed;
     inset-block-start: 0.75rem;
     inset-inline-start: 0.75rem;
@@ -84,11 +95,13 @@ const ogImage = image ? new URL(image, Astro.site).href : undefined;
     background-color: var(--ink);
     color: var(--paper);
     font-weight: 500;
-    transform: translateY(-200%);
-    transition: transform var(--dur-2) var(--ease-out);
+    animation: skip-in var(--dur-2) var(--ease-out);
   }
-  .skip-link:focus-visible {
-    transform: none;
+  @keyframes skip-in {
+    from {
+      opacity: 0;
+      transform: translateY(-0.5rem);
+    }
   }
   main:focus {
     outline: none;

@@ -90,6 +90,8 @@ export const TEXT_PAIRS: ContrastPair[] = [
   { fg: "ink-soft", bg: "tint-tan", usage: "Project card meta (tan)" },
   { fg: "on-deep", bg: "deep-sage", usage: "Writing card (deep sage)" },
   { fg: "on-deep", bg: "deep-ink", usage: "Writing card (charcoal)" },
+  { fg: "on-deep-soft", bg: "deep-sage", usage: "Writing card meta (deep sage)" },
+  { fg: "on-deep-soft", bg: "deep-ink", usage: "Writing card meta (charcoal)" },
   { fg: "paper", bg: "ink", usage: "Primary button label" },
   { fg: "on-fill", bg: "sage", usage: "Text on sage fill (hover states)" },
   { fg: "on-fill", bg: "sky", usage: "Arrow button on sky" },

@@ -11,6 +11,9 @@ export default defineConfig({
 
   integrations: [sampleReport()],
 
+  // The floating dev toolbar would appear in every review screenshot.
+  devToolbar: { enabled: false },
+
   // Typed env vars. SHOW_SAMPLES=true lets a preview deploy include `sample: true` entries (PRD F3).
   env: {
     schema: {

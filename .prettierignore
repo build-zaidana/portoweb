@@ -4,3 +4,8 @@ node_modules/
 docs/references/
 package-lock.json
 .playwright-mcp/
+
+# Hand-written project docs and Claude Code config: keep their original formatting.
+.claude/
+/*.md
+docs/

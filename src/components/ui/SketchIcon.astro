@@ -1,6 +1,8 @@
 ---
 /**
  * Hand-drawn icon set (daylight reference). PLACEHOLDERS until Zaidana draws the final set.
+ * The pen feel comes from two offset stroke passes + the shared #sketch-rough SVG filter
+ * (defined once in SketchFilter.astro, rendered by BaseLayout).
  * To replace one: draw it on a 32×32 artboard (Excalidraw / tablet), export SVG,
  * and paste its <path> `d` values into `icons` below. Keep stroke-only paths so
  * color, width and round caps stay consistent across the set.
@@ -49,9 +51,15 @@ const { name, label, size = 24, class: className } = Astro.props;
   aria-hidden={label ? undefined : "true"}
   focusable="false"
 >
-  {icons[name].map((d) => (
-    <path d={d} />
-  ))}
+  <g filter="url(#sketch-rough)">
+    {icons[name].map((d) => (
+      <>
+        {/* Two passes of the same stroke, slightly offset: reads like pen on paper. */}
+        <path d={d} class="pass-1" />
+        <path d={d} class="pass-2" />
+      </>
+    ))}
+  </g>
 </svg>
 
 <style>
@@ -63,5 +71,15 @@ const { name, label, size = 24, class: className } = Astro.props;
     stroke-linecap: round;
     stroke-linejoin: round;
     overflow: visible;
+  }
+  .pass-1 {
+    stroke-width: 1.8;
+  }
+  /* Second, thinner pass drawn slightly off the first one, like a quick re-trace with a pen. */
+  .pass-2 {
+    stroke-width: 1;
+    opacity: 0.6;
+    transform: translate(0.8px, -0.6px) rotate(1.4deg);
+    transform-origin: center;
   }
 </style>

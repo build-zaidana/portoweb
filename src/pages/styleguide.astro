@@ -372,8 +372,8 @@ const sections = [
               slot="art"
               class="mini-code"
               aria-label="Code example"
-            ><code>function first&lt;T&gt;(items: T[]): T | undefined {'{'}
-  return items[0];
+            ><code>function last&lt;T&gt;(list: T[]) {'{'}
+  return list.at(-1);
 {'}'}</code></pre>
           </CalmCard>
         </div>
@@ -430,6 +430,8 @@ const sections = [
 <style>
   .guide {
     display: grid;
+    /* minmax(0, …) stops wide children (the contrast table) from stretching the page. */
+    grid-template-columns: minmax(0, 1fr);
     gap: 2rem;
     padding-block: 3rem 0;
   }
@@ -547,7 +549,7 @@ const sections = [
   }
   .swatches {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(7.25rem, 1fr));
     gap: 1.25rem 1rem;
   }
   .swatch {
@@ -704,12 +706,13 @@ const sections = [
     display: grid;
     gap: 1rem;
   }
+  /* Featured post on the left spanning two rows, two tones stacked on the right. */
   @media (min-width: 48rem) {
     .writing-grid {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: 1.35fr 1fr;
     }
-    .writing-grid > :first-child {
-      grid-column: 1 / -1;
+    .writing-grid > :global(:first-child) {
+      grid-row: span 2;
     }
   }
   .grid-2 {

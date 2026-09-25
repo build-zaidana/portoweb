@@ -47,14 +47,16 @@
 
   /* ── Pastel card tints (craft-style project cards) ──────────── */
   --tint-sage: light-dark(#e1e7dc, #222a20);
-  --tint-sky: light-dark(#dfeaf0, #1d262b);
+  --tint-sky: light-dark(#dfeaf0, #1e2626); /* dark: teal-grey, kept away from navy */
   --tint-tan: light-dark(#efe4d8, #2b241e);
 
   /* ── Deep card surfaces (integratedbio-style rhythm) ──────────
      Text on these always uses --on-deep. */
   --deep-sage: light-dark(#3e4b39, #33402f);
-  --deep-ink: light-dark(#2a2a2a, #0f110e);
+  /* Dark mode: a warm brown step ABOVE the page, never a darker "hole". */
+  --deep-ink: light-dark(#2a2a2a, #332c25);
   --on-deep: light-dark(#f3f2ee, #eceae4);
+  --on-deep-soft: light-dark(#c4c7bd, #b3b7ac);
 
   /* ── Lines & states ───────────────────────────────────────── */
   --line: light-dark(rgb(42 42 42 / 0.12), rgb(236 234 228 / 0.1));

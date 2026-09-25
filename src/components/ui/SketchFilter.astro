@@ -1,0 +1,24 @@
+---
+/**
+ * Shared SVG filter that makes strokes wobble slightly, like ink on paper.
+ * Rendered ONCE per page (BaseLayout) and referenced as url(#sketch-rough)
+ * by SketchIcon and ThemeToggle, so the id is never duplicated.
+ */
+---
+
+<svg class="sketch-defs" width="0" height="0" aria-hidden="true" focusable="false">
+  <filter id="sketch-rough" x="-15%" y="-15%" width="130%" height="130%">
+    <!-- Low frequency = lines bend gently (hand wobble), not jagged edges. -->
+    <feTurbulence type="fractalNoise" baseFrequency="0.07" numOctaves="2" seed="7" result="noise" />
+    <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.6" xChannelSelector="R" yChannelSelector="G" />
+  </filter>
+</svg>
+
+<style>
+  .sketch-defs {
+    position: absolute;
+    inline-size: 0;
+    block-size: 0;
+    overflow: hidden;
+  }
+</style>
