@@ -121,3 +121,24 @@ const ogImage = image ? new URL(image, Astro.site).href : undefined;
     outline: none;
   }
 </style>
+
+<script>
+  /**
+   * Decides how the next page arrives (see src/lib/motion.ts) and writes it onto the
+   * incoming <html> before the swap, so the transition's keyframes can read it.
+   */
+  import { navMotion } from "../lib/motion";
+
+  let clear: number | undefined;
+  document.addEventListener("astro:before-swap", (event) => {
+    const { x, stagger } = navMotion(event.from, event.to);
+    const root = event.newDocument.documentElement;
+    root.style.setProperty("--nav-x", String(x));
+    if (stagger) root.dataset.navStagger = "";
+  });
+  // The stagger only belongs to the arrival; remove it so later re-renders don't replay it.
+  document.addEventListener("astro:page-load", () => {
+    window.clearTimeout(clear);
+    clear = window.setTimeout(() => delete document.documentElement.dataset.navStagger, 1000);
+  });
+</script>

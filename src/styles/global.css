@@ -303,30 +303,57 @@
 }
 
 /* ── Page transitions (used by src/lib/motion.ts) ─────────────────────── */
-@keyframes page-leave-up {
+/* --nav-x: -1 | 0 | 1 = direction in nav order (0 = list ↔ detail, which moves vertically).
+   Set on the incoming <html> before the swap; the ::view-transition pseudo-elements inherit it. */
+@keyframes page-leave {
   to {
     opacity: 0;
-    transform: translateY(-8px);
+    transform: translate(calc(var(--nav-x, 0) * -40px), calc((1 - var(--nav-x, 0) * var(--nav-x, 0)) * -8px));
+    filter: blur(4px);
   }
 }
-@keyframes page-enter-up {
+@keyframes page-enter {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translate(calc(var(--nav-x, 0) * 40px), calc((1 - var(--nav-x, 0) * var(--nav-x, 0)) * 12px));
   }
 }
-@keyframes page-leave-down {
-  to {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-}
-@keyframes page-enter-down {
+@keyframes page-fade-in {
   from {
     opacity: 0;
-    transform: translateY(-12px);
   }
 }
+/* Between top-level pages nothing morphs, so the new page arrives section by section:
+   <main> itself only fades in, and its first blocks slide in from the side of travel,
+   un-blurring as they land, 70ms apart. User-triggered, so it fits the motion rules. */
+:root[data-nav-stagger]::view-transition-new(page-main) {
+  animation-name: page-fade-in !important;
+  /* Starts as the old page is almost gone, so the two never overlap as text. */
+  animation-delay: 120ms !important;
+}
+@keyframes section-arrive {
+  from {
+    opacity: 0;
+    transform: translateX(calc(var(--nav-x, 0) * 56px));
+    filter: blur(4px);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  /* The home hero has its own opening motion, so it is left out. */
+  :root[data-nav-stagger] main > :not(.hero) {
+    animation: section-arrive 600ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both;
+  }
+  :root[data-nav-stagger] main > :nth-child(2) {
+    animation-delay: 190ms;
+  }
+  :root[data-nav-stagger] main > :nth-child(3) {
+    animation-delay: 260ms;
+  }
+  :root[data-nav-stagger] main > :nth-child(n + 4) {
+    animation-delay: 330ms;
+  }
+}
+
 /*
  * Shared elements (project/post titles, project art) carry over between list and detail
  * pages: the browser morphs position and size while the old and new snapshots crossfade.
@@ -356,20 +383,10 @@
    page's beat instead of lingering for the full morph. */
 ::view-transition-old(.morph):only-child {
   opacity: 1;
-  animation: vt-fade-out 160ms cubic-bezier(0.4, 0, 1, 1) both;
+  animation: page-leave 200ms cubic-bezier(0.4, 0, 1, 1) both;
 }
 ::view-transition-new(.morph):only-child {
-  animation: vt-fade-in 400ms cubic-bezier(0.22, 1, 0.36, 1) 60ms both;
-}
-@keyframes vt-fade-out {
-  to {
-    opacity: 0;
-  }
-}
-@keyframes vt-fade-in {
-  from {
-    opacity: 0;
-  }
+  animation: section-arrive 600ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both;
 }
 /* The rest of the page (header, footer) fades on the same beat as <main>. */
 ::view-transition-old(root) {
