@@ -1,0 +1,325 @@
+---
+/**
+ * /now (nownownow.com): what Zaidana is focused on this month. Cheap to update and the
+ * clearest sign of activity while the project list is short (PRD §5).
+ * Current month as three editorial rows (learning / building / reading); earlier months
+ * fold into an archive below, so progress over time stays visible.
+ */
+import { Code } from "astro:components";
+import { render } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SampleBadge from "../components/ui/SampleBadge.astro";
+import SketchIcon, { type IconName } from "../components/ui/SketchIcon.astro";
+import WhereNext from "../components/WhereNext.astro";
+import { getNowEntries, getProjects, getWriting } from "../lib/content";
+import { formatMonth, isoDate } from "../lib/format";
+
+const [entries, projects, writing] = await Promise.all([getNowEntries(), getProjects(), getWriting()]);
+const [current, ...earlier] = entries;
+const notes = current ? await render(current) : undefined;
+
+type Row = { key: "learning" | "building" | "reading"; label: string; icon: IconName };
+const rows: Row[] = [
+  { key: "learning", label: "Learning", icon: "book" },
+  { key: "building", label: "Building", icon: "build" },
+  { key: "reading", label: "Reading", icon: "spark" },
+];
+---
+
+<BaseLayout
+  title="Now"
+  description="What Zaidana is learning, building, and reading this month. Updated every month."
+>
+  <section class="head wrap" aria-labelledby="now-title">
+    <h1 id="now-title" class="page-title">
+      Now
+    </h1>
+    {current ? (
+      <div class="intro">
+        <p class="lead">
+          What I'm focused on in{" "}
+          <time datetime={isoDate(current.data.month)}>{formatMonth(current.data.month)}</time>
+          {current.data.location && <>, from {current.data.location}</>}.
+        </p>
+        <p class="about">
+          <span>
+            I update this{" "}
+            <a class="link" href="https://nownownow.com/about" target="_blank" rel="noopener">
+              now page<span class="sr-only"> (opens in a new tab)</span>
+            </a>{" "}
+            at the start of every month.
+          </span>
+          {current.data.sample && <SampleBadge />}
+        </p>
+      </div>
+    ) : (
+      <p class="lead">The first monthly update is on its way.</p>
+    )}
+  </section>
+
+  {current && (
+    <div class="rows wrap">
+      {rows.map((row) => {
+        const items = current.data[row.key];
+        if (items.length === 0) return null;
+        return (
+          <section class="row" aria-labelledby={`now-${row.key}`}>
+            <h2 id={`now-${row.key}`} class="row-label">
+              <span class="row-icon" aria-hidden="true">
+                <SketchIcon name={row.icon} size={28} />
+              </span>
+              {row.label}
+            </h2>
+            <div class="row-body">
+              <ul class="items" role="list">
+                {items.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+              {row.key === "learning" && current.data.snippet && (
+                <figure class="snippet">
+                  <Code code={current.data.snippet} lang="ts" theme="css-variables" />
+                  {current.data.heroNote && <figcaption class="hand">{current.data.heroNote}</figcaption>}
+                </figure>
+              )}
+            </div>
+          </section>
+        );
+      })}
+
+      {notes && current.body?.trim() && (
+        <section class="row" aria-labelledby="now-notes">
+          <h2 id="now-notes" class="row-label">
+            <span class="row-icon" aria-hidden="true">
+              <SketchIcon name="cloud" size={28} />
+            </span>
+            Notes
+          </h2>
+          <div class="row-body markdown">
+            <notes.Content />
+          </div>
+        </section>
+      )}
+    </div>
+  )}
+
+  {earlier.length > 0 && (
+    <section class="archive wrap" aria-labelledby="archive-title">
+      <h2 id="archive-title" class="section-title">
+        Earlier months
+      </h2>
+      <div class="months">
+        {earlier.map((entry) => (
+          <details class="month">
+            <summary>
+              <time datetime={isoDate(entry.data.month)}>{formatMonth(entry.data.month)}</time>
+              {entry.data.sample && <SampleBadge />}
+            </summary>
+            <dl class="month-body">
+              {rows.map(
+                (row) =>
+                  entry.data[row.key].length > 0 && (
+                    <div>
+                      <dt>{row.label}</dt>
+                      <dd>{entry.data[row.key].join("; ")}</dd>
+                    </div>
+                  ),
+              )}
+            </dl>
+          </details>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <WhereNext
+    hints={{
+      projects: projects.length > 0 ? `${projects.length} so far` : undefined,
+      writing: writing[0] ? `Latest: ${writing[0].data.title}` : undefined,
+      now: "You're here",
+    }}
+  />
+</BaseLayout>
+
+<style>
+  .head {
+    display: grid;
+    gap: 1.25rem;
+    padding-block: clamp(2.5rem, 1.5rem + 4vw, 5rem) clamp(2rem, 1.5rem + 2vw, 3.5rem);
+  }
+  @media (min-width: 64rem) {
+    .head {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: end;
+    }
+  }
+  .intro {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .lead {
+    max-inline-size: 30ch;
+    font-family: var(--font-display);
+    font-size: var(--text-step-2);
+    line-height: var(--text-step-2--line-height);
+  }
+  .about {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--ink-soft);
+  }
+
+  /* ── Rows: label on the left, the month's items on the right ── */
+  .rows {
+    padding-block-end: clamp(3rem, 2rem + 4vw, 6rem);
+  }
+  .row {
+    display: grid;
+    align-items: start;
+    gap: 1rem;
+    padding-block: 2rem;
+    border-block-start: 1px solid var(--line);
+  }
+  .row:last-child {
+    border-block-end: 1px solid var(--line);
+  }
+  @media (min-width: 56rem) {
+    .row {
+      grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+      gap: 3rem;
+    }
+  }
+  .row-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-sans);
+    font-size: var(--text-step-0);
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+  .row-icon {
+    display: grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border-radius: var(--radius-md);
+    background-color: var(--surface);
+    color: var(--accent);
+  }
+  .row-body {
+    display: grid;
+    gap: 1.5rem;
+    max-inline-size: 44rem;
+  }
+  .items {
+    display: grid;
+    gap: 0.75rem;
+    font-size: var(--text-step-1);
+    line-height: 1.45;
+  }
+  .items li {
+    display: flex;
+    gap: 0.75rem;
+  }
+  .items li::before {
+    content: "";
+    flex: none;
+    inline-size: 0.45rem;
+    block-size: 0.45rem;
+    margin-block-start: 0.6em;
+    border-radius: 999px;
+    background-color: var(--sage);
+  }
+
+  .snippet {
+    display: grid;
+    gap: 0.5rem;
+    justify-items: start;
+  }
+  .snippet :global(pre) {
+    inline-size: 100%;
+    padding: 1.1rem 1.25rem;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    overflow-x: auto;
+  }
+  .hand {
+    padding-inline-start: 1.25rem;
+    font-family: var(--font-hand);
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: var(--accent);
+    rotate: -1.5deg;
+  }
+
+  /* ── Archive ── */
+  .archive {
+    display: grid;
+    gap: 1.5rem;
+    padding-block-end: clamp(3rem, 2rem + 4vw, 6rem);
+  }
+  .months {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .month {
+    border-radius: var(--radius-lg);
+    background-color: var(--surface);
+  }
+  .month summary {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-block-size: 3.5rem;
+    padding-inline: 1.25rem;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  /* A small hand-drawn-weight chevron turns when the month opens. */
+  .month summary {
+    list-style: none;
+  }
+  .month summary::-webkit-details-marker {
+    display: none;
+  }
+  .month summary::after {
+    content: "";
+    inline-size: 0.55rem;
+    block-size: 0.55rem;
+    margin-inline-start: auto;
+    border-inline-end: 1.5px solid currentColor;
+    border-block-end: 1.5px solid currentColor;
+    rotate: 45deg;
+    transition: rotate var(--dur-3) var(--ease-spring);
+  }
+  .month[open] summary::after {
+    rotate: 225deg;
+  }
+  /* Height animates open/closed where supported (::details-content + interpolate-size). */
+  .month {
+    interpolate-size: allow-keywords;
+  }
+  .month::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition:
+      block-size var(--dur-3) var(--ease-out),
+      content-visibility var(--dur-3) allow-discrete;
+  }
+  .month[open]::details-content {
+    block-size: auto;
+  }
+  .month-body {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0 1.25rem 1.25rem;
+  }
+  .month-body dt {
+    color: var(--ink-soft);
+    font-size: var(--text-step--1);
+  }
+</style>
