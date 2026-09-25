@@ -187,6 +187,11 @@ const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`)
   .menu-button:active {
     transform: scale(0.97);
   }
+  @media (prefers-reduced-motion: reduce) {
+    .menu-button:active {
+      transform: none;
+    }
+  }
   .menu-icon {
     position: relative;
     inline-size: 1rem;

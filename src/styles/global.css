@@ -1,6 +1,12 @@
 @import "tailwindcss";
 @import "./tokens.css";
 
+/* Only scan code for class names. Docs and Claude config contain words like "underline"
+   that would otherwise generate unused CSS. */
+@source not "../../docs";
+@source not "../../.claude";
+@source not "../../*.md";
+
 /* `dark:` utilities follow the resolved theme on <html data-theme>.
    Most styling does NOT need `dark:` because tokens already switch via light-dark(). */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
