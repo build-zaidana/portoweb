@@ -16,6 +16,7 @@
     "contrast": "node scripts/contrast.ts"
   },
   "dependencies": {
+    "@astrojs/rss": "^4.0.19",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.3.5",
     "tailwindcss": "^4.3.3"

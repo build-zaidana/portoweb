@@ -40,8 +40,13 @@ export async function getTimeline(): Promise<CollectionEntry<"timeline">[]> {
   return entries.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 }
 
+/** Every /now month, newest first (older months become the archive on /now). */
+export async function getNowEntries(): Promise<CollectionEntry<"now">[]> {
+  const entries = await getVisibleEntries("now");
+  return entries.sort((a, b) => b.data.month.getTime() - a.data.month.getTime());
+}
+
 /** The current /now entry is simply the most recent month. */
 export async function getLatestNow(): Promise<CollectionEntry<"now"> | undefined> {
-  const entries = await getVisibleEntries("now");
-  return entries.sort((a, b) => b.data.month.getTime() - a.data.month.getTime())[0];
+  return (await getNowEntries())[0];
 }

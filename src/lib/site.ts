@@ -25,6 +25,23 @@ export const profile = {
   cv: { href: "/cv-placeholder.pdf", placeholder: true },
 } as const;
 
+/**
+ * Ways to reach Zaidana. `null` = not set up yet, and the UI hides it (never a fake address).
+ * Social links (X, Instagram) are added here once the accounts exist.
+ */
+export const contact: { email: string | null; social: readonly NavItem[] } = {
+  email: null,
+  social: [],
+};
+
+/**
+ * Newsletter (PRD F5, Buttondown). While `username` is null the site says the newsletter
+ * hasn't started and offers RSS instead; with a username, the subscribe form goes live.
+ */
+export const newsletter: { username: string | null } = {
+  username: null,
+};
+
 /** Real progress of this website, phase by phase (update at every gate). Shown on Home. */
 export const siteProgress: readonly { label: string; done: boolean }[] = [
   { label: "Foundations", done: true },

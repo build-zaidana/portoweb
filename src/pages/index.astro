@@ -6,6 +6,7 @@
  *   → closing moment in the footer.
  * Copy is draft until Phase 4.
  */
+import Newsletter from "../components/Newsletter.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Hero from "../components/home/Hero.astro";
 import StoryReveal from "../components/home/StoryReveal.astro";
@@ -135,12 +136,15 @@ const tones = ["sage", "ink"] as const;
       </div>
     </section>
   )}
+
+  <div class="subscribe wrap">
+    <Newsletter />
+  </div>
 </BaseLayout>
 
 <style>
-  .section-title {
-    font-size: var(--text-step-3);
-    line-height: var(--text-step-3--line-height);
+  .subscribe {
+    padding-block: clamp(2rem, 1.5rem + 3vw, 4rem) clamp(3rem, 2rem + 4vw, 6rem);
   }
   .section-lead {
     max-inline-size: 42ch;

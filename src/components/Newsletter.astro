@@ -1,0 +1,145 @@
+---
+/**
+ * Newsletter (PRD §5 + F5). Lives where people decide to subscribe: the end of Home and
+ * the end of every article, never on a page of its own.
+ *
+ * Two honest states, driven by `newsletter.username` in src/lib/site.ts:
+ *   - not set up yet → says so and offers RSS + GitHub instead (no form that goes nowhere)
+ *   - Buttondown username set → a real subscribe form (works without JavaScript)
+ */
+import Button from "./ui/Button.astro";
+import SketchIcon from "./ui/SketchIcon.astro";
+import { newsletter, profile } from "../lib/site";
+
+interface Props {
+  /** "article" sits under a post, so the copy refers to what the reader just finished. */
+  context?: "home" | "article";
+  class?: string;
+}
+
+const { context = "home", class: className } = Astro.props;
+const { username } = newsletter;
+const titleId = `newsletter-title-${context}`;
+const lead =
+  context === "article"
+    ? "If this was useful, the next one can come to your inbox."
+    : "New notes and project updates, sent when they're published.";
+---
+
+<section class:list={["newsletter", className]} aria-labelledby={titleId}>
+  <span class="icon" aria-hidden="true">
+    <SketchIcon name="book" size={40} />
+  </span>
+
+  {username ? (
+    <>
+      <div class="copy">
+        <h2 id={titleId} class="title">
+          Get new notes by email
+        </h2>
+        <p class="lead">{lead} Unsubscribe with one click.</p>
+      </div>
+      <form
+        class="form"
+        action={`https://buttondown.com/api/emails/embed-subscribe/${username}`}
+        method="post"
+      >
+        <div class="field">
+          <label class="field-label" for={`newsletter-email-${context}`}>
+            Email address
+          </label>
+          <div class="row">
+            <input
+              class="input"
+              id={`newsletter-email-${context}`}
+              type="email"
+              name="email"
+              autocomplete="email"
+              placeholder="you@example.com"
+              required
+            />
+            <Button type="submit" variant="primary">
+              Subscribe
+            </Button>
+          </div>
+          <p class="field-error">Enter an email address like name@example.com.</p>
+        </div>
+      </form>
+    </>
+  ) : (
+    <>
+      <div class="copy">
+        <h2 id={titleId} class="title">
+          The newsletter starts soon
+        </h2>
+        <p class="lead">Until then, you can follow new notes with RSS or watch the code on GitHub.</p>
+      </div>
+      <div class="actions">
+        <Button variant="secondary" href="/rss.xml">
+          RSS feed
+        </Button>
+        <Button variant="secondary" href={profile.github.href} target="_blank" rel="noopener">
+          GitHub<span class="sr-only"> (opens in a new tab)</span>
+        </Button>
+      </div>
+    </>
+  )}
+</section>
+
+<style>
+  .newsletter {
+    display: grid;
+    gap: 1.25rem 2rem;
+    padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    border-radius: var(--radius-xl);
+    background-color: var(--surface);
+  }
+  @media (min-width: 56rem) {
+    .newsletter {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+    }
+  }
+  .icon {
+    display: grid;
+    place-items: center;
+    inline-size: 4rem;
+    block-size: 4rem;
+    border-radius: var(--radius-md);
+    background-color: var(--surface-raised);
+    color: var(--accent);
+  }
+  .title {
+    font-size: var(--text-step-2);
+    line-height: var(--text-step-2--line-height);
+  }
+  .lead {
+    margin-block-start: 0.4rem;
+    max-inline-size: 48ch;
+    color: var(--ink-soft);
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .form {
+    min-inline-size: min(100%, 24rem);
+  }
+  .row {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .row .input {
+    min-inline-size: 0;
+  }
+  .row :global(.btn) {
+    flex: none;
+    min-block-size: 3rem;
+  }
+  @media (max-width: 29.99rem) {
+    .row {
+      flex-direction: column;
+    }
+  }
+</style>

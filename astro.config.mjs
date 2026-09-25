@@ -11,6 +11,12 @@ export default defineConfig({
 
   integrations: [sampleReport()],
 
+  // Code blocks use the css-variables theme, so their colors are our tokens
+  // (--astro-code-* in tokens.css) and switch with light/dark like everything else.
+  markdown: {
+    shikiConfig: { theme: "css-variables", wrap: false },
+  },
+
   // The floating dev toolbar would appear in every review screenshot.
   devToolbar: { enabled: false },
 

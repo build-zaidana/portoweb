@@ -12,7 +12,7 @@ import { z } from "astro/zod";
 /** Shared by every collection. */
 const sample = z.boolean().default(false);
 
-/** Pastel surface for the project card (craft-style). Names match --tint-* tokens. */
+/** Pastel chip color on the hero card. Names match --tint-* tokens. */
 const cardTint = z.enum(["sage", "sky", "tan"]);
 
 const projects = defineCollection({
@@ -34,6 +34,22 @@ const projects = defineCollection({
     heroNote: z.string().max(48).optional(),
     /** Placeholder mini-UI shown on the card until the project has a real screenshot. */
     art: z.enum(["form", "cards", "chart"]).default("form"),
+    /**
+     * Annotations on the project picture (lovi-style callouts): a dot at x/y (percent of the
+     * picture) and a short note explaining a decision. 2–4 read best; more crowd the picture.
+     */
+    callouts: z
+      .array(
+        z.object({
+          label: z.string().max(32),
+          note: z.string().max(120),
+          x: z.number().min(0).max(100),
+          y: z.number().min(0).max(100),
+          side: z.enum(["left", "right"]).default("right"),
+        }),
+      )
+      .max(4)
+      .default([]),
     featured: z.boolean().default(false),
     sample,
   }),

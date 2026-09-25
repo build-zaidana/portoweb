@@ -71,7 +71,22 @@
   --star-grid: light-dark(transparent, rgb(236 234 228 / 0.16));
 
   /* ── Code: type names and numbers in highlighted snippets (keywords use --accent) ── */
-  --code-type: light-dark(#8a5a35, #d6bca5);
+  --code-type: light-dark(#80512e, #d6bca5);
+  /* Markdown code blocks (Shiki css-variables theme) reuse the same text tokens on --surface. */
+  --astro-code-foreground: var(--ink);
+  --astro-code-background: var(--surface);
+  --astro-code-token-keyword: var(--accent);
+  --astro-code-token-constant: var(--code-type);
+  --astro-code-token-string: var(--code-type);
+  --astro-code-token-string-expression: var(--code-type);
+  --astro-code-token-function: var(--ink);
+  --astro-code-token-parameter: var(--ink);
+  --astro-code-token-punctuation: var(--ink-soft);
+  --astro-code-token-comment: var(--ink-soft);
+  --astro-code-token-link: var(--accent);
+
+  /* ── Form errors: a muted brick red, text-safe on paper and raised surfaces ── */
+  --danger: light-dark(#9a3b2c, #eba08f);
 
   /* ── Lines & states ───────────────────────────────────────── */
   --line: light-dark(rgb(42 42 42 / 0.12), rgb(236 234 228 / 0.1));

@@ -23,9 +23,18 @@ interface Props {
   noindex?: boolean;
   /** Show the closing moment (floating cards + big CTA) above the footer. Home only. */
   closing?: boolean;
+  /** Open Graph type: "article" for posts and project write-ups. */
+  ogType?: "website" | "article";
 }
 
-const { title, description = site.description, image, noindex = false, closing = false } = Astro.props;
+const {
+  title,
+  description = site.description,
+  image,
+  noindex = false,
+  closing = false,
+  ogType = "website",
+} = Astro.props;
 const fullTitle = title ? `${title} · ${site.name}` : site.title;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = image ? new URL(image, Astro.site).href : undefined;
@@ -43,7 +52,7 @@ const ogImage = image ? new URL(image, Astro.site).href : undefined;
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex" />}
 
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
@@ -56,6 +65,7 @@ const ogImage = image ? new URL(image, Astro.site).href : undefined;
     <meta name="theme-color" content="#f3f2ee" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#161915" media="(prefers-color-scheme: dark)" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" type="application/rss+xml" title={`${site.name} · Writing`} href="/rss.xml" />
     <meta name="generator" content={Astro.generator} />
 
     <!-- Only the display serif is above the fold on every page, so only it is preloaded. -->
