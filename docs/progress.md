@@ -11,8 +11,8 @@
 | 2 | Home + About | ✅ Selesai (Gate 2, 2026-09-25) |
 | 3 | Halaman lain | ✅ Selesai (Gate 3, 2026-09-25) |
 | 4 | Copywriting | ✅ Selesai (Gate 4, 2026-09-25) |
-| 5 | 3 proyek pertama | 🟡 Selesai, menunggu "lanjut" (Gate 5) |
-| 6 | Launch | ⏳ |
+| 5 | 3 proyek pertama | ✅ Selesai (Gate 5, 2026-09-26) |
+| 6 | Launch | 🔄 Siap deploy, menunggu akun Netlify user |
 
 ## Keputusan final
 
@@ -273,3 +273,20 @@ User: kiri-kanan terlalu kosong. Terukur: di 1920px konten hanya 1216px (345px k
 - 🔑 Hanya animasikan elemen tanpa pasangan — ::view-transition-old :only-child · document.getAnimations()
 - Revisi lanjutan (user: halaman yang sedikit kesamaannya perlu animasi lebih menarik): antar halaman top-level kini **punya arah sesuai urutan menu** (Home → Projects → Writing → Now → About → Contact). Halaman lama bergeser ke sisi asal + blur 4px (180ms); halaman baru masuk dari sisi berlawanan, section-nya mendarat bertahap (mulai 120ms, jeda 70ms) sambil blur menajam. Daftar ↔ detail tetap memakai morph. Dicek frame demi frame (100/180/300ms) tanpa tumpang tindih teks.
 - 🔑 Arah transisi dari urutan nav — astro:before-swap event.newDocument · css custom properties inheritance ::view-transition · staggered animation-delay
+
+### Fase 6 — Launch (2026-09-26)
+
+**Selesai:**
+- Sitemap (`@astrojs/sitemap`, tanpa /styleguide & /contact/thanks), `robots.txt` dari `site`, `<link rel="sitemap">`.
+- Gambar Open Graph default 1200×630 (`public/og-default.png`, dirender dari komponen situs sendiri) + `og:image:width/height/alt`, `twitter:card summary_large_image` di semua halaman; `apple-touch-icon.png`.
+- `netlify.toml`: build, Node 22, cache immutable untuk `/_astro/*`, header keamanan (nosniff, frame DENY, referrer, permissions), `SHOW_SAMPLES=true` hanya di deploy preview.
+- Performa: CSS di-inline (`build.inlineStylesheets: "always"`) → LCP mobile (Slow 4G + CPU 4×) 3,0 s → **2,4 s**, CLS 0.
+- Lighthouse mobile, build production: **100/100/100/100** (Accessibility, Best Practices, SEO, Agentic) di /, /about, /projects, detail proyek, /writing, /now, /contact. `/404.html`: SEO 66 karena `noindex` (disengaja).
+- `README.md` (Bahasa Indonesia): cara run, menambah konten, data di `site.ts`, deploy, checklist rilis, daftar sisa sample.
+- 🔑 Sitemap & robots — @astrojs/sitemap filter · astro endpoint robots.txt
+- 🔑 Kartu share link — open graph og:image · twitter summary_large_image
+- 🔑 CSS tanpa request tambahan — astro build.inlineStylesheets · render-blocking resources · largest contentful paint
+
+**Sisa sample (tidak tampil di production):** `now/2026-09.md`, `writing/reading-an-error-message.md`, `writing/what-an-api-is.md`, `timeline.yaml` (2 entri).
+
+**Menunggu user:** akun Netlify (deploy), pilihan analytics F8 (GoatCounter / Cloudflare Web Analytics).

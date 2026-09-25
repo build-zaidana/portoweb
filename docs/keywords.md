@@ -166,6 +166,10 @@
 | `open graph meta tags` | SEO | BaseLayout.astro | 1 |
 | `rel=alternate application/rss+xml` | SEO | BaseLayout | 3 |
 | `og:type article` | SEO | Detail proyek & artikel | 3 |
+| `@astrojs/sitemap` | SEO | astro.config.mjs | 6 |
+| `robots.txt` | SEO | src/pages/robots.txt.ts | 6 |
+| `og:image` | SEO | BaseLayout (public/og-default.png) | 6 |
+| `astro build.inlineStylesheets` | Performance | astro.config.mjs | 6 |
 
 ## Deploy / Tooling
 
@@ -186,4 +190,5 @@
 | `webllm webgpu` | AI | Proyek Quiz from lecture notes | 5 |
 | `structured output json schema` | AI | Proyek Quiz (validasi Zod) | 5 |
 | `netlify functions go` | Deploy | Proyek What your browser sends | 5 |
+| `netlify deploy preview environment` | Deploy | netlify.toml (SHOW_SAMPLES) | 6 |
 
