@@ -55,7 +55,7 @@ const { name, label, size = 24, class: className } = Astro.props;
     {icons[name].map((d) => (
       <>
         {/* Two passes of the same stroke, slightly offset: reads like pen on paper. */}
-        <path d={d} class="pass-1" />
+        <path d={d} />
         <path d={d} class="pass-2" />
       </>
     ))}
@@ -72,10 +72,7 @@ const { name, label, size = 24, class: className } = Astro.props;
     stroke-linejoin: round;
     overflow: visible;
   }
-  .pass-1 {
-    stroke-width: 1.8;
-  }
-  /* Second, thinner pass drawn slightly off the first one, like a quick re-trace with a pen. */
+  /* First pass inherits the 1.8 stroke from the svg. Second, thinner pass drawn slightly off the first one, like a quick re-trace with a pen. */
   .pass-2 {
     stroke-width: 1;
     opacity: 0.6;

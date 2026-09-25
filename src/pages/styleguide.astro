@@ -510,12 +510,16 @@ const sections = [
     margin-block: 0.75rem 2rem;
     color: var(--ink-soft);
   }
-  .sub-title {
-    margin-block: 3rem 1.25rem;
+  /* Small h3s on this page are set in sans, not the display serif. */
+  .sub-title,
+  .group-head h3 {
     font-family: var(--font-sans);
     font-size: var(--text-step-0);
     font-weight: 500;
     letter-spacing: 0;
+  }
+  .sub-title {
+    margin-block: 3rem 1.25rem;
   }
   .empty {
     padding: 1.5rem;
@@ -535,12 +539,6 @@ const sections = [
       grid-template-columns: 14rem minmax(0, 1fr);
       gap: 2rem;
     }
-  }
-  .group-head h3 {
-    font-family: var(--font-sans);
-    font-size: var(--text-step-0);
-    font-weight: 500;
-    letter-spacing: 0;
   }
   .group-head p {
     margin-block-start: 0.375rem;

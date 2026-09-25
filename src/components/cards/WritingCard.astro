@@ -51,7 +51,7 @@ const Heading = `h${headingLevel}` as const;
     --tile: 3.25rem;
     --notch: calc(var(--tile) + 0.5rem);
     --r: var(--radius-lg);
-    --nr: 0.875rem; /* notch corner radius */
+    --nr: var(--radius-md); /* notch corner radius, matches the tile */
 
     /* Light tone uses the calm grey step: a raised white would vanish on --paper, and
        the notch clip rules out a border. */
@@ -70,21 +70,20 @@ const Heading = `h${headingLevel}` as const;
     padding-block-end: calc(var(--notch) + 0.5rem);
     padding-inline-end: calc(var(--notch) * 0.5);
   }
-  .writing-card[data-tone="sage"] {
-    --card-bg: var(--deep-sage);
+  /* Deep tones share the on-deep text colors; only the surface and tile differ. */
+  .writing-card:is([data-tone="sage"], [data-tone="ink"]) {
     --card-fg: var(--on-deep);
     --card-soft: var(--on-deep-soft);
-    --tile-bg: var(--tan);
     --badge-fg: var(--card-soft);
     --badge-line: var(--on-deep-soft);
   }
+  .writing-card[data-tone="sage"] {
+    --card-bg: var(--deep-sage);
+    --tile-bg: var(--tan);
+  }
   .writing-card[data-tone="ink"] {
     --card-bg: var(--deep-ink);
-    --card-fg: var(--on-deep);
-    --card-soft: var(--on-deep-soft);
     --tile-bg: var(--sage);
-    --badge-fg: var(--card-soft);
-    --badge-line: var(--on-deep-soft);
   }
   .writing-card.is-featured {
     min-block-size: 20rem;
