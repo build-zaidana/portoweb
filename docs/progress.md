@@ -182,11 +182,10 @@ User: "ada yang kurang pas", selotip jelek, minta tekstur. Diagnosis 4 masalah �
 User: garis margin di card hero dihapus; warna card proyek "kurang pas"; minta mockup gaya journaling (foto scrapbook).
 - Garis margin vertikal di card hero dihapus, padding kiri = kanan.
 - Mockup (`docs/screenshots/fase-2/mock-*.png`): 4 opsi warna card proyek, strip label di hero, /now bergaya jurnal.
-- User memilih **B · warna = status**: building = sage solid (`--tint-building`), idea = garis putus-putus tanpa isi, shipped = `--deep-sage` (diuji dengan mengganti status di browser; belum ada proyek shipped).
+- User awalnya memilih **B · warna = status** (sudah diterapkan), lalu mengganti ke **A · batu hangat**: semua card `--surface`, warna hanya dari ilustrasi dan chip status. Token `--tint-building` dihapus.
 - **Strip label ketikan** ("Open to remote roles") menggantikan stiker bundar, di pojok kanan atas frame langit. `Sticker.astro` dihapus, `LabelStrip.astro` baru.
 - /now bergaya jurnal **ditolak** → /now di Fase 3 tetap mengikuti gaya situs yang tenang.
-- Kontras pasangan baru lolos (building 10.77/5.17, shipped 8.26/5.40, tape 14.84). Build 0 error, tanpa scroll horizontal di 360/390/1440.
-- 🔑 Warna card mengikuti status proyek — css attribute selector · wcag 1.4.1 use of color · border-style dashed
+- Kontras lolos (teks di `--surface` 11.02/5.29 light, 13.25/6.59 dark; tape 14.84). Build 0 error, tanpa scroll horizontal di 360/390/1440.
+- 🔑 Satu permukaan untuk semua card, warna dari konten — design tokens surface · wcag 1.4.1 use of color
 - 🔑 Huruf timbul yang tidak sejajar — per-character span · text-shadow emboss · seeded PRNG mulberry32
 - 🔑 Nama kelas bentrok dengan utility Tailwind — tailwind grid-column col-* · tailwind utility collision
-

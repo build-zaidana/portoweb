@@ -113,7 +113,7 @@ Warna dipetakan ke utility Tailwind di `global.css` lewat `@theme inline` (`bg-p
 | Aksen teks (link, focus) | `--accent` | `#4a5d44` sage tua | `#aec2a5` sage muda |
 | Aksen permukaan | `--sage` `--sky` `--tan` | `#8b9d83` `#a8c5d6` `#c9a88c` | sama / sedikit lebih terang |
 | Teks di atas isian aksen | `--on-fill` | `#2a2a2a` | `#161915` |
-| Card proyek (warna = status) | `--tint-building` (building), garis putus-putus (idea), `--deep-sage` (shipped) | `#d9e2d2` | `#26301f` |
+| Card proyek | `--surface` (batu hangat, sama untuk semua card; warna dari ilustrasi + chip status) | `#e6e1d7` | `#1f231e` |
 | Tint chip card hero | `--tint-sage/sky/tan` | pastel terang | versi gelap berwarna |
 | Strip label | `--tape` + `--on-tape` | `#1c1c1a` / `#f1efe9` | sama (plastik hitam) |
 | Card tulisan gelap | `--deep-sage`, `--deep-ink` + `--on-deep(-soft)` | `#3e4b39`, `#2a2a2a` | `#33402f`, `#332c25` (selalu lebih terang dari halaman) |
@@ -127,13 +127,9 @@ Sage = aksen utama, sky = pendukung, tan = isian hover yang hangat. **Tidak ada 
 | light | `--ink` | `--paper` | 12.72:1 | ✅ | Body text, headings |
 | light | `--ink-soft` | `--paper` | 6.10:1 | ✅ | Secondary text, meta |
 | light | `--accent` | `--paper` | 6.33:1 | ✅ | Links, focus ring |
-| light | `--ink` | `--surface` | 11.02:1 | ✅ | Text on calm cards |
-| light | `--ink-soft` | `--surface` | 5.29:1 | ✅ | Secondary text on calm cards |
+| light | `--ink` | `--surface` | 11.02:1 | ✅ | Text on calm cards, project cards |
+| light | `--ink-soft` | `--surface` | 5.29:1 | ✅ | Secondary text on calm and project cards |
 | light | `--ink` | `--surface-raised` | 13.99:1 | ✅ | Nav, raised panels |
-| light | `--ink` | `--tint-building` | 10.77:1 | ✅ | Project card (building) |
-| light | `--ink-soft` | `--tint-building` | 5.17:1 | ✅ | Project card meta (building) |
-| light | `--on-deep` | `--deep-sage` | 8.26:1 | ✅ | Project card (shipped) |
-| light | `--on-deep-soft` | `--deep-sage` | 5.40:1 | ✅ | Project card meta (shipped) |
 | light | `--on-tape` | `--tape` | 14.84:1 | ✅ | Label strip (hero) |
 | light | `--ink` | `--tint-sage` | 11.39:1 | ✅ | Hero card chip (sage) |
 | light | `--ink` | `--tint-sky` | 11.73:1 | ✅ | Hero card chip (sky) |
@@ -154,13 +150,9 @@ Sage = aksen utama, sky = pendukung, tan = isian hover yang hangat. **Tidak ada 
 | dark | `--ink` | `--paper` | 14.74:1 | ✅ | Body text, headings |
 | dark | `--ink-soft` | `--paper` | 7.34:1 | ✅ | Secondary text, meta |
 | dark | `--accent` | `--paper` | 9.34:1 | ✅ | Links, focus ring |
-| dark | `--ink` | `--surface` | 13.25:1 | ✅ | Text on calm cards |
-| dark | `--ink-soft` | `--surface` | 6.59:1 | ✅ | Secondary text on calm cards |
+| dark | `--ink` | `--surface` | 13.25:1 | ✅ | Text on calm cards, project cards |
+| dark | `--ink-soft` | `--surface` | 6.59:1 | ✅ | Secondary text on calm and project cards |
 | dark | `--ink` | `--surface-raised` | 11.52:1 | ✅ | Nav, raised panels |
-| dark | `--ink` | `--tint-building` | 11.45:1 | ✅ | Project card (building) |
-| dark | `--ink-soft` | `--tint-building` | 5.70:1 | ✅ | Project card meta (building) |
-| dark | `--on-deep` | `--deep-sage` | 9.11:1 | ✅ | Project card (shipped) |
-| dark | `--on-deep-soft` | `--deep-sage` | 5.37:1 | ✅ | Project card meta (shipped) |
 | dark | `--on-tape` | `--tape` | 14.84:1 | ✅ | Label strip (hero) |
 | dark | `--ink` | `--tint-sage` | 12.29:1 | ✅ | Hero card chip (sage) |
 | dark | `--ink` | `--tint-sky` | 12.83:1 | ✅ | Hero card chip (sky) |
@@ -218,7 +210,7 @@ draft: false # true = tidak tampil di production
 Isi artikel…
 ```
 
-**Proyek baru:** buat `src/content/projects/<slug>.md` dengan field `title`, `summary`, `status` (`idea | building | shipped`), `stack`, `startedAt`, `tint` (`sage | sky | tan`, hanya untuk chip card hero; warna card proyek mengikuti `status`), dan opsional `updatedAt`, `repo`, `demo`, `featured`. Body memakai heading **Problem → Approach → Result → Learnings**.
+**Proyek baru:** buat `src/content/projects/<slug>.md` dengan field `title`, `summary`, `status` (`idea | building | shipped`), `stack`, `startedAt`, `tint` (`sage | sky | tan`, hanya untuk chip card hero; card proyek selalu `--surface`), dan opsional `updatedAt`, `repo`, `demo`, `featured`. Body memakai heading **Problem → Approach → Result → Learnings**.
 
 **Update /now:** buat file baru per bulan `src/content/now/YYYY-MM.md` (field `month`, `learning`, `building`, `reading`). Entri terbaru otomatis menjadi /now.
 
@@ -307,5 +299,5 @@ Card stack **tidak pernah autoplay**. Durasi 150–400ms. `prefers-reduced-motio
 | 015 | Scroll reveal dengan CSS scroll-driven animations | Nol JS, mudah dimatikan, fallback teks penuh | GSAP ScrollTrigger |
 | 016 | Timeline sebagai collection `file()` YAML | Satu file mudah diedit, ikut guard sample | Array di halaman (lolos dari guard) |
 | 017 | Card hero bergaya notebook dengan isi dari field konten | Personal dan spesifik, tapi tetap data-driven (tidak ada klaim hardcoded) | Skeleton generik (terlalu polos), kolase (bertabrakan dengan tumpukan) |
-| 018 | Warna card proyek mengikuti status | Warna punya makna dan jujur (ide tampil sebagai sketsa); status tetap tertulis di chip (WCAG 1.4.1) | Tiga pastel per proyek (kusam, acak), satu warna (datar), kertas notebook (mengulang motif hero), pastel lebih jenuh |
+| 018 | Semua card proyek memakai batu hangat (`--surface`) | Pilihan user setelah mockup: tenang dan disiplin, warna datang dari ilustrasi dan chip status | Tiga pastel per proyek (kusam, acak), warna = status (sempat diterapkan, lalu diganti), kertas notebook (mengulang motif hero), pastel lebih jenuh |
 | 019 | Strip label ketikan menggantikan stiker bundar di hero | Lebih khas dan terbaca; diambil dari referensi journaling tanpa membawa gaya scrapbook | Stiker bundar, /now bergaya jurnal (ditolak user: terlalu ramai) |

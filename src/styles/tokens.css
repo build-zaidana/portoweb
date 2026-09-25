@@ -50,9 +50,6 @@
   --tint-sage: light-dark(#e1e7dc, #222a20);
   --tint-sky: light-dark(#dfeaf0, #1e2626); /* dark: teal-grey, kept away from navy */
   --tint-tan: light-dark(#efe4d8, #2b241e);
-  /* Project cards: color follows status. Building = this solid sage; idea = dashed outline
-     on the page (a sketch, not built yet); shipped = --deep-sage. */
-  --tint-building: light-dark(#d9e2d2, #26301f);
 
   /* ── Label-maker tape (hero strip): black plastic in both modes ── */
   --tape: light-dark(#1c1c1a, #1c1c1a);

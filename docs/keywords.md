@@ -67,8 +67,6 @@
 | `css radial-gradient pattern` | CSS | HeroStack (kertas dot-grid) | 2 |
 | `multiple backgrounds` | CSS | HeroStack (garis margin + titik + kertas) | 2 |
 | `css cascade source order` | CSS | HeroCardFace, about (bug urutan @media) | 2 |
-| `css attribute selector` | CSS | ProjectCard (warna per status) | 2 |
-| `border-style dashed` | CSS | ProjectCard (idea = sketsa) | 2 |
 | `text-shadow emboss` | CSS | LabelStrip | 2 |
 | `tailwind grid-column col-*` | Tailwind | Konvensi nama kelas (bentrok) | 2 |
 
@@ -111,7 +109,7 @@
 | `aria-live polite` | A11y | Hero phrase | 2 |
 | `wcag 4.1.3 status messages` | A11y | Hero phrase | 2 |
 | `sr-only opens in a new tab` | A11y | Hero proof link | 2 |
-| `wcag 1.4.1 use of color` | A11y | ProjectCard (status tetap tertulis) | 2 |
+| `wcag 1.4.1 use of color` | A11y | StatusChip (status tertulis, titik warna hanya pendukung) | 2 |
 | `aria-hidden per-character span` | A11y | LabelStrip (teks dibaca sekali lewat sr-only) | 2 |
 
 ## Animation
