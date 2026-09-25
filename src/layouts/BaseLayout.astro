@@ -17,7 +17,7 @@ interface Props {
   /** Page title without the site name. Omit on the home page. */
   title?: string;
   description?: string;
-  /** Absolute or root-relative OG image. Added for every page in Phase 6. */
+  /** Absolute or root-relative OG image. Defaults to the site card (public/og-default.png, 1200×630). */
   image?: string;
   /** Keep utility pages (e.g. /styleguide) out of search results. */
   noindex?: boolean;
@@ -37,7 +37,7 @@ const {
 } = Astro.props;
 const fullTitle = title ? `${title} · ${site.name}` : site.title;
 const canonical = new URL(Astro.url.pathname, Astro.site);
-const ogImage = image ? new URL(image, Astro.site).href : undefined;
+const ogImage = new URL(image ?? site.ogImage, Astro.site).href;
 ---
 
 <!doctype html>
@@ -58,13 +58,18 @@ const ogImage = image ? new URL(image, Astro.site).href : undefined;
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content="en_US" />
-    {ogImage && <meta property="og:image" content={ogImage} />}
-    <meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${site.name}: learning to build software that helps people`} />
+    <meta name="twitter:card" content="summary_large_image" />
 
     <!-- Browser UI color follows the page surface in each mode. -->
     <meta name="theme-color" content="#f3f2ee" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#161915" media="(prefers-color-scheme: dark)" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="alternate" type="application/rss+xml" title={`${site.name} · Writing`} href="/rss.xml" />
     <meta name="generator" content={Astro.generator} />
 

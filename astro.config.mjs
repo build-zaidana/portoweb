@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig, envField, fontProviders } from "astro/config";
+import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 
 import { sampleReport } from "./integrations/sample-report.ts";
@@ -9,7 +10,13 @@ export default defineConfig({
   // Temporary free subdomain until a custom domain is bought (PRD §10).
   site: "https://zaidana.netlify.app",
 
-  integrations: [sampleReport()],
+  integrations: [
+    sampleReport(),
+    // Utility pages stay out of search: the styleguide and the no-JS form landing page.
+    sitemap({
+      filter: (page) => !/\/(styleguide|contact\/thanks)\/?$/.test(new URL(page).pathname),
+    }),
+  ],
 
   // Code blocks use the css-variables theme, so their colors are our tokens
   // (--astro-code-* in tokens.css) and switch with light/dark like everything else.

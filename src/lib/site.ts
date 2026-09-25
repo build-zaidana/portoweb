@@ -5,7 +5,7 @@ export const site = {
   description:
     "Software Engineering student learning fullstack and AI in public. Open to remote internships and junior roles.",
   locale: "en",
-  /** Open Graph fallback image, relative to /public. Replaced with a generated image in Phase 6. */
+  /** Open Graph image for every page, relative to /public (rendered from the site's own components, 1200×630). */
   ogImage: "/og-default.png",
 } as const;
 
