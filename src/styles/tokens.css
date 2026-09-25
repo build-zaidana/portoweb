@@ -66,6 +66,9 @@
   --star: light-dark(transparent, rgb(236 234 228 / 0.85));
   --star-grid: light-dark(transparent, rgb(236 234 228 / 0.16));
 
+  /* ── Code: type names and numbers in highlighted snippets (keywords use --accent) ── */
+  --code-type: light-dark(#8a5a35, #d6bca5);
+
   /* ── Lines & states ───────────────────────────────────────── */
   --line: light-dark(rgb(42 42 42 / 0.12), rgb(236 234 228 / 0.1));
   --line-strong: light-dark(rgb(42 42 42 / 0.22), rgb(236 234 228 / 0.2));
@@ -112,6 +115,8 @@
   --font-display: var(--font-instrument-serif), "Iowan Old Style", Georgia, serif;
   --font-sans: var(--font-general-sans), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  /* Handwritten margin notes only (never body text or UI labels). */
+  --font-hand: var(--font-caveat), "Segoe Print", cursive;
 
   /* Body steps ~1.2 ratio; display steps jump harder and are fluid. */
   --text-step--1: 0.875rem; /* 14px — captions, meta */

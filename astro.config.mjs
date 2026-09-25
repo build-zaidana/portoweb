@@ -41,6 +41,16 @@ export default defineConfig({
       fallbacks: ["sans-serif"],
     },
     {
+      // Handwriting for margin notes on the hero cards (Gate 2 decision). One weight only.
+      provider: fontProviders.fontsource(),
+      name: "Caveat",
+      cssVariable: "--font-caveat",
+      weights: [600],
+      styles: ["normal"],
+      subsets: ["latin"],
+      fallbacks: ["cursive"],
+    },
+    {
       provider: fontProviders.fontsource(),
       name: "JetBrains Mono",
       cssVariable: "--font-jetbrains-mono",
