@@ -1,0 +1,612 @@
+---
+/**
+ * Hero card stack (wabi.ai reference, the ⭐ in docs/references/README.md).
+ *
+ * - Swipe/drag the front card, use the buttons, or ← → keys. It never moves on its own.
+ * - The swiped card is tossed aside and tucks in at the back; the rest step forward on a spring.
+ * - The phrase under the headline ([data-hero-phrase]) follows the front card and is announced
+ *   politely to screen readers.
+ * - Opening moment: on first paint the cards are dealt into place one after another.
+ * - Reduced motion: no deal-in, no 3D tilt, cards swap instantly.
+ * - Without JS: the front card is a normal link, the rest sit behind it.
+ */
+import type { HeroCard } from "../../lib/hero";
+import ProjectArt from "../cards/ProjectArt.astro";
+import SampleBadge from "../ui/SampleBadge.astro";
+import SketchIcon, { type IconName } from "../ui/SketchIcon.astro";
+
+interface Props {
+  cards: HeroCard[];
+}
+
+const { cards } = Astro.props;
+const total = cards.length;
+const miniCode = "const last = <T,>(list: T[]) =>\n  list.at(-1);";
+
+const kindLabel: Record<HeroCard["kind"], { text: string; icon: IconName }> = {
+  project: { text: "Building", icon: "build" },
+  learning: { text: "Learning", icon: "book" },
+  writing: { text: "Writing", icon: "spark" },
+  site: { text: "This site", icon: "cloud" },
+};
+---
+
+<section
+  class="stack"
+  data-hero-stack
+  aria-roledescription="carousel"
+  aria-label="What I'm working on"
+  style={`--total: ${total}`}
+>
+  <div class="deck">
+    {cards.map((card, i) => (
+      <article
+        class="card"
+        data-tint={card.tint}
+        data-kind={card.kind}
+        data-pos={Math.min(i, 3)}
+        data-verb={card.verb}
+        data-phrase={card.phrase}
+        role="group"
+        aria-roledescription="slide"
+        aria-label={`${i + 1} of ${total}`}
+        aria-hidden={i === 0 ? undefined : "true"}
+        inert={i !== 0}
+      >
+        <div class="top">
+          <span class="kind">
+            <SketchIcon name={kindLabel[card.kind].icon} size={16} />
+            {kindLabel[card.kind].text}
+          </span>
+          {card.sample && <SampleBadge />}
+        </div>
+        <h2 class="title">
+          <a
+            href={card.href}
+            class="card-link"
+            draggable="false"
+            {...(card.external ? { target: "_blank", rel: "noopener" } : {})}
+          >
+            {card.title}
+          </a>
+        </h2>
+        <p class="body">{card.body}</p>
+        <p class="meta">{card.meta}</p>
+
+        <div class="art">
+          {card.kind === "project" && card.art && <ProjectArt variant={card.art} />}
+          {card.kind === "learning" && (
+            // set:text keeps formatters from adding whitespace inside <pre>.
+            <pre class="mini-code" aria-hidden="true" set:text={miniCode} />
+          )}
+          {card.kind === "writing" && (
+            <div class="mini-page" aria-hidden="true">
+              <span class="w-90" />
+              <span class="w-70" />
+              <span class="w-80" />
+              <span class="w-40" />
+            </div>
+          )}
+          {card.kind === "site" && (
+            <div class="mini-site" aria-hidden="true">
+              <span class="mini-nav" />
+              <span class="mini-word">Zaidana</span>
+              <span class="mini-line" />
+            </div>
+          )}
+        </div>
+      </article>
+    ))}
+  </div>
+
+  {total > 1 && (
+    <div class="controls">
+      <button type="button" class="control" data-stack-prev aria-label="Previous card">
+        <SketchIcon name="arrow" size={20} class="flip" />
+      </button>
+      <div class="progress" aria-hidden="true">
+        {cards.map((_, i) => (
+          <span class:list={["segment", { "is-active": i === 0 }]} />
+        ))}
+      </div>
+      <button type="button" class="control" data-stack-next aria-label="Next card">
+        <SketchIcon name="arrow" size={20} />
+      </button>
+    </div>
+  )}
+</section>
+
+<script>
+  const EXIT_MS = 200;
+  const DRAG_THRESHOLD = 80;
+
+  function setupStack(root: HTMLElement) {
+    if (root.dataset.bound) return;
+    root.dataset.bound = "true";
+
+    const cards = Array.from(root.querySelectorAll<HTMLElement>(".card"));
+    const segments = Array.from(root.querySelectorAll<HTMLElement>(".segment"));
+    const phrase = document.querySelector<HTMLElement>("[data-hero-phrase]");
+    const reduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let order = cards.map((_, i) => i); // order[0] is the front card
+    let busy = false;
+
+    function render() {
+      order.forEach((cardIndex, pos) => {
+        const card = cards[cardIndex];
+        if (!card) return;
+        card.dataset.pos = String(Math.min(pos, 3));
+        const isFront = pos === 0;
+        card.inert = !isFront;
+        if (isFront) card.removeAttribute("aria-hidden");
+        else card.setAttribute("aria-hidden", "true");
+      });
+      const front = cards[order[0] ?? 0];
+      segments.forEach((segment, i) => segment.classList.toggle("is-active", i === order[0]));
+      if (front && phrase) updatePhrase(front.dataset.verb ?? "building", front.dataset.phrase ?? "");
+    }
+
+    function updatePhrase(verb: string, text: string) {
+      if (!phrase) return;
+      const verbEl = phrase.querySelector<HTMLElement>("[data-phrase-verb]");
+      const textEl = phrase.querySelector<HTMLElement>("[data-phrase-text]");
+      if (!verbEl || !textEl || textEl.textContent === text) return;
+      const swap = () => {
+        verbEl.textContent = verb === "writing" ? "writing about" : verb;
+        textEl.textContent = text;
+      };
+      if (reduceMotion()) {
+        swap();
+        return;
+      }
+      phrase.classList.add("is-changing");
+      window.setTimeout(() => {
+        swap();
+        phrase.classList.remove("is-changing");
+      }, 160);
+    }
+
+    function step(direction: 1 | -1, fromDrag = false) {
+      if (busy || cards.length < 2) return;
+      if (reduceMotion()) {
+        order = direction === 1 ? [...order.slice(1), order[0]!] : [order.at(-1)!, ...order.slice(0, -1)];
+        render();
+        return;
+      }
+      busy = true;
+      if (direction === 1) {
+        // Toss the front card aside, then tuck it in at the back while the others step forward.
+        const front = cards[order[0]!]!;
+        front.dataset.pos = "exit";
+        window.setTimeout(
+          () => {
+            front.style.removeProperty("--drag-x");
+            front.style.removeProperty("--drag-r");
+            order = [...order.slice(1), order[0]!];
+            render();
+            busy = false;
+          },
+          fromDrag ? EXIT_MS * 0.6 : EXIT_MS,
+        );
+      } else {
+        // Bring the back card round to the front: start it off to the side, then settle.
+        const backIndex = order.at(-1)!;
+        const back = cards[backIndex]!;
+        back.classList.add("no-transition");
+        back.dataset.pos = "enter";
+        void back.offsetWidth; // commit the start position before animating
+        back.classList.remove("no-transition");
+        order = [backIndex, ...order.slice(0, -1)];
+        render();
+        window.setTimeout(() => (busy = false), EXIT_MS);
+      }
+    }
+
+    root.querySelector("[data-stack-next]")?.addEventListener("click", () => step(1));
+    root.querySelector("[data-stack-prev]")?.addEventListener("click", () => step(-1));
+    root.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowRight") step(1);
+      if (event.key === "ArrowLeft") step(-1);
+    });
+
+    // ── Drag / swipe the front card ─────────────────────────────
+    let startX = 0;
+    let startY = 0;
+    let dx = 0;
+    let startTime = 0;
+    let dragging: HTMLElement | null = null;
+    let moved = false;
+
+    root.addEventListener("pointerdown", (event) => {
+      const card = (event.target as Element).closest<HTMLElement>(".card");
+      if (!card || card.dataset.pos !== "0" || busy || event.button !== 0) return;
+      dragging = card;
+      moved = false;
+      startX = event.clientX;
+      startY = event.clientY;
+      startTime = performance.now();
+      dx = 0;
+      card.setPointerCapture(event.pointerId);
+      card.classList.add("is-dragging");
+    });
+
+    root.addEventListener("pointermove", (event) => {
+      if (!dragging) return;
+      dx = event.clientX - startX;
+      const dy = event.clientY - startY;
+      if (!moved && Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(dy)) moved = true;
+      if (!moved) return;
+      dragging.style.setProperty("--drag-x", `${dx}px`);
+      dragging.style.setProperty("--drag-r", `${dx * 0.05}deg`);
+    });
+
+    const endDrag = () => {
+      if (!dragging) return;
+      const card = dragging;
+      dragging = null;
+      card.classList.remove("is-dragging");
+      const velocity = Math.abs(dx) / Math.max(1, performance.now() - startTime);
+      if (moved && (Math.abs(dx) > DRAG_THRESHOLD || velocity > 0.6)) {
+        card.style.setProperty("--toss", dx > 0 ? "1" : "-1");
+        step(1, true);
+      } else {
+        card.style.removeProperty("--drag-x");
+        card.style.removeProperty("--drag-r");
+      }
+    };
+    root.addEventListener("pointerup", endDrag);
+    root.addEventListener("pointercancel", endDrag);
+
+    // A drag must not also follow the card's link.
+    root.addEventListener(
+      "click",
+      (event) => {
+        if (moved && (event.target as Element).closest(".card-link")) {
+          event.preventDefault();
+          moved = false;
+        }
+      },
+      true,
+    );
+
+    render();
+    // Opening moment: deal the cards in on the next frame (CSS handles the stagger).
+    requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add("is-ready")));
+    window.setTimeout(() => root.classList.add("is-settled"), 1200);
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    document.querySelectorAll<HTMLElement>("[data-hero-stack]").forEach(setupStack);
+  });
+</script>
+
+<style>
+  .stack {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 1.5rem;
+  }
+
+  /* ── Deck: a slightly tilted hand of cards (perspective 1200px, measured on wabi.ai) ── */
+  .deck {
+    position: relative;
+    inline-size: min(100%, 20rem);
+    aspect-ratio: 3 / 4.1;
+    perspective: 1200px;
+    transform-style: preserve-3d;
+    touch-action: pan-y; /* horizontal swipes belong to the stack, vertical scroll to the page */
+  }
+
+  .card {
+    --drag-x: 0px;
+    --drag-r: 0deg;
+    --toss: -1;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: 1.25rem 1.25rem 0;
+    border-radius: 1.5rem;
+    background-color: var(--card-tint, var(--tint-sage));
+    border: 1px solid var(--line);
+    box-shadow:
+      0 1px 2px var(--shadow-tint),
+      0 24px 48px -24px var(--shadow-tint);
+    overflow: hidden;
+    user-select: none;
+    cursor: grab;
+    will-change: transform;
+    transform-origin: 50% 85%;
+    transition:
+      transform var(--dur-4) var(--ease-spring),
+      opacity var(--dur-2) var(--ease-out);
+  }
+  .card[data-tint="sky"] {
+    --card-tint: var(--tint-sky);
+  }
+  .card[data-tint="tan"] {
+    --card-tint: var(--tint-tan);
+  }
+
+  /* Positions in the hand. Deeper cards are smaller, rotate the other way, and sit behind. */
+  .card[data-pos="0"] {
+    z-index: 4;
+    transform: translate3d(var(--drag-x), 0, 0) rotate(calc(-3deg + var(--drag-r)));
+  }
+  .card[data-pos="1"] {
+    z-index: 3;
+    transform: translate3d(1.4rem, -0.7rem, -40px) rotate(3deg) scale(0.94);
+  }
+  .card[data-pos="2"] {
+    z-index: 2;
+    transform: translate3d(2.6rem, -1.3rem, -80px) rotate(8deg) scale(0.88);
+  }
+  .card[data-pos="3"] {
+    z-index: 1;
+    opacity: 0;
+    transform: translate3d(3.2rem, -1.6rem, -120px) rotate(11deg) scale(0.84);
+  }
+  /* Tossed: flies out to the side it was swiped toward, fast and ease-in. */
+  .card[data-pos="exit"] {
+    z-index: 5;
+    opacity: 0;
+    transform: translate3d(calc(var(--toss) * 120%), 1.5rem, 0) rotate(calc(var(--toss) * 16deg));
+    transition:
+      transform 200ms cubic-bezier(0.4, 0, 1, 1),
+      opacity 200ms cubic-bezier(0.4, 0, 1, 1);
+  }
+  /* Start position for a card brought back to the front with "Previous". */
+  .card[data-pos="enter"] {
+    z-index: 5;
+    opacity: 0;
+    transform: translate3d(-110%, 1rem, 0) rotate(-14deg);
+  }
+  .card.is-dragging {
+    cursor: grabbing;
+    transition: none;
+  }
+  .card.no-transition {
+    transition: none;
+  }
+
+  /* Press feedback on the front card (only for pointer devices). */
+  @media (hover: hover) {
+    .card[data-pos="0"]:hover {
+      transform: translate3d(var(--drag-x), -4px, 0) rotate(calc(-2deg + var(--drag-r)));
+    }
+  }
+
+  /* ── Opening moment: deal the cards in once. Only when JS runs, never with reduced motion. ── */
+  @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+    .stack:not(.is-ready) .card {
+      opacity: 0;
+      transform: translate3d(0, 3rem, 0) rotate(0deg) scale(0.96);
+    }
+    .stack.is-ready:not(.is-settled) .card[data-pos="0"] {
+      transition-delay: 300ms;
+    }
+    .stack.is-ready:not(.is-settled) .card[data-pos="1"] {
+      transition-delay: 220ms;
+    }
+    .stack.is-ready:not(.is-settled) .card[data-pos="2"] {
+      transition-delay: 140ms;
+    }
+  }
+
+  /* ── Card content ───────────────────────────────────────── */
+  .top {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .kind {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.6rem 0.25rem 0.45rem;
+    border-radius: 999px;
+    background-color: color-mix(in oklab, var(--surface-raised) 80%, transparent);
+    font-size: var(--text-step--1);
+    font-weight: 500;
+  }
+  .title {
+    margin-block-start: 0.35rem;
+    font-size: var(--text-step-2);
+    line-height: var(--text-step-2--line-height);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .card-link {
+    color: inherit;
+    text-decoration: none;
+    -webkit-user-drag: none;
+  }
+  /* The front card is one big link; its focus ring goes around the card. */
+  .card-link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+  .card-link:focus-visible {
+    outline: none;
+  }
+  .card:has(.card-link:focus-visible) {
+    outline: 2px solid var(--focus);
+    outline-offset: 4px;
+  }
+  .body {
+    color: var(--ink-soft);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .meta {
+    font-size: var(--text-step--1);
+    color: var(--ink-soft);
+  }
+
+  .art {
+    position: relative;
+    flex: 1;
+    min-block-size: 6rem;
+    margin-inline: -1.25rem;
+  }
+  .art :global(.art) {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+  }
+  .mini-code {
+    position: absolute;
+    inset: 1rem 1.25rem auto;
+    padding: 0.9rem 1rem 2rem;
+    border-radius: var(--radius-md);
+    background-color: var(--surface-raised);
+    border: 1px solid var(--line);
+    font-size: 0.75rem;
+    line-height: 1.6;
+    rotate: -2deg;
+    white-space: pre;
+    overflow: hidden;
+  }
+  .mini-page {
+    position: absolute;
+    inset: 1rem 1.5rem -1rem;
+    display: grid;
+    align-content: start;
+    gap: 0.6rem;
+    padding: 1.1rem;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    background-color: var(--surface-raised);
+    border: 1px solid var(--line);
+    rotate: 2deg;
+  }
+  .mini-page span,
+  .mini-line {
+    display: block;
+    block-size: 0.45rem;
+    border-radius: 999px;
+    background-color: var(--line-strong);
+  }
+  .w-40 {
+    inline-size: 40%;
+  }
+  .w-70 {
+    inline-size: 70%;
+  }
+  .w-80 {
+    inline-size: 80%;
+  }
+  .w-90 {
+    inline-size: 90%;
+  }
+  .mini-site {
+    position: absolute;
+    inset: 1rem 1.25rem -1rem;
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: 0.7rem;
+    padding: 0.9rem 1rem;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    background-color: var(--paper);
+    border: 1px solid var(--line);
+    rotate: -2deg;
+  }
+  .mini-nav {
+    justify-self: center;
+    inline-size: 55%;
+    block-size: 0.9rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+  }
+  .mini-word {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    line-height: 1;
+  }
+  .mini-line {
+    inline-size: 70%;
+  }
+
+  /* ── Controls (origin-style: prev · progress · next) ───────── */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .control {
+    display: grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    color: var(--ink);
+    background-color: color-mix(in oklab, var(--surface-raised) 70%, transparent);
+    transition:
+      background-color var(--dur-2) var(--ease-out),
+      border-color var(--dur-2) var(--ease-out),
+      transform var(--dur-4) var(--ease-spring);
+  }
+  .control :global(.flip) {
+    rotate: 180deg;
+  }
+  @media (hover: hover) {
+    .control:hover {
+      border-color: var(--ink);
+      background-color: var(--surface-raised);
+      transform: translateY(-2px);
+    }
+  }
+  .control:active {
+    transform: scale(0.94);
+    transition-duration: var(--dur-1);
+  }
+  .progress {
+    display: flex;
+    gap: 0.35rem;
+  }
+  .segment {
+    inline-size: 1.25rem;
+    block-size: 3px;
+    border-radius: 999px;
+    background-color: var(--line-strong);
+    transition:
+      background-color var(--dur-3) var(--ease-out),
+      inline-size var(--dur-4) var(--ease-spring);
+  }
+  .segment.is-active {
+    inline-size: 2.25rem;
+    background-color: var(--ink);
+  }
+
+  @media (min-width: 64rem) {
+    .deck {
+      inline-size: 21.5rem;
+    }
+  }
+
+  /* Reduced motion: no tilt, no travel. Cards still swap and the phrase still updates. */
+  @media (prefers-reduced-motion: reduce) {
+    .card {
+      transition: none;
+    }
+    .card[data-pos="0"],
+    .card[data-pos="0"]:hover {
+      transform: rotate(-2deg);
+    }
+    .control:hover,
+    .control:active {
+      transform: none;
+    }
+  }
+</style>

@@ -1,0 +1,75 @@
+---
+/**
+ * Progressive blur at the end of a preview list (cosmos.so reference).
+ * The bottom of the content gets blurrier AND fades into the page, step by step,
+ * instead of being cut off. The `action` slot (a "See all" button) sits on top.
+ *
+ * Three stacked backdrop-filter layers with growing blur, each masked to a lower band,
+ * approximate a smooth blur ramp. Only the overlay is non-interactive; the action stays clickable.
+ */
+interface Props {
+  /** Height of the fading band, e.g. "45%" or "14rem". */
+  height?: string;
+  class?: string;
+}
+const { height = "42%", class: className } = Astro.props;
+---
+
+<div class:list={["fade-wrap", className]} style={`--fade-h: ${height}`}>
+  <slot />
+  <div class="fade" aria-hidden="true">
+    <span class="layer l1"></span>
+    <span class="layer l2"></span>
+    <span class="layer l3"></span>
+    <span class="tint"></span>
+  </div>
+  {Astro.slots.has("action") && (
+    <div class="action">
+      <slot name="action" />
+    </div>
+  )}
+</div>
+
+<style>
+  .fade-wrap {
+    position: relative;
+  }
+  .fade {
+    position: absolute;
+    inset: auto 0 0;
+    block-size: var(--fade-h);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .layer,
+  .tint {
+    position: absolute;
+    inset: 0;
+  }
+  .l1 {
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 30%);
+  }
+  .l2 {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    mask-image: linear-gradient(to bottom, transparent 30%, #000 65%);
+  }
+  .l3 {
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    mask-image: linear-gradient(to bottom, transparent 55%, #000 90%);
+  }
+  /* Finally fade into the page color so the edge disappears. */
+  .tint {
+    background: linear-gradient(to bottom, transparent 20%, var(--paper) 96%);
+  }
+  .action {
+    position: absolute;
+    inset: auto 0 1.75rem;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+  }
+</style>

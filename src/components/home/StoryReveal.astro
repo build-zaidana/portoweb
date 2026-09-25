@@ -1,0 +1,89 @@
+---
+/**
+ * The one scroll text reveal on the site (lovi.care reference, approved in CLAUDE.md).
+ * Words start faint and fill in with ink as the reader scrolls: the reader drives it,
+ * nothing plays on its own. Max 3 inline sketch icons.
+ *
+ * Built with CSS scroll-driven animations (animation-timeline: view()):
+ * - each word gets --k (its position from 0 to 1) and reveals over its own slice of the scroll;
+ * - no JS; browsers without support, and reduced motion, just show the full paragraph.
+ * The faint state is only "before read": every word ends at full ink contrast.
+ */
+import SketchIcon, { type IconName } from "../ui/SketchIcon.astro";
+
+type Part = string | { icon: IconName };
+
+interface Props {
+  parts: Part[];
+  class?: string;
+}
+
+const { parts, class: className } = Astro.props;
+const icons = parts.filter((p) => typeof p !== "string");
+if (icons.length > 3) throw new Error("StoryReveal: max 3 inline icons (CLAUDE.md, lovi limits).");
+
+type Token = { kind: "word"; text: string } | { kind: "icon"; name: IconName };
+const tokens: Token[] = parts.flatMap((part): Token[] =>
+  typeof part === "string"
+    ? part
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((text) => ({ kind: "word", text }))
+    : [{ kind: "icon", name: part.icon }],
+);
+const last = Math.max(1, tokens.length - 1);
+---
+
+<p class:list={["story", className]}>
+  {tokens.map((token, i) => (
+    <>
+      <span class:list={["t", token.kind === "icon" && "icon"]} style={`--k: ${(i / last).toFixed(3)}`}>
+        {token.kind === "word" ? token.text : <SketchIcon name={token.name} size={36} />}
+      </span>{" "}
+    </>
+  ))}
+</p>
+
+<style>
+  .story {
+    view-timeline-name: --story;
+    font-family: var(--font-sans);
+    font-size: clamp(1.625rem, 1.1rem + 2.1vw, 2.75rem);
+    font-weight: 500;
+    line-height: 1.22;
+    letter-spacing: -0.015em;
+    text-wrap: pretty;
+  }
+  .icon {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 1.15em;
+    block-size: 1em;
+    vertical-align: -0.12em;
+    color: var(--accent);
+  }
+  .icon :global(svg) {
+    inline-size: 1.05em;
+    block-size: 1.05em;
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .t {
+        animation: story-ink linear both;
+        animation-timeline: --story;
+        /* Word k fills during its own slice of the scroll. The last word is done at cover 46%,
+           i.e. just before the paragraph reaches the middle of the screen (reading position). */
+        animation-range: cover calc(10% + var(--k) * 30%) cover calc(16% + var(--k) * 30%);
+      }
+    }
+  }
+  @keyframes story-ink {
+    from {
+      opacity: 0.18;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+</style>
