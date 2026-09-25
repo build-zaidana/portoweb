@@ -19,6 +19,7 @@ import SketchIcon from "../components/ui/SketchIcon.astro";
 import { getHeroCards } from "../lib/hero";
 import { getLatestNow, getProjects, getWriting } from "../lib/content";
 import { formatMonth, isoDate } from "../lib/format";
+import { siteProgress } from "../lib/site";
 
 const [heroCards, projects, writing, now] = await Promise.all([
   getHeroCards(),
@@ -112,18 +113,12 @@ const tones = ["sage", "ink"] as const;
             </Fragment>
             <h3>{now.data.building[0]}</h3>
             <div slot="art" class="mini-list" aria-hidden="true">
-              <span class="mini-row">
-                <i class="done" />
-                Foundations
-              </span>
-              <span class="mini-row">
-                <i class="done" />
-                Home and About
-              </span>
-              <span class="mini-row">
-                <i />
-                Projects and writing
-              </span>
+              {siteProgress.map((step) => (
+                <span class="mini-row">
+                  <i class:list={{ done: step.done }} />
+                  {step.label}
+                </span>
+              ))}
             </div>
           </CalmCard>
         )}

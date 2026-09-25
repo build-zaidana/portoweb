@@ -5,7 +5,7 @@
  */
 import { getLatestNow, getProjects, getWriting } from "./content";
 import { formatDate, formatMonth } from "./format";
-import { profile } from "./site";
+import { profile, siteProgress } from "./site";
 
 /** Verb in the hero sentence. Projects pick theirs from their status, so an idea is never "being built". */
 export type HeroVerb = "planning" | "building" | "improving" | "learning" | "writing about";
@@ -23,25 +23,31 @@ export interface Highlighted {
 }
 
 /**
- * First real paragraph of a Markdown body (skips quotes, headings, code, lists),
- * as plain text, optionally split around `highlight`.
+ * Opening text of a Markdown body as plain text: the first real paragraphs (skips quotes,
+ * headings, code, lists) joined up to `max` characters, optionally split around `highlight`.
  */
 export function excerpt(
   markdown: string | undefined,
   highlight?: string,
-  max = 190,
+  max = 300,
 ): Highlighted | undefined {
-  const paragraph = (markdown ?? "")
+  const blocks = (markdown ?? "")
     .split(/\r?\n\s*\r?\n/)
     .map((block) => block.trim())
-    .find((block) => block && !/^(>|#|```|[-*] |\d+\. )/.test(block));
-  if (!paragraph) return undefined;
-  let text = paragraph
+    .filter((block) => block && !/^(>|#|```|[-*] |\d+\. )/.test(block));
+  if (blocks.length === 0) return undefined;
+  let text = "";
+  for (const block of blocks) {
+    if (text.length >= max) break;
+    text = text ? `${text} ${block}` : block;
+  }
+  text = text
     .replace(/`([^`]+)`/g, "$1")
     .replace(/\*\*?([^*]+)\*\*?/g, "$1")
     .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
     .replace(/\s+/g, " ");
-  if (text.length > max) text = `${text.slice(0, max).replace(/\s+\S*$/, "")}…`;
+  // Cut at a word boundary and drop trailing punctuation so we never print "word.…".
+  if (text.length > max) text = `${text.slice(0, max).replace(/\s+\S*$/, "").replace(/[\s.,;:!?]+$/, "")}…`;
   const at = highlight ? text.indexOf(highlight) : -1;
   if (!highlight || at < 0) return { before: text, mark: "", after: "" };
   return { before: text.slice(0, at), mark: highlight, after: text.slice(at + highlight.length) };
@@ -67,6 +73,8 @@ export interface HeroCard {
   page?: Highlighted;
   /** Learning cards: a few lines of real code from this month. */
   snippet?: string;
+  /** A short checklist drawn in the card (site progress, other things being learned). */
+  checklist?: { label: string; done: boolean }[];
   sample: boolean;
 }
 
@@ -107,6 +115,7 @@ export async function getHeroCards(): Promise<HeroCard[]> {
       tint: "sage",
       note: now.data.heroNote,
       snippet: now.data.snippet,
+      checklist: now.data.learning.slice(1, 3).map((item) => ({ label: `Also: ${item}`, done: false })),
       sample: now.data.sample,
     });
   }
@@ -142,6 +151,7 @@ export async function getHeroCards(): Promise<HeroCard[]> {
     external: true,
     tint: "sky",
     note: "you are here",
+    checklist: [...siteProgress],
     sample: false,
   });
 

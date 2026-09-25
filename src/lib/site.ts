@@ -25,6 +25,13 @@ export const profile = {
   cv: { href: "/cv-placeholder.pdf", placeholder: true },
 } as const;
 
+/** Real progress of this website, phase by phase (update at every gate). Shown on Home. */
+export const siteProgress: readonly { label: string; done: boolean }[] = [
+  { label: "Foundations", done: true },
+  { label: "Home and About", done: true },
+  { label: "Projects and writing", done: false },
+];
+
 export interface NavItem {
   label: string;
   href: string;

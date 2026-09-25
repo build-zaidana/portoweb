@@ -1,9 +1,10 @@
 ---
 /**
- * The inside of one hero card, "notebook" style (Gate 2 decision, option 1):
- * washi tape on top, light paper grain, content that is specific to the entry
- * (a mini quiz, real code, the article's first lines with a highlighter mark,
- * a tiny copy of this site) and a handwritten margin note.
+ * The inside of one hero card, "notebook" style (Gate 2 decision, option 1, revised):
+ * a page of dot-grid notebook paper (texture and margin line live on the card in HeroStack),
+ * with content specific to the entry pasted in like printouts (a mini quiz, real code,
+ * the article's first lines with a highlighter mark, a tiny copy of this site),
+ * a short checklist where it helps, and a handwritten margin note.
  *
  * HeroStack owns position, motion and accessibility; this component only draws the face.
  */
@@ -14,11 +15,9 @@ import SketchIcon, { type IconName } from "../ui/SketchIcon.astro";
 
 interface Props {
   card: HeroCard;
-  /** Position in the deck, used to vary tape color and angle. */
-  index: number;
 }
 
-const { card, index } = Astro.props;
+const { card } = Astro.props;
 
 const kindLabel: Record<HeroCard["kind"], { text: string; icon: IconName }> = {
   project: { text: "Building", icon: "build" },
@@ -26,10 +25,6 @@ const kindLabel: Record<HeroCard["kind"], { text: string; icon: IconName }> = {
   writing: { text: "Writing", icon: "spark" },
   site: { text: "This site", icon: "cloud" },
 };
-
-/** Tape contrasts with the card: tan on sky, sky on sage, sage on tan. */
-const tapeFor = { sky: "tan", sage: "sky", tan: "sage" } as const;
-const tapeAngle = [-5, 4, -3, 6][index % 4];
 
 /** Tiny, dependency-free TypeScript highlighter for a few lines of code. */
 function highlight(code: string): string {
@@ -44,12 +39,6 @@ function highlight(code: string): string {
     .replace(/\b([a-z_]\w*)(?=\()/g, '<span class="f">$1</span>');
 }
 ---
-
-<span
-  class="tape"
-  style={`--tape: var(--${tapeFor[card.tint]}); --tape-r: ${tapeAngle}deg`}
-  aria-hidden="true"
-></span>
 
 <div class="top">
   <span class="kind">
@@ -135,46 +124,20 @@ function highlight(code: string): string {
   </p>
 )}
 
+{card.checklist && card.checklist.length > 0 && (
+  <ul class="checklist" role="list" aria-hidden="true">
+    {card.checklist.map((item) => (
+      <li class:list={{ done: item.done }}>
+        <i />
+        {item.label}
+      </li>
+    ))}
+  </ul>
+)}
+
 <p class="meta">{card.meta}</p>
 
 <style>
-  /* ── Tape + paper ─────────────────────────────────────────── */
-  .tape {
-    position: absolute;
-    inset-block-start: -0.8rem;
-    inset-inline-start: 50%;
-    z-index: 2;
-    inline-size: 5.75rem;
-    block-size: 1.5rem;
-    translate: -50% 0;
-    rotate: var(--tape-r);
-    background:
-      repeating-linear-gradient(90deg, transparent 0 6px, rgb(255 255 255 / 0.18) 6px 7px),
-      color-mix(in oklab, var(--tape) 72%, transparent);
-    /* Torn ends */
-    clip-path: polygon(
-      0 8%,
-      4% 0,
-      8% 10%,
-      12% 0,
-      100% 0,
-      96% 12%,
-      100% 25%,
-      96% 40%,
-      100% 55%,
-      96% 70%,
-      100% 85%,
-      96% 100%,
-      0 100%,
-      4% 88%,
-      0 75%,
-      4% 60%,
-      0 45%,
-      4% 30%,
-      0 18%
-    );
-  }
-
   /* ── Header ───────────────────────────────────────────────── */
   .top {
     display: flex;
@@ -188,7 +151,8 @@ function highlight(code: string): string {
     gap: 0.35rem;
     padding: 0.25rem 0.6rem 0.25rem 0.45rem;
     border-radius: 999px;
-    background-color: color-mix(in oklab, var(--surface-raised) 80%, transparent);
+    /* The card's pastel lives here now: paper page, colored label. */
+    background-color: var(--card-tint);
     font-size: var(--text-step--1);
     font-weight: 500;
   }
@@ -229,7 +193,7 @@ function highlight(code: string): string {
     flex-shrink: 1;
     min-block-size: 0;
     overflow: hidden;
-    padding: 0.35rem; /* room for the rotated page + shadows inside the clip */
+    padding: 0.35rem 0.35rem 0.75rem; /* room for the printout shadows inside the clip */
     margin: -0.35rem;
     font-size: 0.8125rem;
   }
@@ -263,13 +227,18 @@ function highlight(code: string): string {
       display: none;
     }
   }
+  /* Printouts pasted onto the page: straight, a hairline edge and a soft contact shadow. */
   .quiz,
   .code,
   .mini-site,
-  .plain {
+  .plain,
+  .page {
     border-radius: var(--radius-md);
     background-color: var(--surface-raised);
     border: 1px solid var(--line);
+    box-shadow:
+      0 1px 1px var(--shadow-tint),
+      0 10px 18px -12px var(--shadow-tint);
   }
   .quiz {
     display: grid;
@@ -368,12 +337,11 @@ function highlight(code: string): string {
         color-mix(in oklab, var(--sky) 45%, transparent) 1.35rem calc(1.35rem + 1px)
       ),
       var(--surface-raised);
-    box-shadow: 0 8px 16px -10px var(--shadow-tint);
-    rotate: 1.5deg;
+
     font-size: 0.875rem;
     line-height: 1.35rem;
     display: -webkit-box;
-    -webkit-line-clamp: 5;
+    -webkit-line-clamp: 8; /* the preview clips it earlier on small cards */
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
@@ -420,6 +388,49 @@ function highlight(code: string): string {
     line-height: 1;
   }
 
+  /* ── Checklist (site progress, other things being learned) ── */
+  .checklist {
+    display: grid;
+    gap: 0.35rem;
+    flex-shrink: 0;
+    font-size: 0.8125rem;
+    color: var(--ink-soft);
+  }
+  .checklist li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .checklist i {
+    flex: none;
+    inline-size: 0.8rem;
+    block-size: 0.8rem;
+    border-radius: 0.2rem;
+    border: 1.5px solid var(--line-strong);
+  }
+  .checklist .done {
+    color: var(--ink);
+  }
+  .checklist .done i {
+    border-color: var(--sage);
+    background-color: var(--sage);
+  }
+  /* Phones: the checklist is a desktop extra, and the article page shows fewer lines
+     (these rules must come after the base rules they override). */
+  @media (max-width: 47.99rem) {
+    .checklist {
+      display: none;
+    }
+    .page {
+      -webkit-line-clamp: 5;
+    }
+  }
+  @media (max-width: 23.75rem) {
+    .page {
+      -webkit-line-clamp: 4;
+    }
+  }
+
   /* ── Handwritten margin note ──────────────────────────────── */
   .note {
     position: relative;
@@ -428,7 +439,7 @@ function highlight(code: string): string {
     font-size: 1.3rem;
     line-height: 1.05;
     color: var(--accent);
-    rotate: -2.5deg;
+    rotate: -2deg; /* the only tilted thing inside the card */
     text-wrap: balance;
   }
   .note--learning {

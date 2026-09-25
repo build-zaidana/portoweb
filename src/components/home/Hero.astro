@@ -225,17 +225,18 @@ const first = cards[0];
       overflow: clip;
     }
   }
+  /* Sticker sits on the bottom-right corner of the sky, away from the cards' top edge. */
   .visual :global(.hero-sticker) {
     position: absolute;
-    inset-block-start: -1.25rem;
-    inset-inline-start: -1rem;
+    inset-block-end: -1.5rem;
+    inset-inline-end: -1rem;
     z-index: 2;
   }
   @media (max-width: 47.99rem) {
+    /* Phones: top-right, so it never covers the stack's Next button at the bottom. */
     .visual :global(.hero-sticker) {
-      inset-inline-start: auto;
+      inset-block: -2rem auto;
       inset-inline-end: -0.25rem;
-      inset-block-start: -2rem;
       scale: 0.8;
     }
   }
