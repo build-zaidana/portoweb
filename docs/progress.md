@@ -9,8 +9,8 @@
 | 0 | Review & rencana | ✅ Selesai (Gate 0, 2026-09-25) |
 | 1 | Fondasi | ✅ Selesai (Gate 1, 2026-09-25) |
 | 2 | Home + About | ✅ Selesai (Gate 2, 2026-09-25) |
-| 3 | Halaman lain | 🟡 Selesai, menunggu "lanjut" (Gate 3) |
-| 4 | Copywriting | ⏳ |
+| 3 | Halaman lain | ✅ Selesai (Gate 3, 2026-09-25) |
+| 4 | Copywriting | 🔄 Copy deck siap (`docs/copy-deck.md`), menunggu pilihan user |
 | 5 | 3 proyek pertama | ⏳ |
 | 6 | Launch | ⏳ |
 
