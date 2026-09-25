@@ -271,3 +271,5 @@ User: kiri-kanan terlalu kosong. Terukur: di 1920px konten hanya 1216px (345px k
 - Reduced motion: semua animasi view transition dimatikan (terverifikasi 0 animasi berjalan). Build 0 error.
 - 🔑 Elemen yang berpindah antar halaman — astro transition:name · view-transition-class · ::view-transition-group
 - 🔑 Hanya animasikan elemen tanpa pasangan — ::view-transition-old :only-child · document.getAnimations()
+- Revisi lanjutan (user: halaman yang sedikit kesamaannya perlu animasi lebih menarik): antar halaman top-level kini **punya arah sesuai urutan menu** (Home → Projects → Writing → Now → About → Contact). Halaman lama bergeser ke sisi asal + blur 4px (180ms); halaman baru masuk dari sisi berlawanan, section-nya mendarat bertahap (mulai 120ms, jeda 70ms) sambil blur menajam. Daftar ↔ detail tetap memakai morph. Dicek frame demi frame (100/180/300ms) tanpa tumpang tindih teks.
+- 🔑 Arah transisi dari urutan nav — astro:before-swap event.newDocument · css custom properties inheritance ::view-transition · staggered animation-delay

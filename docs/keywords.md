@@ -154,6 +154,7 @@
 | `::view-transition-group` | Animation | global.css (durasi morph) | 5 |
 | `::view-transition-old :only-child` | Animation | global.css (elemen tanpa pasangan) | 5 |
 | `document.getAnimations()` | Animation | Verifikasi transisi (Playwright) | 5 |
+| `staggered animation-delay` | Animation | global.css (section-arrive) | 5 |
 
 ## Performance / SEO
 
