@@ -261,22 +261,13 @@ const total = cards.length;
     display: flex;
     flex-direction: column;
     gap: 0.65rem;
-    /* Left padding clears the notebook margin line. */
-    padding: 1.3rem 1.25rem 1.2rem 2.35rem;
+    padding: 1.3rem 1.25rem 1.2rem;
     border-radius: 1.5rem;
-    /* A page of dot-grid notebook paper: margin line in the card's accent color,
-       a faint dot grid (echoes the halftone sky), on the paper surface. */
+    /* A page of dot-grid notebook paper: a faint dot grid (echoes the halftone sky)
+       on the paper surface. */
     --card-tint: var(--tint-sage);
-    --margin-line: var(--sage);
     --dot: color-mix(in oklab, var(--ink) 16%, transparent);
     background:
-      linear-gradient(
-          90deg,
-          transparent 1.5rem,
-          var(--margin-line) 1.5rem calc(1.5rem + 1.5px),
-          transparent calc(1.5rem + 1.5px)
-        )
-        no-repeat,
       radial-gradient(circle, var(--dot) 0.9px, transparent 1.3px) 0.75rem 0.75rem / 16px 16px,
       var(--surface-raised);
     border: 1px solid var(--line);
@@ -305,11 +296,9 @@ const total = cards.length;
   }
   .card[data-tint="sky"] {
     --card-tint: var(--tint-sky);
-    --margin-line: var(--sky);
   }
   .card[data-tint="tan"] {
     --card-tint: var(--tint-tan);
-    --margin-line: var(--tan);
   }
 
   /* Positions in the hand. Deeper cards are smaller, rotate the other way, and sit behind. */
