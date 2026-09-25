@@ -28,6 +28,8 @@ const projects = defineCollection({
     repo: z.url().optional(),
     demo: z.url().optional(),
     tint: cardTint.default("sage"),
+    /** Placeholder mini-UI shown on the card until the project has a real screenshot. */
+    art: z.enum(["form", "cards", "chart"]).default("form"),
     featured: z.boolean().default(false),
     sample,
   }),

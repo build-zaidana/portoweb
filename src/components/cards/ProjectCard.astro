@@ -8,6 +8,7 @@
 import type { CollectionEntry } from "astro:content";
 import StatusChip from "../ui/StatusChip.astro";
 import SampleBadge from "../ui/SampleBadge.astro";
+import ProjectArt from "./ProjectArt.astro";
 
 interface Props {
   project: CollectionEntry<"projects">;
@@ -15,7 +16,7 @@ interface Props {
 }
 
 const { project, headingLevel = 3 } = Astro.props;
-const { title, summary, status, stack, tint, sample } = project.data;
+const { title, summary, status, stack, tint, art, sample } = project.data;
 const Heading = `h${headingLevel}` as const;
 ---
 
@@ -36,23 +37,7 @@ const Heading = `h${headingLevel}` as const;
     {stack.join(", ")}
   </p>
 
-  <!-- Placeholder illustration: abstract "window" panels. Real projects swap in a cropped screenshot or sketch. -->
-  <div class="art" aria-hidden="true">
-    <div class="panel panel--back">
-      <span class="bar w-60"></span>
-      <span class="bar w-40"></span>
-    </div>
-    <div class="panel panel--front">
-      <span class="dots">
-        <i></i>
-        <i></i>
-        <i></i>
-      </span>
-      <span class="bar w-80"></span>
-      <span class="bar w-50"></span>
-      <span class="block"></span>
-    </div>
-  </div>
+  <ProjectArt variant={art} />
 </article>
 
 <style>
@@ -115,80 +100,5 @@ const Heading = `h${headingLevel}` as const;
   .stack {
     font-size: var(--text-step--1);
     color: var(--ink-soft);
-  }
-
-  /* ── Illustration ─────────────────────────────────────────── */
-  .art {
-    position: relative;
-    flex: 1;
-    min-block-size: 9.5rem;
-    margin-block-start: 1rem;
-  }
-  .panel {
-    position: absolute;
-    inset-inline-start: 12%;
-    inline-size: 76%;
-    block-size: 11rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    padding: 1rem;
-    border-radius: var(--radius-md);
-    background-color: var(--surface-raised);
-    box-shadow: var(--shadow-lift);
-    border: 1px solid var(--line);
-    transition: transform var(--dur-3) var(--ease-out);
-  }
-  .panel--back {
-    inset-block-start: 1.25rem;
-    inset-inline-start: 30%;
-    inline-size: 62%;
-    opacity: 0.7;
-    transform: rotate(5deg);
-  }
-  .panel--front {
-    inset-block-start: 2.25rem;
-    transform: rotate(-3deg);
-  }
-  .dots {
-    display: flex;
-    gap: 0.3rem;
-  }
-  .dots i {
-    inline-size: 0.45rem;
-    block-size: 0.45rem;
-    border-radius: 999px;
-    background-color: var(--line-strong);
-  }
-  .bar {
-    display: block;
-    block-size: 0.5rem;
-    border-radius: 999px;
-    background-color: var(--line-strong);
-  }
-  .w-40 {
-    inline-size: 40%;
-  }
-  .w-50 {
-    inline-size: 50%;
-  }
-  .w-60 {
-    inline-size: 60%;
-  }
-  .w-80 {
-    inline-size: 80%;
-  }
-  .block {
-    flex: 1;
-    border-radius: var(--radius-sm);
-    background-color: var(--card-tint);
-  }
-
-  /* Hover (user-triggered): the panels lift and straighten a little. */
-  .project-card:hover .panel--front {
-    transform: translateY(-0.5rem) rotate(-1.5deg);
-  }
-  .project-card:hover .panel--back {
-    transform: translateY(-0.25rem) rotate(7deg);
   }
 </style>

@@ -1,0 +1,225 @@
+---
+/**
+ * Placeholder mini-UI for a project card (craft.do + letters.app references).
+ * Each variant hints at what the project actually does, so three cards in a row
+ * never show the same picture. When a project has a real screenshot, it replaces this.
+ *
+ *   form  → paste text, get generated items (e.g. quiz from notes)
+ *   cards → a stack of term cards (e.g. glossary)
+ *   chart → a week of small daily marks (e.g. journal, tracker)
+ */
+interface Props {
+  variant: "form" | "cards" | "chart";
+}
+const { variant } = Astro.props;
+
+/** One week of mood marks for the chart variant: 0 empty → 3 strong. */
+const week = [2, 3, 1, 0, 2, 3, 2];
+---
+
+<div class="art" data-variant={variant} aria-hidden="true">
+  {variant === "form" && (
+    <>
+      <div class="panel back">
+        <span class="line w-70" />
+        <span class="line w-50" />
+        <span class="line w-60" />
+      </div>
+      <div class="panel front">
+        <span class="field">
+          <span class="line w-60" />
+        </span>
+        <span class="go">Make 5 questions</span>
+        <span class="q">
+          <i />
+          <span class="line w-80" />
+        </span>
+        <span class="q">
+          <i />
+          <span class="line w-60" />
+        </span>
+      </div>
+    </>
+  )}
+  {variant === "cards" && (
+    <>
+      <div class="panel term t3" />
+      <div class="panel term t2" />
+      <div class="panel term t1">
+        <span class="glyph">API</span>
+        <span class="line w-80" />
+        <span class="line w-60" />
+      </div>
+    </>
+  )}
+  {variant === "chart" && (
+    <div class="panel front week">
+      <span class="line w-40" />
+      <span class="days">
+        {week.map((level) => (
+          <span class="day" data-level={level} />
+        ))}
+      </span>
+      <span class="line w-70" />
+    </div>
+  )}
+</div>
+
+<style>
+  .art {
+    position: relative;
+    flex: 1;
+    min-block-size: 9.5rem;
+    margin-block-start: 1rem;
+  }
+  @media (max-width: 47.99rem) {
+    .art {
+      min-block-size: 8rem;
+    }
+  }
+
+  .panel {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    background-color: var(--surface-raised);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-lift);
+    transition: transform var(--dur-3) var(--ease-out);
+  }
+  .line {
+    display: block;
+    block-size: 0.5rem;
+    border-radius: 999px;
+    background-color: var(--line-strong);
+  }
+  .w-40 {
+    inline-size: 40%;
+  }
+  .w-50 {
+    inline-size: 50%;
+  }
+  .w-60 {
+    inline-size: 60%;
+  }
+  .w-70 {
+    inline-size: 70%;
+  }
+  .w-80 {
+    inline-size: 80%;
+  }
+
+  /* ── form ─────────────────────────────────────────────────── */
+  .back {
+    inset: 1rem 6% auto 34%;
+    block-size: 9rem;
+    opacity: 0.7;
+    transform: rotate(5deg);
+  }
+  .front {
+    inset: 2rem 18% auto 10%;
+    min-block-size: 10rem;
+    transform: rotate(-3deg);
+  }
+  .field {
+    display: flex;
+    align-items: center;
+    block-size: 2rem;
+    padding-inline: 0.6rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--line-strong);
+  }
+  .go {
+    align-self: flex-start;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    background-color: var(--ink);
+    color: var(--paper);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .q {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .q i {
+    flex: none;
+    inline-size: 0.75rem;
+    block-size: 0.75rem;
+    border-radius: 999px;
+    border: 1.5px solid var(--line-strong);
+  }
+  .q .line {
+    flex: none;
+  }
+
+  /* ── cards ────────────────────────────────────────────────── */
+  .term {
+    inset: 1.75rem auto auto 50%;
+    inline-size: 58%;
+    block-size: 9rem;
+    translate: -50% 0;
+  }
+  .t3 {
+    transform: rotate(9deg) translateX(1.5rem);
+    opacity: 0.55;
+  }
+  .t2 {
+    transform: rotate(4deg) translateX(0.75rem);
+    opacity: 0.8;
+  }
+  .t1 {
+    transform: rotate(-4deg);
+  }
+  .glyph {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    line-height: 1;
+    color: var(--ink);
+  }
+
+  /* ── chart ────────────────────────────────────────────────── */
+  .week {
+    inset: 2rem 12% auto 12%;
+    gap: 0.9rem;
+    transform: rotate(-2deg);
+  }
+  .days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.4rem;
+  }
+  .day {
+    aspect-ratio: 1;
+    border-radius: 0.4rem;
+    background-color: var(--line);
+  }
+  .day[data-level="1"] {
+    background-color: color-mix(in oklab, var(--tan) 45%, var(--surface-raised));
+  }
+  .day[data-level="2"] {
+    background-color: color-mix(in oklab, var(--tan) 75%, var(--surface-raised));
+  }
+  .day[data-level="3"] {
+    background-color: var(--tan);
+  }
+
+  /* Hover on the parent card (user-triggered): the front panel lifts and straightens. */
+  :global(.project-card:hover) .front {
+    transform: translateY(-0.5rem) rotate(-1.5deg);
+  }
+  :global(.project-card:hover) .back {
+    transform: translateY(-0.25rem) rotate(7deg);
+  }
+  :global(.project-card:hover) .t1 {
+    transform: translateY(-0.5rem) rotate(-2deg);
+  }
+  :global(.project-card:hover) .t2 {
+    transform: rotate(6deg) translateX(1rem);
+  }
+</style>

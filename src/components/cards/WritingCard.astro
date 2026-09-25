@@ -29,12 +29,12 @@ const Heading = `h${headingLevel}` as const;
 <article class:list={["writing-card", { "is-featured": featured }]} data-tone={tone}>
   <div class="meta">
     <time datetime={isoDate(publishedAt)}>{formatDate(publishedAt)}</time>
-    {sample && <SampleBadge class="badge" />}
+    {sample && <SampleBadge />}
   </div>
 
   <Heading class="title">
     <a href={`/writing/${post.id}`} class="stretched">
-      <span class="underline">{title}</span>
+      <span class="title-line">{title}</span>
     </a>
   </Heading>
 
@@ -53,7 +53,9 @@ const Heading = `h${headingLevel}` as const;
     --r: var(--radius-lg);
     --nr: 0.875rem; /* notch corner radius */
 
-    --card-bg: var(--surface-raised);
+    /* Light tone uses the calm grey step: a raised white would vanish on --paper, and
+       the notch clip rules out a border. */
+    --card-bg: var(--surface);
     --card-fg: var(--ink);
     --card-soft: var(--ink-soft);
     --tile-bg: var(--sky);
@@ -71,14 +73,18 @@ const Heading = `h${headingLevel}` as const;
   .writing-card[data-tone="sage"] {
     --card-bg: var(--deep-sage);
     --card-fg: var(--on-deep);
-    --card-soft: color-mix(in oklab, var(--on-deep) 78%, var(--deep-sage));
-    --tile-bg: var(--tint-sage);
+    --card-soft: var(--on-deep-soft);
+    --tile-bg: var(--tan);
+    --badge-fg: var(--card-soft);
+    --badge-line: var(--on-deep-soft);
   }
   .writing-card[data-tone="ink"] {
     --card-bg: var(--deep-ink);
     --card-fg: var(--on-deep);
-    --card-soft: color-mix(in oklab, var(--on-deep) 72%, var(--deep-ink));
+    --card-soft: var(--on-deep-soft);
     --tile-bg: var(--sage);
+    --badge-fg: var(--card-soft);
+    --badge-line: var(--on-deep-soft);
   }
   .writing-card.is-featured {
     min-block-size: 20rem;
@@ -122,10 +128,6 @@ const Heading = `h${headingLevel}` as const;
     font-size: var(--text-step--1);
     color: var(--card-soft);
   }
-  .writing-card:not([data-tone="light"]) .badge {
-    color: var(--card-soft);
-    border-color: color-mix(in oklab, var(--on-deep) 40%, transparent);
-  }
 
   .title {
     font-size: var(--text-step-2);
@@ -138,7 +140,9 @@ const Heading = `h${headingLevel}` as const;
     max-inline-size: 18ch;
   }
 
+  /* Featured: title up top, description settles at the bottom of the tall card. */
   .description {
+    margin-block-start: auto;
     max-inline-size: 44ch;
     color: var(--card-soft);
   }
@@ -164,7 +168,8 @@ const Heading = `h${headingLevel}` as const;
   }
 
   /* Hover underline grows from the left, line by line (measured: 300ms on integratedbio). */
-  .underline {
+  /* Not named "underline": that is a Tailwind utility and would always draw a line. */
+  .title-line {
     background-image: linear-gradient(currentColor, currentColor);
     background-repeat: no-repeat;
     background-position: 0 100%;
@@ -173,7 +178,7 @@ const Heading = `h${headingLevel}` as const;
     box-decoration-break: clone;
     -webkit-box-decoration-break: clone;
   }
-  .writing-card:hover .underline {
+  .writing-card:hover .title-line {
     background-size: 100% 1px;
   }
 

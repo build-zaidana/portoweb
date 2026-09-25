@@ -5,6 +5,7 @@ status: building
 stack: [TypeScript, Astro, Hono, LLM API]
 startedAt: 2026-08-18
 tint: sky
+art: form
 featured: true
 sample: true
 ---
