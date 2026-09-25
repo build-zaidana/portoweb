@@ -95,7 +95,7 @@ const emptyText: Record<string, string> = {
                   <p class="summary">{summary}</p>
                   <dl class="facts">
                     <div>
-                      <dt>Started</dt>
+                      <dt>{status === "idea" ? "Added" : "Started"}</dt>
                       <dd>
                         <time datetime={isoDate(startedAt)}>{formatMonth(startedAt)}</time>
                       </dd>

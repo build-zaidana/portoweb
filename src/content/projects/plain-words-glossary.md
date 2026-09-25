@@ -1,41 +1,40 @@
 ---
 title: Plain-words glossary
-phrase: a plain-words glossary
-summary: A small glossary that explains one software term at a time for readers aged 14–18, with a picture for each.
+phrase: a glossary of software terms in plain words
+summary: Software terms explained for readers aged 14 to 18, one short card per term, drafted with a local AI model and edited by me.
 status: idea
-stack: [Markdown, Astro content collections]
-startedAt: 2026-09-10
+stack: [Python, Ollama, Markdown]
+startedAt: 2026-09-25
 tint: sage
-heroNote: one word per page
+heroNote: every card is checked by a person
 art: cards
 callouts:
-  - label: Picture first
-    note: Readers aged 14–18 skim. A picture carries the idea before the definition does.
+  - label: One term per card
+    note: At most 60 words and one everyday comparison, short enough to read on a phone.
     x: 34
     y: 26
     side: left
-  - label: One term per card
-    note: Short enough to read on a phone between classes.
+  - label: A person has the last word
+    note: The model only writes a draft. A term goes live after I edit and approve it.
     x: 70
     y: 48
     side: right
-sample: true
 ---
-
-> Sample project. It shows the page format; the real project list arrives in Phase 5.
 
 ## Problem
 
-Many explanations of "API" or "database" assume the reader already knows the other words in the sentence.
+Teenagers who get curious about technology meet words like API, cache, and deploy, and most explanations use more jargon to explain the jargon. Existing glossaries are written for developers.
 
 ## Approach
 
-One term per page, explained using only words from earlier pages. Each page ends with a question to check understanding.
+A Python command-line tool asks a model running locally (through Ollama) for a first draft of each term, under strict rules: at most 60 words, one everyday comparison, no other technical terms. Automatic checks measure length, a readability score, and banned jargon. I edit and approve every card before it becomes a Markdown page on this site.
+
+The MVP is three weeks and twenty reviewed terms.
 
 ## Result
 
-Idea stage. Nothing built yet.
+Not built yet.
 
 ## Learnings
 
-Placeholder.
+Nothing yet. This section fills in as I build.

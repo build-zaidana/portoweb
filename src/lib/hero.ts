@@ -3,6 +3,7 @@
  * pulled from content collections (so samples follow the same production guard),
  * plus one card that is always true: this website, built in public.
  */
+import type { CollectionEntry } from "astro:content";
 import { getLatestNow, getProjects, getWriting } from "./content";
 import { formatDate, formatMonth } from "./format";
 import { profile, siteProgress } from "./site";
@@ -70,7 +71,9 @@ export interface HeroCard {
   href: string;
   external?: boolean;
   tint: "sage" | "sky" | "tan";
-  art?: "form" | "cards" | "chart";
+  art?: CollectionEntry<"projects">["data"]["art"];
+  /** Project cards only: the chip says the real status, so an idea never reads as "Building". */
+  status?: CollectionEntry<"projects">["data"]["status"];
   /** Handwritten margin note (notebook style), from the entry's `heroNote`. */
   note?: string;
   /** Writing cards: the opening of the article, with an optional highlighted phrase. */
@@ -99,6 +102,7 @@ export async function getHeroCards(): Promise<HeroCard[]> {
       href: `/projects/${project.id}`,
       tint: project.data.tint,
       art: project.data.art,
+      status: project.data.status,
       note: project.data.heroNote,
       sample: project.data.sample,
     });

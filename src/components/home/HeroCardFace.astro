@@ -25,6 +25,8 @@ const kindLabel: Record<HeroCard["kind"], { text: string; icon: IconName }> = {
   writing: { text: "Writing", icon: "spark" },
   site: { text: "This site", icon: "cloud" },
 };
+const statusText = { idea: "Idea", building: "Building", shipped: "Shipped" } as const;
+const chipText = card.status ? statusText[card.status] : kindLabel[card.kind].text;
 
 /** Tiny, dependency-free TypeScript highlighter for a few lines of code. */
 function highlight(code: string): string {
@@ -43,7 +45,7 @@ function highlight(code: string): string {
 <div class="top">
   <span class="kind">
     <SketchIcon name={kindLabel[card.kind].icon} size={16} />
-    {kindLabel[card.kind].text}
+    {chipText}
   </span>
   {card.sample && <SampleBadge />}
 </div>

@@ -6,12 +6,18 @@
  *
  *   form  → paste text, get generated items (e.g. quiz from notes)
  *   cards → a stack of term cards (e.g. glossary)
- *   chart → a week of small daily marks (e.g. journal, tracker)
+ *   chart   → a week of small daily marks (e.g. journal, tracker)
+ *   request → an HTTP request and its response (e.g. "what your browser sends")
  */
+import type { CollectionEntry } from "astro:content";
+
 interface Props {
-  variant: "form" | "cards" | "chart";
+  variant: CollectionEntry<"projects">["data"]["art"];
 }
 const { variant } = Astro.props;
+
+/** Header names drawn in the request variant (values are just lines). */
+const headers = ["Host", "Accept-Language", "User-Agent"];
 
 /** One week of mood marks for the chart variant: 0 empty → 3 strong. */
 const week = [2, 3, 1, 0, 2, 3, 2];
@@ -62,6 +68,24 @@ const week = [2, 3, 1, 0, 2, 3, 2];
       </span>
       <span class="line w-70" />
     </div>
+  )}
+  {variant === "request" && (
+    <>
+      <div class="panel back response">
+        <span class="status">200 OK</span>
+        <span class="line w-70" />
+        <span class="line w-50" />
+      </div>
+      <div class="panel front request">
+        <code class="request-line">GET / HTTP/1.1</code>
+        {headers.map((name) => (
+          <span class="header">
+            <b>{name}</b>
+            <span class="line w-40" />
+          </span>
+        ))}
+      </div>
+    </>
   )}
 </div>
 
@@ -207,6 +231,49 @@ const week = [2, 3, 1, 0, 2, 3, 2];
   }
   .day[data-level="3"] {
     background-color: var(--tan);
+  }
+
+  /* ── request ──────────────────────────────────────────────── */
+  .response {
+    inset: 1.25rem 8% auto 40%;
+    block-size: 8.5rem;
+    opacity: 0.75;
+    transform: rotate(5deg);
+  }
+  .status {
+    align-self: flex-start;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    background-color: var(--sage);
+    color: var(--on-fill);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 600;
+  }
+  .request {
+    inset: 2rem 22% auto 8%;
+    gap: 0.55rem;
+    transform: rotate(-3deg);
+  }
+  .request-line {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    color: var(--ink-soft);
+  }
+  .header b {
+    flex: none;
+    font-weight: 500;
+  }
+  .header .line {
+    flex: 1;
   }
 
   /* Hover on the parent card (user-triggered): panels lift and straighten on a spring.

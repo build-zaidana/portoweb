@@ -33,7 +33,7 @@ const projects = defineCollection({
     /** Short handwritten margin note shown on the hero card (notebook style). */
     heroNote: z.string().max(48).optional(),
     /** Placeholder mini-UI shown on the card until the project has a real screenshot. */
-    art: z.enum(["form", "cards", "chart"]).default("form"),
+    art: z.enum(["form", "cards", "chart", "request"]).default("form"),
     /**
      * Annotations on the project picture (lovi-style callouts): a dot at x/y (percent of the
      * picture) and a short note explaining a decision. 2–4 read best; more crowd the picture.

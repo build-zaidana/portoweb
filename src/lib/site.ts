@@ -52,7 +52,8 @@ export const siteProgress: readonly { label: string; done: boolean }[] = [
   { label: "Foundations", done: true },
   { label: "Home and About", done: true },
   { label: "Projects and writing", done: true },
-  { label: "Copy and real projects", done: false },
+  { label: "Copy and real projects", done: true },
+  { label: "Launch", done: false },
 ];
 
 export interface NavItem {

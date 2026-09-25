@@ -42,7 +42,7 @@ const outline = headings.filter((heading) => heading.depth === 2);
 
     <dl class="facts">
       <div>
-        <dt>Started</dt>
+        <dt>{status === "idea" ? "Added" : "Started"}</dt>
         <dd>
           <time datetime={isoDate(startedAt)}>{formatMonth(startedAt)}</time>
         </dd>
