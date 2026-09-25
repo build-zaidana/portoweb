@@ -15,6 +15,38 @@ const projectVerb = { idea: "planning", building: "building", shipped: "improvin
 /** Titles are quoted when used mid-sentence, so capitals and commas don't break the grammar. */
 const quoted = (title: string) => `“${title}”`;
 
+/** Text split around a highlighted phrase, for the marker effect on writing cards. */
+export interface Highlighted {
+  before: string;
+  mark: string;
+  after: string;
+}
+
+/**
+ * First real paragraph of a Markdown body (skips quotes, headings, code, lists),
+ * as plain text, optionally split around `highlight`.
+ */
+export function excerpt(
+  markdown: string | undefined,
+  highlight?: string,
+  max = 190,
+): Highlighted | undefined {
+  const paragraph = (markdown ?? "")
+    .split(/\r?\n\s*\r?\n/)
+    .map((block) => block.trim())
+    .find((block) => block && !/^(>|#|```|[-*] |\d+\. )/.test(block));
+  if (!paragraph) return undefined;
+  let text = paragraph
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/\*\*?([^*]+)\*\*?/g, "$1")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/\s+/g, " ");
+  if (text.length > max) text = `${text.slice(0, max).replace(/\s+\S*$/, "")}…`;
+  const at = highlight ? text.indexOf(highlight) : -1;
+  if (!highlight || at < 0) return { before: text, mark: "", after: "" };
+  return { before: text.slice(0, at), mark: highlight, after: text.slice(at + highlight.length) };
+}
+
 export interface HeroCard {
   id: string;
   /** Drives the changing sentence under the headline: "Right now I'm {verb} {phrase}." */
@@ -29,6 +61,12 @@ export interface HeroCard {
   external?: boolean;
   tint: "sage" | "sky" | "tan";
   art?: "form" | "cards" | "chart";
+  /** Handwritten margin note (notebook style), from the entry's `heroNote`. */
+  note?: string;
+  /** Writing cards: the opening of the article, with an optional highlighted phrase. */
+  page?: Highlighted;
+  /** Learning cards: a few lines of real code from this month. */
+  snippet?: string;
   sample: boolean;
 }
 
@@ -49,6 +87,7 @@ export async function getHeroCards(): Promise<HeroCard[]> {
       href: `/projects/${project.id}`,
       tint: project.data.tint,
       art: project.data.art,
+      note: project.data.heroNote,
       sample: project.data.sample,
     });
   }
@@ -66,6 +105,8 @@ export async function getHeroCards(): Promise<HeroCard[]> {
       meta: `Updated ${formatMonth(now.data.month)}`,
       href: "/now",
       tint: "sage",
+      note: now.data.heroNote,
+      snippet: now.data.snippet,
       sample: now.data.sample,
     });
   }
@@ -82,6 +123,8 @@ export async function getHeroCards(): Promise<HeroCard[]> {
       meta: formatDate(post.data.publishedAt),
       href: `/writing/${post.id}`,
       tint: "tan",
+      note: post.data.heroNote,
+      page: excerpt(post.body, post.data.highlight),
       sample: post.data.sample,
     });
   }
@@ -98,6 +141,7 @@ export async function getHeroCards(): Promise<HeroCard[]> {
     href: profile.github.href,
     external: true,
     tint: "sky",
+    note: "you are here",
     sample: false,
   });
 

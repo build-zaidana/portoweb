@@ -6,6 +6,7 @@ status: idea
 stack: [TypeScript, IndexedDB, PWA]
 startedAt: 2026-07-02
 tint: tan
+heroNote: stays on your phone
 art: chart
 sample: true
 ---

@@ -30,6 +30,8 @@ const projects = defineCollection({
     repo: z.url().optional(),
     demo: z.url().optional(),
     tint: cardTint.default("sage"),
+    /** Short handwritten margin note shown on the hero card (notebook style). */
+    heroNote: z.string().max(48).optional(),
     /** Placeholder mini-UI shown on the card until the project has a real screenshot. */
     art: z.enum(["form", "cards", "chart"]).default("form"),
     featured: z.boolean().default(false),
@@ -47,6 +49,10 @@ const writing = defineCollection({
     publishedAt: z.coerce.date(),
     updatedAt: z.coerce.date().optional(),
     tags: z.array(z.string()).default([]),
+    /** Words from the first paragraph to mark with a highlighter on the hero card. */
+    highlight: z.string().max(80).optional(),
+    /** Short handwritten margin note shown on the hero card (notebook style). */
+    heroNote: z.string().max(48).optional(),
     draft: z.boolean().default(false),
     sample,
   }),
@@ -61,6 +67,10 @@ const now = defineCollection({
     learning: z.array(z.string()).min(1),
     building: z.array(z.string()).default([]),
     reading: z.array(z.string()).default([]),
+    /** A few lines of real code from this month's learning, shown on the hero card. */
+    snippet: z.string().max(160).optional(),
+    /** Short handwritten margin note shown on the hero card (notebook style). */
+    heroNote: z.string().max(48).optional(),
     sample,
   }),
 });

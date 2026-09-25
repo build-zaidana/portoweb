@@ -4,6 +4,7 @@ phrase: how I read error messages
 description: A sample article showing the writing layout. The real first post will replace it.
 publishedAt: 2026-09-08
 tags: [learning, debugging]
+highlight: read it from the top, in three passes
 sample: true
 ---
 
