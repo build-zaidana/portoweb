@@ -1,8 +1,9 @@
 ---
 /**
  * Light/dark switch. The choice is stored in localStorage and applied by ThemeScript.
- * Feedback: the page crossfades (View Transition API) and the sketch icon rotates
- * between sun and moon. Both are skipped under prefers-reduced-motion.
+ * Feedback: the new theme spreads from the button as a growing circle ("the sky
+ * changes"), using the View Transition API, while the sketch icon turns from moon
+ * to sun. Under prefers-reduced-motion the theme switches instantly.
  */
 interface Props {
   class?: string;
@@ -53,17 +54,47 @@ const { class: className } = Astro.props;
     syncLabels();
   }
 
-  // One delegated listener survives ClientRouter page swaps (module scripts run once).
-  document.addEventListener("click", (event) => {
-    const button = (event.target as Element | null)?.closest("[data-theme-toggle]");
-    if (!button) return;
+  /** Radius that covers the whole viewport from (x, y). */
+  const coverRadius = (x: number, y: number) =>
+    Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+
+  async function switchTheme(button: Element) {
     const next: Theme = current() === "dark" ? "light" : "dark";
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!document.startViewTransition || reduceMotion) {
       setTheme(next);
       return;
     }
-    document.startViewTransition(() => setTheme(next));
+
+    const box = button.getBoundingClientRect();
+    const x = box.left + box.width / 2;
+    const y = box.top + box.height / 2;
+    const root = document.documentElement;
+
+    // While switching: freeze other CSS transitions and let the whole page be one
+    // snapshot (see global.css), so only the circle moves.
+    root.dataset.themeSwitching = "";
+    const transition = document.startViewTransition(() => setTheme(next));
+    try {
+      await transition.ready;
+      root.animate(
+        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${coverRadius(x, y)}px at ${x}px ${y}px)`] },
+        {
+          duration: 400,
+          easing: "cubic-bezier(0.65, 0, 0.35, 1)", // --ease-in-out
+          pseudoElement: "::view-transition-new(root)",
+        },
+      );
+      await transition.finished;
+    } finally {
+      delete root.dataset.themeSwitching;
+    }
+  }
+
+  // One delegated listener survives ClientRouter page swaps (module scripts run once).
+  document.addEventListener("click", (event) => {
+    const button = (event.target as Element | null)?.closest("[data-theme-toggle]");
+    if (button) void switchTheme(button);
   });
 
   document.addEventListener("astro:page-load", syncLabels);
@@ -108,7 +139,7 @@ const { class: className } = Astro.props;
   .moon {
     transform-origin: 16px 16px;
     transition:
-      transform var(--dur-4) var(--ease-out),
+      transform var(--dur-4) var(--ease-spring),
       opacity var(--dur-2) var(--ease-out);
   }
 

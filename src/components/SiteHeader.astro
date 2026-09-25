@@ -15,7 +15,8 @@ const path = Astro.url.pathname;
 const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`);
 ---
 
-<header class="site-header" data-site-header>
+<!-- The header stays still between pages (no crossfade); only the active-page pill moves. -->
+<header class="site-header" data-site-header transition:name="site-header" transition:animate="none">
   <div class="bar wrap">
     <a href="/" class="wordmark" aria-label={`${site.name}, home`}>
       {site.name}
@@ -26,7 +27,11 @@ const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`)
         {nav.map((item) => (
           <li>
             <a href={item.href} aria-current={isCurrent(item.href) ? "page" : undefined}>
-              {item.label}
+              {isCurrent(item.href) && (
+                // Shared view-transition name: on navigation the pill slides from the old link to the new one.
+                <span class="indicator" transition:name="nav-indicator" transition:animate="initial" />
+              )}
+              <span class="link-label">{item.label}</span>
             </a>
           </li>
         ))}
@@ -57,8 +62,8 @@ const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`)
   <div class="mobile-panel wrap" id="mobile-menu" data-menu-panel>
     <div class="mobile-inner glass">
       <ul role="list">
-        {[...nav, { label: "Let's talk", href: contactHref }].map((item) => (
-          <li>
+        {[...nav, { label: "Let's talk", href: contactHref }].map((item, i) => (
+          <li style={`--i: ${i}`}>
             <a href={item.href} aria-current={isCurrent(item.href) ? "page" : undefined}>
               {item.label}
             </a>
@@ -142,6 +147,8 @@ const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`)
     gap: 0.125rem;
   }
   .links a {
+    position: relative;
+    isolation: isolate;
     display: inline-flex;
     align-items: center;
     min-block-size: 2.75rem; /* 44px touch target */
@@ -159,9 +166,20 @@ const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`)
     color: var(--ink);
     background-color: var(--line);
   }
+  /* Active page: a translucent pill BEHIND the label. Translucent on purpose: while it
+     slides between links during a page transition, labels stay readable through it. */
   .links a[aria-current="page"] {
-    color: var(--paper);
-    background-color: var(--ink);
+    color: var(--ink);
+  }
+  .indicator {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 999px;
+    background-color: var(--line-strong);
+  }
+  .links a[aria-current="page"]:hover {
+    background-color: transparent;
   }
 
   .actions {
@@ -247,6 +265,19 @@ const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`)
   .mobile-inner ul {
     display: grid;
     padding: 0.5rem;
+  }
+  /* Items arrive one after another (30ms apart) when the menu opens. */
+  .mobile-inner li {
+    opacity: 0;
+    transform: translateY(-0.4rem);
+    transition:
+      opacity var(--dur-2) var(--ease-out),
+      transform var(--dur-3) var(--ease-out);
+  }
+  [data-menu-open] .mobile-inner li {
+    opacity: 1;
+    transform: none;
+    transition-delay: calc(var(--i) * 30ms + 60ms);
   }
   .mobile-inner a {
     display: flex;
