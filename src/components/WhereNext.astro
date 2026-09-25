@@ -1,0 +1,149 @@
+---
+/**
+ * "Where to next" navigation cards (daylight reference): headline on the left,
+ * four cards with a big hand-drawn icon on the right. On hover a card fills with
+ * warm tan and its icon lifts (user-triggered). Used at the end of About.
+ */
+import SketchIcon, { type IconName } from "./ui/SketchIcon.astro";
+import { contactHref } from "../lib/site";
+
+interface Props {
+  title?: string;
+  lead?: string;
+}
+const { title = "Where to next", lead = "Pick a door. Each one shows a different side of the work." } =
+  Astro.props;
+
+const doors: { label: string; href: string; icon: IconName; hint: string }[] = [
+  { label: "Projects", href: "/projects", icon: "build", hint: "What I'm building" },
+  { label: "Writing", href: "/writing", icon: "book", hint: "What I've learned" },
+  { label: "Now", href: "/now", icon: "spark", hint: "This month" },
+  { label: "Contact", href: contactHref, icon: "cloud", hint: "Say hello" },
+];
+---
+
+<section class="where wrap" aria-labelledby="where-title">
+  <div class="where-intro">
+    <h2 id="where-title">{title}</h2>
+    <p>{lead}</p>
+  </div>
+  <ul class="doors" role="list">
+    {doors.map((door) => (
+      <li>
+        <a class="door" href={door.href}>
+          <span class="door-art">
+            <SketchIcon name={door.icon} size={64} />
+          </span>
+          <span class="door-bar">
+            <span class="door-label">{door.label}</span>
+            <span class="door-hint">{door.hint}</span>
+          </span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .where {
+    display: grid;
+    gap: 2rem;
+  }
+  @media (min-width: 64rem) {
+    .where {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 2fr);
+      align-items: end;
+      gap: 3rem;
+    }
+  }
+  .where-intro h2 {
+    font-size: var(--text-step-3);
+    line-height: var(--text-step-3--line-height);
+  }
+  .where-intro p {
+    margin-block-start: 0.75rem;
+    max-inline-size: 32ch;
+    color: var(--ink-soft);
+  }
+
+  .doors {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+  @media (min-width: 48rem) {
+    .doors {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .door {
+    display: flex;
+    flex-direction: column;
+    block-size: 100%;
+    border-radius: var(--radius-lg);
+    background-color: var(--surface);
+    color: var(--ink);
+    text-decoration: none;
+    overflow: hidden;
+    transition:
+      transform var(--dur-4) var(--ease-spring),
+      background-color var(--dur-3) var(--ease-out);
+  }
+  .door-art {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    color: var(--ink);
+    transition: transform var(--dur-4) var(--ease-spring);
+  }
+  .door-bar {
+    display: grid;
+    gap: 0.1rem;
+    padding: 0.75rem 1rem 0.9rem;
+    background-color: color-mix(in oklab, var(--ink) 6%, transparent);
+    transition: background-color var(--dur-3) var(--ease-out);
+  }
+  .door-label {
+    font-weight: 500;
+  }
+  .door-hint {
+    font-size: var(--text-step--1);
+    color: var(--ink-soft);
+    transition: color var(--dur-3) var(--ease-out);
+  }
+
+  /* Hover: warm fill (daylight's amber, here the palette's tan) + the drawing lifts. */
+  .door:hover {
+    background-color: var(--tan);
+    color: var(--on-fill);
+  }
+  .door:hover .door-art {
+    color: var(--on-fill);
+  }
+  .door:hover .door-hint {
+    color: var(--on-fill);
+  }
+  .door:hover .door-bar {
+    background-color: color-mix(in oklab, var(--on-fill) 10%, transparent);
+  }
+  @media (hover: hover) {
+    .door:hover {
+      transform: translateY(-4px);
+    }
+    .door:hover .door-art {
+      transform: translateY(-4px) rotate(-4deg);
+    }
+  }
+  .door:active {
+    transform: scale(0.98);
+    transition-duration: var(--dur-1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .door:hover,
+    .door:hover .door-art,
+    .door:active {
+      transform: none;
+    }
+  }
+</style>

@@ -1,23 +1,289 @@
 ---
 /**
- * Temporary home page for Phase 1. Phase 2 replaces it with the real hero
- * (card stack) and sections. Kept honest: it says the site is being built.
+ * Home. Sections deliberately differ in shape (CLAUDE.md "ritme yang bervariasi"):
+ *   hero (split + sky) → story (one narrow scroll-revealed paragraph) → projects (grid ending in a
+ *   progressive blur) → writing (asymmetric: sticky intro + notched cards) → currently (calm cards)
+ *   → closing moment in the footer.
+ * Copy is draft until Phase 4.
  */
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "../components/home/Hero.astro";
+import StoryReveal from "../components/home/StoryReveal.astro";
+import ProjectCard from "../components/cards/ProjectCard.astro";
+import WritingCard from "../components/cards/WritingCard.astro";
+import CalmCard from "../components/cards/CalmCard.astro";
 import Button from "../components/ui/Button.astro";
+import ProgressiveFade from "../components/ui/ProgressiveFade.astro";
+import SampleBadge from "../components/ui/SampleBadge.astro";
+import SketchIcon from "../components/ui/SketchIcon.astro";
+import { getHeroCards } from "../lib/hero";
+import { getLatestNow, getProjects, getWriting } from "../lib/content";
+import { formatMonth, isoDate } from "../lib/format";
+
+const [heroCards, projects, writing, now] = await Promise.all([
+  getHeroCards(),
+  getProjects(),
+  getWriting(),
+  getLatestNow(),
+]);
+const shownProjects = projects.slice(0, 3);
+const [featuredPost, ...morePosts] = writing;
+const tones = ["sage", "ink"] as const;
 ---
 
-<BaseLayout>
-  <section class="wrap pt-24 pb-16 sm:pt-32">
-    <h1 class="font-display text-step-5 max-w-[12ch]">Zaidana is building this site in public.</h1>
-    <p class="measure mt-8 text-step-1 text-ink-soft">
-      The foundations are in place: colors, type, and components. The home page, projects, and writing come
-      next.
-    </p>
-    <div class="mt-10 flex flex-wrap gap-3">
-      <Button href="/styleguide" variant="primary" size="lg">
-        See the styleguide
-      </Button>
-    </div>
+<BaseLayout closing>
+  <Hero cards={heroCards} />
+
+  <!-- Story: the single scroll-driven reveal on the site. -->
+  <section class="story-section wrap" aria-label="In short">
+    <StoryReveal
+      parts={[
+        "I'm a Software Engineering student in Indonesia, learning to build",
+        { icon: "build" },
+        "fullstack apps and",
+        { icon: "spark" },
+        "AI tools that make people's work easier. I write down what I learn",
+        { icon: "book" },
+        "in the open, so others can grow alongside me.",
+      ]}
+    />
   </section>
+
+  {shownProjects.length > 0 && (
+    <section class="projects wrap" aria-labelledby="projects-title">
+      <div class="section-head">
+        <h2 id="projects-title" class="section-title">
+          Things I'm building
+        </h2>
+        <p class="section-lead">
+          Small tools for students and learners, each with notes on what went wrong along the way.
+        </p>
+      </div>
+      <ProgressiveFade height="38%">
+        <div class="project-grid">
+          {shownProjects.map((project) => (
+            <ProjectCard project={project} headingLevel={3} />
+          ))}
+        </div>
+        <Button slot="action" variant="glass" href="/projects">
+          See all projects
+        </Button>
+      </ProgressiveFade>
+    </section>
+  )}
+
+  {featuredPost && (
+    <section class="writing wrap" aria-labelledby="writing-title">
+      <div class="writing-intro">
+        <h2 id="writing-title" class="section-title">
+          Notes from the way
+        </h2>
+        <p class="section-lead">What I learn, written down while it's still fresh. Mistakes included.</p>
+        <a class="link" href="/writing">
+          Read all writing
+        </a>
+      </div>
+      <div class="writing-grid">
+        <WritingCard post={featuredPost} featured tone="light" headingLevel={3} />
+        {morePosts.slice(0, 2).map((post, i) => (
+          <WritingCard post={post} tone={tones[i % 2]} headingLevel={3} />
+        ))}
+      </div>
+    </section>
+  )}
+
+  {now && (
+    <section class="currently wrap" aria-labelledby="currently-title">
+      <div class="currently-head">
+        <h2 id="currently-title" class="section-title">
+          Currently
+        </h2>
+        <p class="updated">
+          Updated <time datetime={isoDate(now.data.month)}>{formatMonth(now.data.month)}</time>
+          {now.data.sample && <SampleBadge />}
+        </p>
+      </div>
+      <div class="currently-grid">
+        {now.data.building[0] && (
+          <CalmCard>
+            <Fragment slot="label">
+              <SketchIcon name="build" size={18} /> Building
+            </Fragment>
+            <h3>{now.data.building[0]}</h3>
+            <div slot="art" class="mini-list" aria-hidden="true">
+              <span class="mini-row">
+                <i class="done" />
+                Foundations
+              </span>
+              <span class="mini-row">
+                <i class="done" />
+                Home and About
+              </span>
+              <span class="mini-row">
+                <i />
+                Projects and writing
+              </span>
+            </div>
+          </CalmCard>
+        )}
+        <CalmCard>
+          <Fragment slot="label">
+            <SketchIcon name="book" size={18} /> Learning
+          </Fragment>
+          <h3>{now.data.learning[0]}</h3>
+          {now.data.learning[1] && <p>Also: {now.data.learning[1]}</p>}
+          <Button slot="action" variant="secondary" href="/now">
+            What I'm doing now
+          </Button>
+        </CalmCard>
+      </div>
+    </section>
+  )}
 </BaseLayout>
+
+<style>
+  .section-title {
+    font-size: var(--text-step-3);
+    line-height: var(--text-step-3--line-height);
+  }
+  .section-lead {
+    max-inline-size: 42ch;
+    margin-block-start: 0.75rem;
+    color: var(--ink-soft);
+  }
+
+  /* ── Story: narrow, offset to the right of center ── */
+  .story-section {
+    padding-block: clamp(3rem, 2rem + 5vw, 7rem);
+  }
+  .story-section :global(.story) {
+    max-inline-size: 30ch;
+  }
+  @media (min-width: 64rem) {
+    .story-section :global(.story) {
+      margin-inline-start: 16.666%;
+    }
+  }
+
+  /* ── Projects: header left, grid, blur at the end ── */
+  .projects {
+    padding-block-start: clamp(2rem, 1rem + 3vw, 4rem);
+  }
+  .section-head {
+    display: grid;
+    gap: 0.25rem;
+    margin-block-end: 2.5rem;
+  }
+  @media (min-width: 64rem) {
+    .section-head {
+      grid-template-columns: 1fr 1fr;
+      align-items: end;
+    }
+    .section-head .section-lead {
+      justify-self: end;
+    }
+  }
+  .project-grid {
+    display: grid;
+    gap: 1rem;
+    padding-block-end: 1rem;
+  }
+  @media (min-width: 48rem) {
+    .project-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 72rem) {
+    .project-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  /* ── Writing: sticky intro on the left, cards on the right ── */
+  .writing {
+    display: grid;
+    gap: 2.5rem;
+    padding-block-start: clamp(5rem, 4rem + 4vw, 8rem);
+  }
+  @media (min-width: 64rem) {
+    .writing {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 2fr);
+      gap: 3rem;
+    }
+    .writing-intro {
+      position: sticky;
+      inset-block-start: 7rem;
+      align-self: start;
+    }
+  }
+  .writing-intro .link {
+    display: inline-block;
+    margin-block-start: 1.25rem;
+  }
+  .writing-grid {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 48rem) {
+    .writing-grid {
+      grid-template-columns: 1.3fr 1fr;
+    }
+    .writing-grid > :global(:first-child) {
+      grid-row: span 2;
+    }
+  }
+
+  /* ── Currently: calm cards (letters) ── */
+  .currently {
+    padding-block-start: clamp(5rem, 4rem + 4vw, 8rem);
+  }
+  .currently-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 2rem;
+    margin-block-end: 2rem;
+  }
+  .updated {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--ink-soft);
+    font-size: var(--text-step--1);
+  }
+  .currently-grid {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 48rem) {
+    .currently-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .mini-list {
+    display: grid;
+    gap: 0.5rem;
+    inline-size: min(100%, 17rem);
+    padding: 0.875rem;
+    border-radius: var(--radius-md);
+    background-color: var(--surface-raised);
+    box-shadow: var(--shadow-lift);
+    font-size: var(--text-step--1);
+  }
+  .mini-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .mini-row i {
+    inline-size: 0.875rem;
+    block-size: 0.875rem;
+    border-radius: 0.25rem;
+    border: 1.5px solid var(--line-strong);
+  }
+  .mini-row i.done {
+    border-color: var(--sage);
+    background-color: var(--sage);
+  }
+</style>
