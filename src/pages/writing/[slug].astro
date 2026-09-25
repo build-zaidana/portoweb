@@ -36,7 +36,9 @@ const { Content } = await render(post);
         <span>{readingTime(post.body)}</span>
         {sample && <SampleBadge />}
       </p>
-      <h1 class="title">{title}</h1>
+      <h1 class="title vt-morph" transition:name={`post-title-${post.id}`} transition:animate="initial">
+        {title}
+      </h1>
       <p class="dek">{description}</p>
       {(updatedAt || tags.length > 0) && (
         <p class="sub">

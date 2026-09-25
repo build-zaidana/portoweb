@@ -16,11 +16,12 @@ interface Props {
   project: CollectionEntry<"projects">;
 }
 
-const { title, art, callouts } = Astro.props.project.data;
+const { project } = Astro.props;
+const { title, art, callouts } = project.data;
 ---
 
 <figure class="figure" aria-label={`${title}, annotated`}>
-  <div class="stage">
+  <div class="stage vt-morph" transition:name={`project-art-${project.id}`} transition:animate="initial">
     <div class="art-box">
       <ProjectArt variant={art} />
     </div>

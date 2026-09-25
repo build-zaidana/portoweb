@@ -27,7 +27,11 @@ const Heading = `h${headingLevel}` as const;
     {sample && <SampleBadge />}
   </div>
 
-  <Heading class="title">
+  <Heading
+    class="title vt-morph"
+    transition:name={`project-title-${project.id}`}
+    transition:animate="initial"
+  >
     <a href={`/projects/${project.id}`} class="stretched">
       {title}
     </a>

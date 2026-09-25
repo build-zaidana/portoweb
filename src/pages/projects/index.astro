@@ -87,7 +87,11 @@ const emptyText: Record<string, string> = {
                     <StatusChip status={status} />
                     {sample && <SampleBadge />}
                   </div>
-                  <h2 class="title">
+                  <h2
+                    class="title vt-morph"
+                    transition:name={`project-title-${project.id}`}
+                    transition:animate="initial"
+                  >
                     <a class="stretched" href={`/projects/${project.id}`}>
                       <span class="title-line">{title}</span>
                     </a>
@@ -114,7 +118,11 @@ const emptyText: Record<string, string> = {
                     </div>
                   </dl>
                 </div>
-                <div class="art-frame">
+                <div
+                  class="art-frame vt-morph"
+                  transition:name={`project-art-${project.id}`}
+                  transition:animate="initial"
+                >
                   <ProjectArt variant={art} />
                 </div>
               </article>

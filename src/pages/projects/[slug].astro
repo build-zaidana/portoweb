@@ -37,7 +37,9 @@ const outline = headings.filter((heading) => heading.depth === 2);
       <StatusChip status={status} />
       {sample && <SampleBadge />}
     </div>
-    <h1 class="title">{title}</h1>
+    <h1 class="title vt-morph" transition:name={`project-title-${project.id}`} transition:animate="initial">
+      {title}
+    </h1>
     <p class="lead">{summary}</p>
 
     <dl class="facts">

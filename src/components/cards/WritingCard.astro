@@ -32,7 +32,7 @@ const Heading = `h${headingLevel}` as const;
     {sample && <SampleBadge />}
   </div>
 
-  <Heading class="title">
+  <Heading class="title vt-morph" transition:name={`post-title-${post.id}`} transition:animate="initial">
     <a href={`/writing/${post.id}`} class="stretched">
       <span class="title-line">{title}</span>
     </a>

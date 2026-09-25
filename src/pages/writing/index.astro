@@ -57,7 +57,11 @@ const years = Map.groupBy(posts, (post) => post.data.publishedAt.getUTCFullYear(
                   <span>{readingTime(post.body)}</span>
                   {post.data.sample && <SampleBadge />}
                 </p>
-                <h3 class="post-title">
+                <h3
+                  class="post-title vt-morph"
+                  transition:name={`post-title-${post.id}`}
+                  transition:animate="initial"
+                >
                   <a class="stretched" href={`/writing/${post.id}`}>
                     <span class="title-line">{post.data.title}</span>
                   </a>
