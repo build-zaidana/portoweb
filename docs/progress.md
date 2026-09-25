@@ -10,7 +10,7 @@
 | 1 | Fondasi | ✅ Selesai (Gate 1, 2026-09-25) |
 | 2 | Home + About | ✅ Selesai (Gate 2, 2026-09-25) |
 | 3 | Halaman lain | ✅ Selesai (Gate 3, 2026-09-25) |
-| 4 | Copywriting | 🔄 Copy deck siap (`docs/copy-deck.md`), menunggu pilihan user |
+| 4 | Copywriting | 🟡 Selesai, menunggu "lanjut" (Gate 4) |
 | 5 | 3 proyek pertama | ⏳ |
 | 6 | Launch | ⏳ |
 
@@ -33,6 +33,7 @@
 - 2026-09-25 — Nav memakai "Projects" (bukan "Work") supaya konsisten dengan URL & tombol.
 - 2026-09-25 — Card proyek: **batu hangat** (`--surface`) untuk semua card. Hero: **strip label ketikan** menggantikan stiker. /now **tidak** bergaya jurnal.
 - 2026-09-25 — Contact: **tanpa email & sosial** (belum ada; muncul otomatis saat diisi di `site.ts`). Newsletter: **belum ada akun Buttondown**, tampil status jujur + RSS.
+- 2026-09-25 — Copy (Gate 4): semua rekomendasi ⭐ di `docs/copy-deck.md`; AI coding assistant **tidak disebut**; logistik = "Start date and weekly hours: happy to discuss".
 - 2026-09-25 — 5 usulan review PRD disetujui: sample dikecualikan dari production (flag `SHOW_SAMPLES`), bukti non-sample di layar pertama, logistik remote, analytics gratis tanpa cookie (F8), target 2 tulisan/bulan.
 
 ## Log
@@ -223,3 +224,16 @@ User: garis margin di card hero dihapus; warna card proyek "kurang pas"; minta m
 - Nama kelas yang bentrok dengan Tailwind lagi: `.outline` (menjadi `outline: 1px solid`). Sekarang `.toc`.
 - Content store dev server bisa basi setelah file konten diedit lewat skrip; restart `astro dev --force` bila nilai tidak berubah.
 - Python di Windows menulis CRLF dalam mode teks; pakai `newline=""` saat menulis file proyek.
+
+### Fase 4 — Copywriting (2026-09-25)
+
+**Selesai:**
+- `docs/copy-deck.md`: semua teks situs per halaman, 2 alternatif + rekomendasi untuk hero, intro About, CTA penutup, terjemahan Indonesia, dan tanda 🟨 [DATA] untuk kalimat yang butuh data.
+- User memilih semua ⭐. Diterapkan: tombol hero kedua "See my projects", lead proyek di Home disamakan dengan /projects ("Things I've built or plan to build…"), baris **Availability** di About dan Contact dari `profile.availability`.
+- AI coding assistant tidak disebut (keputusan user); keputusan yang tertunda sejak Fase 2 ditutup.
+- Build 0 error, tanpa scroll horizontal; tampilan baris baru dicek di 390/1440.
+- 🔑 Satu sumber untuk fakta logistik — single source of truth · astro props from config
+
+**Tertunda (butuh data dari user, tampil otomatis saat diisi di `src/lib/site.ts`):**
+- Jam overlap, tanggal mulai, jam per minggu (ganti `profile.availability`).
+- Foto About, CV asli, email kerja, X/Instagram, Buttondown.

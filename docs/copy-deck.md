@@ -9,6 +9,12 @@
 > - 🟨 **[DATA]** = kalimat yang butuh jawaban/data dari Zaidana. Selama belum ada, kalimat itu **tidak tampil** (tidak diisi tebakan).
 > - Teks tanpa alternatif = sudah dicek dan dipertahankan (sudah lolos review `copy-reviewer` di Fase 3), atau hanya dirapikan kecil.
 
+## Keputusan (2026-09-25)
+
+- Bagian penting: **semua ⭐** (headline A, perkenalan A, tombol B "See my projects", judul & intro About A, CTA penutup A).
+- AI coding assistant: **tidak disebut** (§7 opsi B). Footer tetap "Built in public with Astro."
+- Logistik: **"Start date and weekly hours: happy to discuss"** di About dan Contact (`profile.availability`), diganti angka asli nanti.
+
 ---
 
 ## 1. Home — Hero (bagian penting)
