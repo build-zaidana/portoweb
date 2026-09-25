@@ -8,7 +8,7 @@
 |---|---|---|
 | 0 | Review & rencana | ✅ Selesai (Gate 0, 2026-09-25) |
 | 1 | Fondasi | ✅ Selesai (Gate 1, 2026-09-25) |
-| 2 | Home + About | 🔄 Berjalan |
+| 2 | Home + About | 🟡 Selesai, menunggu "lanjut" (Gate 2) |
 | 3 | Halaman lain | ⏳ |
 | 4 | Copywriting | ⏳ |
 | 5 | 3 proyek pertama | ⏳ |
@@ -24,6 +24,10 @@
 - 2026-09-25 — Font heading: **Instrument Serif**. Body: General Sans. Kode: JetBrains Mono.
 - 2026-09-25 — Foto diri: **ada, hanya di About**, bingkai persegi bersudut. Placeholder dulu.
 - 2026-09-25 — Domain: **ditunda**, pakai `*.netlify.app` dulu.
+- 2026-09-25 — Hero: konsep **A (card stack) + baris logistik** dari C.
+- 2026-09-25 — Zona waktu **WIB (UTC+7)**. Jam/minggu & tanggal mulai **tidak ditampilkan** (belum pasti).
+- 2026-09-25 — Bukti non-sample di layar pertama: **github.com/build-zaidana**.
+- 2026-09-25 — Nav memakai "Projects" (bukan "Work") supaya konsisten dengan URL & tombol.
 - 2026-09-25 — 5 usulan review PRD disetujui: sample dikecualikan dari production (flag `SHOW_SAMPLES`), bukti non-sample di layar pertama, logistik remote, analytics gratis tanpa cookie (F8), target 2 tulisan/bulan.
 
 ## Log
@@ -111,4 +115,40 @@ User: animasi terasa kaku di semua bagian (tombol, card, ganti tema, pindah hala
 - 🔑 Tema menyebar dari tombol — ::view-transition-new(root) · element.animate() pseudoElement · view-transition-name
 - 🔑 Header diam, pil aktif bergeser — astro transition:name · astro transition:animate · ::view-transition-group()
 - 🔑 Hover tidak nyangkut di HP — @media (hover: hover) · clip-path inset() transition
+
+### Fase 2 — Home + About (2026-09-25)
+**Selesai:**
+- 3 wireframe hero (`docs/wireframes/hero-concepts.html`, screenshot di `docs/screenshots/fase-2/hero-concept-*.png`). User memilih A + logistik.
+- **Home:** hero (headline, kalimat yang berganti sesuai card depan, CTA, logistik, link GitHub asli) + card stack 3D yang bisa di-swipe/tombol/keyboard di atas langit (awan halftone siang / bintang malam) + stiker "Open to remote roles"; paragraf cerita dengan scroll reveal (satu-satunya); proyek dengan progressive blur; tulisan (asimetris, judul menempel); "Currently" (card calm); penutup: card berhamburan sekali + CTA besar + wordmark raksasa di footer.
+- **About:** cerita + foto placeholder (bingkai persegi), card "What I'm looking for" (peran, lokasi, zona waktu, CV placeholder), "How I think" (3 prinsip PRD §4, baris editorial), learning timeline (2 entri asli + 2 sample), "Where to next?" dengan petunjuk dari konten asli.
+- Collection baru `timeline` (YAML, `file()` loader). Laporan sample ikut memindai YAML/JSON.
+- Kritik `copy-reviewer` & `design-critic` (7/10) → semua temuan Tinggi + Sedang diperbaiki: kalimat hero tidak lagi mengklaim sample sebagai fakta (label Sample + kata kerja dari status proyek + frasa pendek), fokus Fullstack + AI di layar pertama, judul card mobile tidak terpotong, langit malam lebih terlihat, blur mobile hanya menutupi ilustrasi, CTA utama solid, pintu "Where to next?" berisi konten asli.
+
+- `code-tidy`: 4 file dirapikan, identik per pixel. Temuannya membuka 2 bug nyata (overlay blur menghalangi klik, rasio foto desktop) → diperbaiki dan diverifikasi.
+- Lighthouse mobile (build production + sample): `/` dan `/about` = A11y 100 · Best Practices 100 · SEO 100 · Agentic 100 (setelah card stack diganti `<div role="group">`; `role` itu tidak sah di `<article>`). Trace Home Slow 4G + CPU 4×: LCP 1.73 s, CLS 0.
+
+**Keputusan:**
+- 🔑 Card hero diambil dari collections + satu card yang selalu asli ("This site") — astro content collections · getCollection · progressive enhancement
+- 🔑 Card stack tanpa autoplay, swipe/tombol/keyboard, card belakang `inert` — pointer events · setPointerCapture · inert attribute · aria-roledescription carousel
+- 🔑 Kalimat hero diumumkan sopan ke screen reader — aria-live polite · wcag 4.1.3 status messages
+- 🔑 Langit orisinal tanpa gambar — svg feTurbulence · feColorMatrix · svg mask · seeded PRNG mulberry32
+- 🔑 Scroll reveal tanpa JS — animation-timeline view() · view-timeline-name · animation-range · @supports
+- 🔑 Penutup sekali jalan, drift hanya saat terlihat — IntersectionObserver · requestAnimationFrame · @media (scripting: enabled)
+- 🔑 Progressive blur — backdrop-filter · mask-image linear-gradient · pointer-events none
+- 🔑 Stiker teks melingkar — svg textPath · textLength
+- 🔑 Timeline dari satu file data — astro file() loader · yaml
+
+**Tertunda:**
+- Kartu "This site" menaut ke profil GitHub; ganti ke repo situs kalau repo ini dipublikasikan.
+- Copy masih draf → Fase 4 (nada dinilai sudah baik oleh `copy-reviewer`; sisa poin minor dicatat di sana).
+- Di production (tanpa sample) Home hanya berisi hero + cerita + penutup sampai konten asli ada (Fase 5).
+- Newsletter (Buttondown) di Home → Fase 3 bersama form kontak.
+- `/projects`, `/writing`, `/now`, `/contact` masih 404 → Fase 3.
+- Performa: CSS render-blocking + ukuran DOM (span per kata di story, bintang di langit) → evaluasi di Fase 6.
+- Keputusan user: apakah card "This site" menyebut bahwa situs dibangun bersama AI coding assistant (usulan `copy-reviewer`).
+
+**Catatan untuk fase berikutnya:**
+- Halaman detail proyek: callout beranotasi (lovi) + format Problem → Approach → Result → Learnings.
+- Pil nav aktif sudah siap bergeser saat halaman Projects/Writing/Now ada.
+- Tambahkan field `phrase` di proyek/tulisan asli supaya kalimat hero tetap enak dibaca.
 

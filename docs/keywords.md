@@ -29,6 +29,9 @@
 | `astro:page-load` | Astro | ThemeToggle, SiteHeader | 1 |
 | `astro scoped styles :global()` | Astro | cards, styleguide | 1 |
 | `vite ?raw import` | Astro / Vite | styleguide.astro (tokens.css?raw) | 1 |
+| `astro file() loader` | Astro | src/content.config.ts (timeline) | 2 |
+| `set:text` | Astro | HeroStack (mini code) | 2 |
+| `Astro.slots.has` | Astro | ProgressiveFade, CalmCard | 2 |
 
 ## Tailwind / CSS
 
@@ -50,6 +53,13 @@
 | `backdrop-filter` | CSS | global.css (.glass) | 1 |
 | `box-decoration-break` | CSS | WritingCard (underline per baris) | 1 |
 | `css clamp()` | CSS | tokens.css (text-step-3..5) | 1 |
+| `view-timeline-name` | CSS | StoryReveal | 2 |
+| `animation-range` | CSS | StoryReveal | 2 |
+| `@media (scripting: enabled)` | CSS | HeroStack deal-in, SiteFooter scatter | 2 |
+| `-webkit-line-clamp` | CSS | HeroStack card text, WhereNext hints | 2 |
+| `transform-style preserve-3d` | CSS | HeroStack deck | 2 |
+| `touch-action pan-y` | CSS | HeroStack (swipe vs scroll) | 2 |
+| `mask-image linear-gradient` | CSS | ProgressiveFade | 2 |
 
 ## Design / Typography
 
@@ -62,6 +72,10 @@
 | `text-wrap balance` | Typography | global.css (h1–h3) | 1 |
 | `svg feTurbulence` | Illustration | SketchFilter.astro | 1 |
 | `feDisplacementMap` | Illustration | SketchFilter.astro | 1 |
+| `svg textPath` | Illustration | Sticker | 2 |
+| `svg feColorMatrix` | Illustration | SkyBackdrop (clouds) | 2 |
+| `svg mask halftone` | Illustration | SkyBackdrop | 2 |
+| `seeded PRNG mulberry32` | Illustration | SkyBackdrop (stars) | 2 |
 
 ## Accessibility
 
@@ -79,6 +93,10 @@
 | `disclosure pattern aria-expanded` | A11y | SiteHeader (menu mobile) | 1 |
 | `:focus-visible` | A11y | global.css | 1 |
 | `wcag 2.5.5 target size` | A11y | nav, tombol 44px | 1 |
+| `inert attribute` | A11y | HeroStack (back cards) | 2 |
+| `aria-live polite` | A11y | Hero phrase | 2 |
+| `wcag 4.1.3 status messages` | A11y | Hero phrase | 2 |
+| `sr-only opens in a new tab` | A11y | Hero proof link | 2 |
 
 ## Animation
 
@@ -99,6 +117,10 @@
 | `astro transition:animate` | Astro | SiteHeader (none), BaseLayout (custom) | 1 |
 | `TransitionDirectionalAnimations` | Astro | src/lib/motion.ts | 1 |
 | `::view-transition-group()` | Animation | global.css (nav-indicator) | 1 |
+| `setPointerCapture` | Animation / JS | HeroStack drag | 2 |
+| `IntersectionObserver` | Animation / JS | SiteFooter scatter | 2 |
+| `requestAnimationFrame` | Animation / JS | SiteFooter pointer drift | 2 |
+| `depth of field blur opacity` | Animation | SiteFooter floaters | 2 |
 
 ## Performance / SEO
 

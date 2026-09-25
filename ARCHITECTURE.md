@@ -1,7 +1,7 @@
 # ARCHITECTURE — Zaidana Studio
 
 > **Bagaimana** situs ini dibangun. *Apa* dan *kenapa* ada di `PRD.md`. Dokumen ini dirawat Claude Code dan diperbarui di akhir setiap fase.
-> Terakhir diperbarui: Fase 1 + revisi motion & palet (2026-09-25).
+> Terakhir diperbarui: Fase 2 (2026-09-25).
 
 ## 1. Stack
 
@@ -31,12 +31,15 @@
 │   ├── content/            # SEMUA konten Markdown (lihat §5)
 │   │   ├── projects/
 │   │   ├── writing/
-│   │   └── now/
+│   │   ├── now/
+│   │   └── timeline.yaml # milestones /about (file() loader)
 │   ├── lib/                # TypeScript murni, tanpa UI
 │   │   ├── content.ts      # SATU-SATUNYA cara halaman membaca konten (guard sample + sort)
 │   │   ├── contrast.ts     # parser token + rumus kontras (dipakai /styleguide & script)
 │   │   ├── format.ts       # format tanggal
-│   │   └── site.ts         # nama situs, deskripsi, navigasi
+│   │   ├── hero.ts         # card untuk hero stack (dari collections + card "This site")
+│   │   ├── motion.ts       # animasi transisi <main> antar halaman
+│   │   └── site.ts         # nama situs, nav, `profile` (fakta yang boleh diklaim)
 │   ├── styles/
 │   │   ├── tokens.css      # design tokens (sumber tunggal)
 │   │   └── global.css      # import Tailwind + mapping token → utility + base + komponen global
@@ -47,11 +50,15 @@
 │   │   ├── ThemeToggle.astro
 │   │   ├── SiteHeader.astro  # nav pil + menu mobile
 │   │   ├── SiteFooter.astro
-│   │   ├── ui/               # elemen kecil: Button, StatusChip, SampleBadge, SketchIcon
-│   │   └── cards/            # ProjectCard (craft), WritingCard (notch), CalmCard (letters)
+│   │   ├── WhereNext.astro   # 4 pintu navigasi (daylight)
+│   │   ├── ui/               # Button, StatusChip, SampleBadge, SketchIcon, SketchFilter, Sticker, ProgressiveFade
+│   │   ├── cards/            # ProjectCard + ProjectArt (craft), WritingCard (notch), CalmCard (letters)
+│   │   └── home/             # Hero, HeroStack, SkyBackdrop, StoryReveal
 │   └── pages/              # routing berbasis file
-│       ├── index.astro     # placeholder sampai Fase 2
+│       ├── index.astro     # Home
+│       ├── about.astro
 │       └── styleguide.astro
+├── public/cv-placeholder.pdf  # PRD F7, diganti CV asli
 └── docs/                   # progress, keywords, referensi, screenshots per fase
 ```
 
@@ -77,6 +84,10 @@ pages/*.astro  →  components/cards/*  →  HTML statis
 Paralel dengan itu, `integrations/sample-report.ts` membaca frontmatter langsung dari disk saat `astro:build:done` dan mencetak daftar file sample yang masih ada (PRD F3).
 
 **Jangan** memanggil `getCollection()` langsung dari halaman: guard sample bisa terlewat.
+
+**Fakta tentang Zaidana** (peran, negara, zona waktu, GitHub, CV) hanya diambil dari `profile` di `src/lib/site.ts`. Klaim baru harus ditambahkan di sana dulu (sumber: PRD §1/§4 atau jawaban user).
+
+**Hero stack:** `getHeroCards()` mengambil proyek teratas, entri /now terbaru, dan tulisan terbaru, lalu selalu menambahkan card asli "This site". Kata kerja kalimat hero mengikuti status proyek (idea → planning, building → building, shipped → improving). Field opsional `phrase` di proyek/tulisan dipakai untuk kalimat, dengan fallback judul berkutip. Kalau card depan adalah sample, kalimatnya ikut berlabel Sample.
 
 ## 4. Design tokens
 
@@ -204,7 +215,12 @@ Isi artikel…
 
 ## 6b. Motion
 
-Semua gerakan dipicu user, kecuali dua momen yang diorkestrasi (hero card stack dan footer, dibuat di Fase 2). Durasi 150–400ms. `prefers-reduced-motion` membuat semua `--dur-*` bernilai 0ms, transform hover/press dimatikan, dan ClientRouter menonaktifkan transisi halaman.
+Semua gerakan dipicu user, kecuali dua momen yang diorkestrasi dan satu reveal yang digerakkan scroll:
+1. **Pembuka (Home):** kata-kata hero naik pelan (3 blok), lalu card "dibagikan" ke tumpukan satu per satu (`HeroStack`, `@media (scripting: enabled)`).
+2. **Penutup (Home):** card kecil berhamburan dari tengah **sekali** saat section penutup pertama kali terlihat (IntersectionObserver). Setelah itu hanya bergeser sedikit mengikuti pointer, dan hanya saat terlihat.
+3. **Scroll reveal (Home, satu paragraf):** CSS `animation-timeline: view()`, tanpa JS, penuh tinta sebelum posisi baca.
+
+Card stack **tidak pernah autoplay**. Durasi 150–400ms. `prefers-reduced-motion` membuat semua `--dur-*` bernilai 0ms, transform hover/press dimatikan, dan ClientRouter menonaktifkan transisi halaman.
 
 | Token | Nilai | Dipakai untuk |
 |---|---|---|
@@ -266,3 +282,8 @@ Semua gerakan dipicu user, kecuali dua momen yang diorkestrasi (hero card stack 
 | 009 | TS 6: `"types": ["node"]` di tsconfig | TS 6 tidak lagi memuat `@types/*` otomatis; dibutuhkan untuk `integrations/` dan `scripts/` | — |
 | 010 | Easing spring via CSS `linear()` | Terasa fisik dan halus tanpa library JS; tetap CSS murni dan ikut reduced motion | Library animasi (Motion/GSAP), menambah JS |
 | 011 | Pil nav aktif transparan + View Transition bernama | Pil bisa bergeser antar halaman tanpa menutupi label | Pil hitam solid (label tertutup saat bergeser) |
+| 012 | Card hero dari collections + 1 card selalu asli | Hero tidak pernah kosong di production, dan sample tetap mengikuti guard | Card hardcoded di komponen |
+| 013 | Kalimat hero dari status + `phrase` + label Sample | Tidak mengklaim ide sebagai "building", grammar tidak rusak oleh judul | Menempel judul mentah |
+| 014 | Langit dari SVG filter (bukan gambar) | Orisinal, ringan, otomatis ikut tema lewat token | Foto/ilustrasi awan (aset berlisensi, berat) |
+| 015 | Scroll reveal dengan CSS scroll-driven animations | Nol JS, mudah dimatikan, fallback teks penuh | GSAP ScrollTrigger |
+| 016 | Timeline sebagai collection `file()` YAML | Satu file mudah diedit, ikut guard sample | Array di halaman (lolos dari guard) |
