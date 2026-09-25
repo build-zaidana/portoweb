@@ -11,10 +11,10 @@ Website personal branding untuk Zaidana, mahasiswa Software Engineering (21, Ind
 
 ## 2. Tujuan & metrik sukses
 
-| # | Tujuan | Sinyal sukses (dicek manual, tanpa analytics berbayar) |
+| # | Tujuan | Sinyal sukses (dicek manual + analytics gratis tanpa cookie, lihat F8) |
 |---|---|---|
-| G1 | Mendapat peluang kerja remote (junior/intern SWE, luar negeri) | Ada pesan masuk lewat form kontak/email; link CV diklik |
-| G2 | Menjadi pusat konten & perjalanan belajar | ≥ 1 tulisan per minggu terbit; halaman Now diperbarui tiap bulan |
+| G1 | Mendapat peluang kerja remote (junior/intern SWE, luar negeri) | Ada pesan masuk lewat form kontak/email; link CV diklik (diukur lewat F8) |
+| G2 | Menjadi pusat konten & perjalanan belajar | ≥ 2 tulisan per bulan terbit; halaman Now diperbarui tiap bulan; tanggal terbit/update terlihat jelas di setiap halaman |
 | G3 | Membangun jejaring | Subscriber newsletter bertambah; ada balasan/diskusi |
 
 **Non-goals (v1):** komentar blog, login, CMS, multi-bahasa, analytics berbayar, e-commerce.
@@ -22,7 +22,8 @@ Website personal branding untuk Zaidana, mahasiswa Software Engineering (21, Ind
 ## 3. Persona
 
 **Rian, 32, tech lead di startup remote (persona utama).** Sibuk, praktis, men-scan halaman dalam < 30 detik. Tidak peduli gelar. Yang dia cari: proyek nyata, cara berpikir, dan kemampuan komunikasi.
-→ *Kebutuhan:* dalam 1 layar pertama dia harus tahu siapa Zaidana, fokusnya apa, sedang mencari apa, dan ke mana melihat bukti.
+→ *Kebutuhan:* dalam 1 layar pertama dia harus tahu siapa Zaidana, fokusnya apa, sedang mencari apa, dan ke mana melihat bukti. **Buktinya harus nyata:** minimal 1 link non-sample (GitHub profile atau repo latihan asli) terlihat di layar pertama, walaupun semua proyek masih sample.
+→ *Kebutuhan logistik (remote):* peran yang dicari, zona waktu (WIB, UTC+7) dan jam overlap yang bisa disediakan, ketersediaan (mulai kapan), dan jam per minggu harus bisa ditemukan dalam 1 klik (About dan Contact).
 
 **Sesama mahasiswa/developer (persona sekunder).** Ingin belajar bersama.
 → *Kebutuhan:* tulisan yang mudah dicerna, bisa subscribe, dan jelas cara mengajak diskusi.
@@ -42,12 +43,12 @@ Website personal branding untuk Zaidana, mahasiswa Software Engineering (21, Ind
 
 | Prioritas | Halaman | Tujuan | Isi |
 |---|---|---|---|
-| **MVP** | `/` Home | G1 G2 G3 | Hero (nama, value prop, status "Open to remote internships", CTA) → sorotan proyek → tulisan terbaru → "Currently learning" → newsletter |
-| **MVP** | `/about` | G1 | Cerita singkat, learning timeline, filosofi, cara berpikir, apa yang dicari, link CV |
+| **MVP** | `/` Home | G1 G2 G3 | Hero (nama, value prop, status "Open to remote internships", CTA, **≥ 1 link bukti non-sample**) → sorotan proyek → tulisan terbaru → "Currently learning" → newsletter |
+| **MVP** | `/about` | G1 | Cerita singkat, learning timeline, filosofi, cara berpikir, apa yang dicari (peran, zona waktu & jam overlap, ketersediaan, jam/minggu), link CV |
 | **MVP** | `/projects` + `/projects/[slug]` | G1 | 3–5 proyek dengan format **Problem → Approach → Result → Learnings**, stack, status (idea / building / shipped), repo, demo |
 | **MVP** | `/writing` + `/writing/[slug]` | G2 | Daftar artikel, tag, waktu baca, RSS |
 | **MVP** | `/now` | G1 G2 | Apa yang sedang dipelajari/dibangun bulan ini (konsep nownownow.com). Murah dirawat, sinyal kuat bahwa kamu aktif |
-| **MVP** | `/contact` | G1 G3 | Form, email, GitHub, X, Instagram, ajakan "let's talk tech" |
+| **MVP** | `/contact` | G1 G3 | Form, email, GitHub, X, Instagram, ajakan "let's talk tech", ringkasan zona waktu & ketersediaan |
 | **MVP** | Newsletter | G3 | Form subscribe di Home dan di akhir setiap artikel (bukan halaman terpisah) |
 | **MVP** | `/404` | — | Ramah, berisi link kembali |
 | Nanti | `/learn` (How Things Work) | G2 | Penjelasan sederhana. Tunggu sampai ada ≥ 3 tulisan |
@@ -61,11 +62,12 @@ Website personal branding untuk Zaidana, mahasiswa Software Engineering (21, Ind
 
 - F1. Light & dark mode: mengikuti sistem, ada toggle manual, pilihan tersimpan, tidak ada flash saat load.
 - F2. Konten dari file Markdown dengan schema yang divalidasi (blog, projects, now).
-- F3. **Konten dummy:** setiap entri dummy memakai `sample: true` dan label visual "Sample". Build production **gagal** (atau mengecualikan entri tersebut) selama masih ada entri sample, supaya konten palsu tidak ikut tayang tanpa sengaja.
+- F3. **Konten dummy:** setiap entri dummy memakai `sample: true` dan label visual "Sample". Entri sample **dikecualikan otomatis dari build production** dan hanya tampil di dev atau di deploy preview yang menyalakan flag env `SHOW_SAMPLES=true`. Build mencetak daftar entri sample yang masih ada, supaya konten palsu tidak ikut tayang tanpa sengaja dan tetap mudah dilacak. *(Diubah di Gate 0: versi awal "build gagal" membuat rilis v1 yang berisi dummy tidak bisa di-deploy.)*
 - F4. RSS feed, sitemap, robots.txt, meta + Open Graph image per halaman.
 - F5. Form kontak yang berfungsi di hosting gratis. Form newsletter memakai Buttondown.
 - F6. Transisi halaman dan micro-interaction yang halus, dan mati saat `prefers-reduced-motion`.
 - F7. CV (PDF) bisa diunduh dari About dan Contact (placeholder dulu).
+- F8. Analytics gratis, tanpa cookie, dan tanpa banner consent (GoatCounter atau Cloudflare Web Analytics, dipilih di Fase 6) untuk mengukur kunjungan dan klik link CV/kontak. Tidak ada data pribadi yang dikumpulkan.
 
 ## 7. Kebutuhan non-fungsional
 
