@@ -150,6 +150,10 @@
 | `IntersectionObserver` | Animation / JS | SiteFooter scatter | 2 |
 | `requestAnimationFrame` | Animation / JS | SiteFooter pointer drift | 2 |
 | `depth of field blur opacity` | Animation | SiteFooter floaters | 2 |
+| `view-transition-class` | Animation | global.css (.vt-morph) | 5 |
+| `::view-transition-group` | Animation | global.css (durasi morph) | 5 |
+| `::view-transition-old :only-child` | Animation | global.css (elemen tanpa pasangan) | 5 |
+| `document.getAnimations()` | Animation | Verifikasi transisi (Playwright) | 5 |
 
 ## Performance / SEO
 

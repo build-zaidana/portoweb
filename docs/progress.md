@@ -263,3 +263,11 @@ User: kiri-kanan terlalu kosong. Terukur: di 1920px konten hanya 1216px (345px k
 - `.wrap` sekarang `min(100% - 2 × --gutter, --page-max)` dengan `--page-max: 88rem` dan gutter cair (`clamp(1.25rem, 5vw - 0.5rem, 6rem)`): 1920px → konten 1408px (tepi 249px), 1440px → tepi 64px, HP tetap 20px.
 - Tanpa scroll horizontal di 360/390/768/1024/1280/1440/1920. Build 0 error.
 - 🔑 Lebar konten responsif — css min() · css clamp() · fluid gutter
+
+#### Revisi: dekorasi daun & transisi halaman (2026-09-25)
+- Mockup daun (A garis, B kertas, lalu tanaman besar) di `docs/screenshots/mockups/`. **Keputusan user: tidak pakai daun**, halaman dibiarkan kosong dulu.
+- Transisi antar halaman diperhalus: judul proyek/tulisan dan ilustrasi proyek **berpindah dan berubah ukuran** dari daftar (Home, /projects, /writing) ke halaman detail, dan sebaliknya saat Back. Elemen lain pudar mengikuti ritme `<main>` (160ms keluar, 400ms masuk). Header/footer ikut ritme yang sama.
+- Tanpa bayangan ganda: pasangan hanya menampilkan snapshot baru; judul memakai `inline-size: fit-content` supaya yang diskalakan adalah teksnya.
+- Reduced motion: semua animasi view transition dimatikan (terverifikasi 0 animasi berjalan). Build 0 error.
+- 🔑 Elemen yang berpindah antar halaman — astro transition:name · view-transition-class · ::view-transition-group
+- 🔑 Hanya animasikan elemen tanpa pasangan — ::view-transition-old :only-child · document.getAnimations()
