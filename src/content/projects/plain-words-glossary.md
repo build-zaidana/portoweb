@@ -8,6 +8,17 @@ startedAt: 2026-09-10
 tint: sage
 heroNote: one word per page
 art: cards
+callouts:
+  - label: Picture first
+    note: Readers aged 14–18 skim. A picture carries the idea before the definition does.
+    x: 34
+    y: 26
+    side: left
+  - label: One term per card
+    note: Short enough to read on a phone between classes.
+    x: 70
+    y: 48
+    side: right
 sample: true
 ---
 

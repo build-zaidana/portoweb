@@ -8,6 +8,17 @@ startedAt: 2026-08-18
 tint: sky
 heroNote: every answer links back to the notes
 art: form
+callouts:
+  - label: One text box
+    note: Paste notes and go. No account, no settings, so the first question appears in seconds.
+    x: 38
+    y: 24
+    side: left
+  - label: Answers link to the source
+    note: Every answer points back to the sentence it came from, so a wrong question is easy to spot.
+    x: 60
+    y: 62
+    side: right
 featured: true
 sample: true
 ---

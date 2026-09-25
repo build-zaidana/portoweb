@@ -1,0 +1,221 @@
+---
+/**
+ * Project picture with annotated callouts (lovi.care reference): a dot on the picture,
+ * a thin line, and a small card that explains one decision. It shows how the project
+ * was thought through, not just what it looks like.
+ *
+ * One list serves both layouts, so screen readers hear each note once:
+ *   - wide screens: every note is positioned over the picture (dot → line → card)
+ *   - phones: notes become a numbered list under the picture; numbered dots stay on it
+ * Until the project has a real screenshot, the picture is its ProjectArt mini-UI.
+ */
+import type { CollectionEntry } from "astro:content";
+import ProjectArt from "./cards/ProjectArt.astro";
+
+interface Props {
+  project: CollectionEntry<"projects">;
+}
+
+const { title, art, callouts } = Astro.props.project.data;
+---
+
+<figure class="figure" aria-label={`${title}: picture with notes`}>
+  <div class="stage">
+    <div class="art-box">
+      <ProjectArt variant={art} />
+    </div>
+    <div class="dots" aria-hidden="true">
+      {callouts.map((callout, i) => (
+        <span class="dot" style={`--x: ${callout.x}; --y: ${callout.y}`}>
+          {i + 1}
+        </span>
+      ))}
+    </div>
+  </div>
+
+  {callouts.length > 0 && (
+    <ol class="notes" role="list">
+      {callouts.map((callout, i) => (
+        <li class="note" data-side={callout.side} style={`--x: ${callout.x}; --y: ${callout.y}`}>
+          <span class="pin" aria-hidden="true" />
+          <span class="line" aria-hidden="true" />
+          <span class="card">
+            <span class="num" aria-hidden="true">
+              {i + 1}
+            </span>
+            <span class="card-text">
+              <strong class="label">{callout.label}</strong>
+              <span class="text">{callout.note}</span>
+            </span>
+          </span>
+        </li>
+      ))}
+    </ol>
+  )}
+</figure>
+
+<style>
+  /* Callout x/y are percentages of the illustration box, not the stage, so a dot lands on
+     the same part of the picture on phones and on wide screens. --box-* place that box. */
+  .figure {
+    /* The mini-UI is ~12rem tall at zoom 1, so the box height follows the zoom and a
+       y percentage means the same spot at every width. */
+    --zoom: 1.2;
+    --box-l: 8%;
+    --box-t: 2rem;
+    --box-w: 84%;
+    --box-h: calc(12rem * var(--zoom));
+    position: relative;
+  }
+  /* Resolved on each dot/note, where its own --x/--y are set. */
+  .dot,
+  .note {
+    --at-x: calc(var(--box-l) + var(--x) * var(--box-w) / 100);
+    --at-y: calc(var(--box-t) + var(--y) * var(--box-h) / 100);
+  }
+  .stage {
+    position: relative;
+    /* The picture bleeds off the bottom edge a little, like on the cards. */
+    block-size: calc(var(--box-t) + var(--box-h) * 0.9);
+    border-radius: var(--radius-xl);
+    background-color: var(--surface);
+    overflow: hidden;
+  }
+  /* The mini-UI is drawn for a card; here it is scaled up and centered. */
+  .art-box {
+    position: absolute;
+    inset-inline-start: var(--box-l);
+    inset-block-start: var(--box-t);
+    inline-size: var(--box-w);
+    block-size: var(--box-h);
+    display: flex;
+  }
+  .art-box :global(.art) {
+    zoom: var(--zoom);
+    margin: 0;
+  }
+
+  .num,
+  .dot {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    border-radius: 999px;
+    background-color: var(--ink);
+    color: var(--paper);
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .dot {
+    position: absolute;
+    inset-inline-start: var(--at-x);
+    inset-block-start: var(--at-y);
+    translate: -50% -50%;
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--paper) 70%, transparent);
+  }
+
+  /* Phones: numbered list under the picture. */
+  .notes {
+    display: grid;
+    gap: 1rem;
+    margin-block-start: 1.25rem;
+  }
+  .pin,
+  .line {
+    display: none;
+  }
+  .card {
+    display: flex;
+    gap: 0.75rem;
+    align-items: start;
+  }
+  .card-text {
+    display: grid;
+    gap: 0.2rem;
+  }
+  .label {
+    font-weight: 600;
+  }
+  .text {
+    color: var(--ink-soft);
+    font-size: var(--text-step--1);
+    line-height: 1.5;
+  }
+
+  /* Wide screens: each note sits on the picture — pin at (x, y), a line, then the card
+     against the picture's edge. Hovering a note strengthens its line and pin. */
+  @media (min-width: 56rem) {
+    .figure {
+      --zoom: 1.7;
+      --box-l: 28%;
+      --box-t: 3.5rem;
+      --box-w: 44%;
+    }
+    .dots {
+      display: none;
+    }
+    .notes {
+      position: absolute;
+      inset: 0;
+      margin: 0;
+      pointer-events: none;
+    }
+    .note {
+      position: absolute;
+      inset-block-start: var(--at-y);
+      inset-inline: var(--at-x) 1.5rem;
+      display: flex;
+      align-items: center;
+      translate: 0 -50%;
+      pointer-events: auto;
+    }
+    .note[data-side="left"] {
+      inset-inline: 1.5rem calc(100% - var(--at-x));
+      flex-direction: row-reverse;
+    }
+    .pin {
+      display: block;
+      flex: none;
+      inline-size: 0.75rem;
+      block-size: 0.75rem;
+      margin-inline: -0.375rem 0;
+      border-radius: 999px;
+      background-color: var(--ink);
+      box-shadow: 0 0 0 4px color-mix(in oklab, var(--paper) 75%, transparent);
+      transition: box-shadow var(--dur-3) var(--ease-spring);
+    }
+    .note[data-side="left"] .pin {
+      margin-inline: 0 -0.375rem;
+    }
+    .line {
+      display: block;
+      flex: 1;
+      min-inline-size: 1.5rem;
+      block-size: 0;
+      border-block-start: 1.5px dashed var(--line-strong);
+      transition: border-color var(--dur-2) var(--ease-out);
+    }
+    .card {
+      flex: none;
+      inline-size: min(15rem, 22vw);
+      padding: 0.85rem 1rem;
+      border-radius: var(--radius-md);
+      background-color: var(--surface-raised);
+      box-shadow: var(--shadow-lift);
+      transition: translate var(--dur-4) var(--ease-spring);
+    }
+    .note:hover .line {
+      border-block-start-style: solid;
+      border-color: var(--ink);
+    }
+    .note:hover .pin {
+      box-shadow: 0 0 0 7px color-mix(in oklab, var(--sage) 45%, transparent);
+    }
+    .note:hover .card {
+      translate: 0 -2px;
+    }
+  }
+</style>

@@ -1,0 +1,313 @@
+---
+/**
+ * Project write-up. Order follows what Rian scans for:
+ *   what it is + status + links → annotated picture (how it was thought through)
+ *   → Problem → Approach → Result → Learnings (Markdown body), with a sticky outline.
+ */
+import type { GetStaticPaths } from "astro";
+import { render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ProjectFigure from "../../components/ProjectFigure.astro";
+import StatusChip from "../../components/ui/StatusChip.astro";
+import SampleBadge from "../../components/ui/SampleBadge.astro";
+import SketchIcon from "../../components/ui/SketchIcon.astro";
+import BackLink from "../../components/ui/BackLink.astro";
+import { getProjects } from "../../lib/content";
+import { formatMonth, isoDate } from "../../lib/format";
+
+export const getStaticPaths = (async () => {
+  const projects = await getProjects();
+  return projects.map((project, i) => ({
+    params: { slug: project.id },
+    // Wraps around, so the last project still points somewhere useful.
+    props: { project, next: projects.length > 1 ? projects[(i + 1) % projects.length] : undefined },
+  }));
+}) satisfies GetStaticPaths;
+
+const { project, next } = Astro.props;
+const { title, summary, status, stack, startedAt, updatedAt, repo, demo, sample } = project.data;
+const { Content, headings } = await render(project);
+const outline = headings.filter((heading) => heading.depth === 2);
+---
+
+<BaseLayout title={title} description={summary} ogType="article">
+  <header class="head wrap">
+    <BackLink href="/projects">All projects</BackLink>
+    <div class="meta">
+      <StatusChip status={status} />
+      {sample && <SampleBadge />}
+    </div>
+    <h1 class="title">{title}</h1>
+    <p class="lead">{summary}</p>
+
+    <dl class="facts">
+      <div>
+        <dt>Started</dt>
+        <dd>
+          <time datetime={isoDate(startedAt)}>{formatMonth(startedAt)}</time>
+        </dd>
+      </div>
+      {updatedAt && (
+        <div>
+          <dt>Updated</dt>
+          <dd>
+            <time datetime={isoDate(updatedAt)}>{formatMonth(updatedAt)}</time>
+          </dd>
+        </div>
+      )}
+      <div>
+        <dt>Stack</dt>
+        <dd>{stack.join(", ")}</dd>
+      </div>
+      <div>
+        <dt>Code</dt>
+        <dd>
+          {repo ? (
+            <a class="link" href={repo} target="_blank" rel="noopener">
+              Repository<span class="sr-only"> (opens in a new tab)</span>
+            </a>
+          ) : (
+            <span class="soft">Not public yet</span>
+          )}
+        </dd>
+      </div>
+      <div>
+        <dt>Demo</dt>
+        <dd>
+          {demo ? (
+            <a class="link" href={demo} target="_blank" rel="noopener">
+              Live demo<span class="sr-only"> (opens in a new tab)</span>
+            </a>
+          ) : (
+            <span class="soft">{status === "shipped" ? "Offline for now" : "Not built yet"}</span>
+          )}
+        </dd>
+      </div>
+    </dl>
+  </header>
+
+  <div class="wrap">
+    <ProjectFigure project={project} />
+  </div>
+
+  <div class="body wrap">
+    {outline.length > 1 && (
+      <nav class="toc" aria-label="On this page">
+        <p class="toc-title">On this page</p>
+        <ul role="list">
+          {outline.map((heading) => (
+            <li>
+              <a href={`#${heading.slug}`} data-outline-link={heading.slug}>
+                {heading.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    )}
+    <article class="markdown" data-outline-source>
+      <Content />
+    </article>
+  </div>
+
+  {next && (
+    <nav class="next wrap" aria-label="Next project">
+      <a class="next-link" href={`/projects/${next.id}`}>
+        <span class="next-kicker">Next project</span>
+        <span class="next-title">{next.data.title}</span>
+        <span class="next-summary">{next.data.summary}</span>
+        <span class="next-icon" aria-hidden="true">
+          <SketchIcon name="arrow" size={28} />
+        </span>
+      </a>
+    </nav>
+  )}
+</BaseLayout>
+
+<script>
+  /** Marks the outline link of the section being read (IntersectionObserver, no scroll handlers). */
+  function initOutline() {
+    const links = document.querySelectorAll<HTMLAnchorElement>("[data-outline-link]");
+    const source = document.querySelector("[data-outline-source]");
+    if (links.length === 0 || !source) return;
+    const byId = new Map([...links].map((link) => [link.dataset.outlineLink, link]));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          for (const link of links) link.removeAttribute("aria-current");
+          byId.get(entry.target.id)?.setAttribute("aria-current", "true");
+        }
+      },
+      // A thin band near the top of the viewport: the heading that crosses it is "current".
+      { rootMargin: "-20% 0px -70% 0px" },
+    );
+    source.querySelectorAll("h2[id]").forEach((heading) => observer.observe(heading));
+    document.addEventListener("astro:before-swap", () => observer.disconnect(), { once: true });
+  }
+  document.addEventListener("astro:page-load", initOutline);
+</script>
+
+<style>
+  .head {
+    display: grid;
+    gap: 1.1rem;
+    padding-block: clamp(2rem, 1.5rem + 3vw, 4rem) 2.5rem;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .title {
+    max-inline-size: 18ch;
+    font-size: var(--text-step-4);
+    line-height: var(--text-step-4--line-height);
+  }
+  .lead {
+    max-inline-size: 52ch;
+    font-size: var(--text-step-1);
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: 1rem 2rem;
+    margin-block-start: 1.25rem;
+    padding-block-start: 1.25rem;
+    border-block-start: 1px solid var(--line);
+    font-size: var(--text-step--1);
+  }
+  .facts dt {
+    margin-block-end: 0.2rem;
+    color: var(--ink-soft);
+  }
+  .soft {
+    color: var(--ink-soft);
+  }
+
+  /* ── Body: sticky outline + Markdown ── */
+  .body {
+    display: grid;
+    gap: 2rem;
+    padding-block: clamp(3rem, 2rem + 4vw, 6rem);
+  }
+  @media (min-width: 64rem) {
+    .body {
+      grid-template-columns: 13rem minmax(0, var(--measure));
+      gap: 4rem;
+      justify-content: start;
+    }
+    .toc {
+      position: sticky;
+      inset-block-start: 7rem;
+      align-self: start;
+    }
+  }
+  .toc-title {
+    margin-block-end: 0.75rem;
+    color: var(--ink-soft);
+    font-size: var(--text-step--1);
+  }
+  .toc ul {
+    display: grid;
+    gap: 0.2rem;
+    border-inline-start: 1px solid var(--line-strong);
+  }
+  .toc a {
+    display: block;
+    margin-inline-start: -1px;
+    padding: 0.35rem 0 0.35rem 1rem;
+    border-inline-start: 2px solid transparent;
+    color: var(--ink-soft);
+    font-size: var(--text-step--1);
+    text-decoration: none;
+    transition:
+      color var(--dur-2) var(--ease-out),
+      border-color var(--dur-3) var(--ease-out);
+  }
+  .toc a:hover {
+    color: var(--ink);
+  }
+  .toc a[aria-current] {
+    border-color: var(--accent);
+    color: var(--ink);
+    font-weight: 500;
+  }
+  @media (max-width: 63.99rem) {
+    /* Phones and tablets: the outline is a short row of jump links, not a sidebar. */
+    .toc ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      border: 0;
+    }
+    .toc a {
+      margin: 0;
+      padding: 0.4rem 0.85rem;
+      border: 1px solid var(--line-strong);
+      border-radius: 999px;
+    }
+  }
+
+  /* ── Next project ── */
+  .next {
+    padding-block-end: clamp(4rem, 3rem + 4vw, 7rem);
+  }
+  .next-link {
+    position: relative;
+    display: grid;
+    gap: 0.4rem;
+    padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    padding-inline-end: 6rem;
+    border-radius: var(--radius-xl);
+    background-color: var(--surface);
+    color: inherit;
+    text-decoration: none;
+    transition:
+      background-color var(--dur-2) var(--ease-out),
+      transform var(--dur-4) var(--ease-spring);
+  }
+  .next-kicker {
+    color: var(--ink-soft);
+    font-size: var(--text-step--1);
+  }
+  .next-title {
+    font-family: var(--font-display);
+    font-size: var(--text-step-3);
+    line-height: var(--text-step-3--line-height);
+  }
+  .next-summary {
+    max-inline-size: 52ch;
+    color: var(--ink-soft);
+  }
+  .next-icon {
+    position: absolute;
+    inset-inline-end: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    inset-block-start: 50%;
+    display: grid;
+    place-items: center;
+    inline-size: 3.25rem;
+    block-size: 3.25rem;
+    border-radius: var(--radius-md);
+    background-color: var(--surface-raised);
+    translate: 0 -50%;
+    transition:
+      translate var(--dur-4) var(--ease-spring),
+      background-color var(--dur-2) var(--ease-out);
+  }
+  @media (hover: hover) {
+    .next-link:hover {
+      background-color: var(--tint-tan);
+    }
+    .next-link:hover .next-icon {
+      translate: 4px -50%;
+      background-color: var(--tan);
+      color: var(--on-fill);
+    }
+  }
+  .next-link:active {
+    transform: scale(0.99);
+  }
+</style>

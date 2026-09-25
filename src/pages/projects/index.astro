@@ -1,0 +1,377 @@
+---
+/**
+ * Projects index. An editorial list (one wide row per project), not the card grid from Home,
+ * so the two pages don't repeat each other.
+ *
+ * Status filter = native radio group (letters.app segmented control):
+ *   - filtering is pure CSS (:has(:checked)), so it works without JavaScript
+ *   - a small script only slides the active pill and announces the result count
+ */
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ProjectArt from "../../components/cards/ProjectArt.astro";
+import StatusChip from "../../components/ui/StatusChip.astro";
+import SampleBadge from "../../components/ui/SampleBadge.astro";
+import WhereNext from "../../components/WhereNext.astro";
+import { getProjects, getWriting, getLatestNow } from "../../lib/content";
+import { formatMonth, isoDate } from "../../lib/format";
+
+const [projects, writing, now] = await Promise.all([getProjects(), getWriting(), getLatestNow()]);
+
+const count = (status: string) => projects.filter((p) => p.data.status === status).length;
+const filters = [
+  { value: "all", label: "All", count: projects.length },
+  { value: "building", label: "Building", count: count("building") },
+  { value: "idea", label: "Ideas", count: count("idea") },
+  { value: "shipped", label: "Shipped", count: count("shipped") },
+];
+
+/** What an empty filter says: honest about being early, never "no results". */
+const emptyText: Record<string, string> = {
+  building: "Nothing in progress right now. The next build starts from the ideas list.",
+  idea: "No open ideas at the moment.",
+  shipped: "Nothing shipped yet. The first one is on its way.",
+};
+---
+
+<BaseLayout
+  title="Projects"
+  description="Small tools for students and young learners, each written up as problem, approach, result, and what I learned."
+>
+  <section class="head wrap" aria-labelledby="projects-title">
+    <h1 id="projects-title" class="page-title">
+      Projects
+    </h1>
+    <p class="lead">
+      Small tools for students and young learners. Each write-up covers the problem, my approach, what
+      happened, and what I learned, including what didn't work.
+    </p>
+  </section>
+
+  {projects.length === 0 ? (
+    <p class="wrap none">The first project write-up is on its way. Until then, the code is on GitHub.</p>
+  ) : (
+    <div class="wrap listing" data-listing>
+      <fieldset class="seg" data-seg>
+        <legend class="sr-only">Show projects by status</legend>
+        {filters.map((filter) => (
+          <label class="seg-opt">
+            <input
+              class="sr-only"
+              type="radio"
+              name="project-status"
+              value={filter.value}
+              checked={filter.value === "all"}
+            />
+            <span class="seg-text">
+              {filter.label} <span class="seg-count">{filter.count}</span>
+            </span>
+          </label>
+        ))}
+        <span class="seg-pill" aria-hidden="true"></span>
+      </fieldset>
+      <p class="sr-only" aria-live="polite" data-seg-status></p>
+
+      <ol class="rows" role="list">
+        {projects.map((project) => {
+          const { title, summary, status, stack, art, startedAt, updatedAt, sample } = project.data;
+          return (
+            <li class="row-wrap" data-status={status}>
+              <article class="project-row">
+                <div class="text">
+                  <div class="meta">
+                    <StatusChip status={status} />
+                    {sample && <SampleBadge />}
+                  </div>
+                  <h2 class="title">
+                    <a class="stretched" href={`/projects/${project.id}`}>
+                      <span class="title-line">{title}</span>
+                    </a>
+                  </h2>
+                  <p class="summary">{summary}</p>
+                  <dl class="facts">
+                    <div>
+                      <dt>Started</dt>
+                      <dd>
+                        <time datetime={isoDate(startedAt)}>{formatMonth(startedAt)}</time>
+                      </dd>
+                    </div>
+                    {updatedAt && (
+                      <div>
+                        <dt>Updated</dt>
+                        <dd>
+                          <time datetime={isoDate(updatedAt)}>{formatMonth(updatedAt)}</time>
+                        </dd>
+                      </div>
+                    )}
+                    <div>
+                      <dt>Stack</dt>
+                      <dd>{stack.join(", ")}</dd>
+                    </div>
+                  </dl>
+                </div>
+                <div class="art-frame">
+                  <ProjectArt variant={art} />
+                </div>
+              </article>
+            </li>
+          );
+        })}
+      </ol>
+
+      {Object.entries(emptyText).map(([status, text]) => (
+        <p class="empty" data-empty={status}>
+          {text}
+        </p>
+      ))}
+    </div>
+  )}
+
+  <WhereNext
+    hints={{
+      writing: writing[0] ? `Latest: ${writing[0].data.title}` : undefined,
+      now: now ? `Updated ${formatMonth(now.data.month)}` : undefined,
+    }}
+  />
+</BaseLayout>
+
+<script>
+  /**
+   * Progressive enhancement for the status filter: slides the active pill under the checked
+   * option and announces how many projects are shown. Filtering itself is CSS.
+   */
+  function initFilter() {
+    const seg = document.querySelector<HTMLElement>("[data-seg]");
+    const status = document.querySelector<HTMLElement>("[data-seg-status]");
+    const listing = document.querySelector<HTMLElement>("[data-listing]");
+    if (!seg || !status || !listing) return;
+
+    const place = () => {
+      const label = seg.querySelector<HTMLInputElement>("input:checked")?.closest("label");
+      if (!label) return;
+      seg.style.setProperty("--pill-x", `${label.offsetLeft}px`);
+      seg.style.setProperty("--pill-w", `${label.offsetWidth}px`);
+    };
+    place();
+    seg.dataset.ready = "";
+
+    seg.addEventListener("change", (event) => {
+      place();
+      const value = (event.target as HTMLInputElement).value;
+      const shown = listing.querySelectorAll(
+        value === "all" ? ".row-wrap" : `.row-wrap[data-status="${value}"]`,
+      ).length;
+      status.textContent = `Showing ${shown} ${shown === 1 ? "project" : "projects"}.`;
+    });
+    // Label widths change when fonts finish loading or the viewport resizes.
+    new ResizeObserver(place).observe(seg);
+  }
+  document.addEventListener("astro:page-load", initFilter);
+</script>
+
+<style>
+  .head {
+    display: grid;
+    gap: 1.25rem;
+    padding-block: clamp(2.5rem, 1.5rem + 4vw, 5rem) 2.5rem;
+  }
+  @media (min-width: 64rem) {
+    .head {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: end;
+    }
+  }
+  .lead {
+    max-inline-size: 46ch;
+    font-size: var(--text-step-1);
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+
+  /* ── Segmented control ── */
+  .seg {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    max-inline-size: 100%;
+    gap: 0.25rem;
+    padding: 0.3rem;
+    border: 0;
+    border-radius: 999px;
+    background-color: var(--surface);
+  }
+  .seg-opt {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.5rem;
+    padding-inline: 1rem;
+    border-radius: 999px;
+    color: var(--ink-soft);
+    font-size: var(--text-step--1);
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      color var(--dur-2) var(--ease-out),
+      background-color var(--dur-2) var(--ease-out);
+  }
+  .seg-opt:hover {
+    color: var(--ink);
+  }
+  .seg-opt:has(:checked) {
+    color: var(--ink);
+    background-color: var(--surface-raised);
+    box-shadow: var(--shadow-lift);
+  }
+  .seg-opt:has(:focus-visible) {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  .seg-opt:active {
+    scale: 0.97;
+  }
+  /* Small phones: tighter options so all four stay on one line. */
+  @media (max-width: 29.99rem) {
+    .seg {
+      gap: 0;
+    }
+    .seg-opt {
+      padding-inline: 0.7rem;
+    }
+  }
+  .seg-count {
+    margin-inline-start: 0.2rem;
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+  }
+  /* With JS: one pill slides between options instead of each option painting its own. */
+  .seg-pill {
+    display: none;
+  }
+  .seg[data-ready] .seg-opt:has(:checked) {
+    background-color: transparent;
+    box-shadow: none;
+  }
+  .seg[data-ready] .seg-pill {
+    display: block;
+    position: absolute;
+    z-index: -1;
+    inset-block: 0.3rem;
+    inset-inline-start: 0;
+    inline-size: var(--pill-w, 0);
+    translate: var(--pill-x, 0) 0;
+    border-radius: 999px;
+    background-color: var(--surface-raised);
+    box-shadow: var(--shadow-lift);
+    transition:
+      translate var(--dur-4) var(--ease-spring),
+      inline-size var(--dur-4) var(--ease-spring);
+  }
+
+  /* ── Filtering (CSS only) ── */
+  .listing:has([value="building"]:checked) .row-wrap:not([data-status="building"]),
+  .listing:has([value="idea"]:checked) .row-wrap:not([data-status="idea"]),
+  .listing:has([value="shipped"]:checked) .row-wrap:not([data-status="shipped"]) {
+    display: none;
+  }
+  .none {
+    padding-block: 2rem 5rem;
+    color: var(--ink-soft);
+    font-size: var(--text-step-1);
+  }
+  .empty {
+    display: none;
+    padding-block: 3rem;
+    color: var(--ink-soft);
+    font-size: var(--text-step-1);
+  }
+  .listing:has([value="building"]:checked):not(:has([data-status="building"])) [data-empty="building"],
+  .listing:has([value="idea"]:checked):not(:has([data-status="idea"])) [data-empty="idea"],
+  .listing:has([value="shipped"]:checked):not(:has([data-status="shipped"])) [data-empty="shipped"] {
+    display: block;
+  }
+
+  /* ── Rows ── */
+  .rows {
+    margin-block: 2rem clamp(4rem, 3rem + 4vw, 7rem);
+    border-block-end: 1px solid var(--line);
+  }
+  .project-row {
+    position: relative;
+    display: grid;
+    gap: 1.5rem;
+    padding-block: 2rem;
+    border-block-start: 1px solid var(--line);
+  }
+  @media (min-width: 56rem) {
+    .project-row {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 24rem);
+      gap: 3rem;
+      align-items: center;
+    }
+  }
+  .text {
+    display: grid;
+    gap: 0.9rem;
+    align-content: start;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .title {
+    font-size: var(--text-step-3);
+    line-height: var(--text-step-3--line-height);
+  }
+  .stretched {
+    color: inherit;
+    text-decoration: none;
+  }
+  .stretched::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+  .stretched:focus-visible {
+    outline: none;
+  }
+  .project-row:has(.stretched:focus-visible) {
+    outline: 2px solid var(--focus);
+    outline-offset: 6px;
+    border-radius: var(--radius-md);
+  }
+  /* Title underline grows from the left on hover (same motion as the writing cards). */
+  .title-line {
+    background: linear-gradient(currentColor, currentColor) 0 100% / 0 1.5px no-repeat;
+    transition: background-size var(--dur-4) var(--ease-out);
+  }
+  @media (hover: hover) {
+    .project-row:hover .title-line {
+      background-size: 100% 1.5px;
+    }
+  }
+  .summary {
+    max-inline-size: 48ch;
+    color: var(--ink-soft);
+  }
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 2rem;
+    font-size: var(--text-step--1);
+  }
+  .facts dt {
+    color: var(--ink-soft);
+  }
+
+  .art-frame {
+    position: relative;
+    display: flex;
+    block-size: 13rem;
+    padding-inline: 1rem;
+    border-radius: var(--radius-lg);
+    background-color: var(--surface);
+    overflow: hidden;
+  }
+</style>

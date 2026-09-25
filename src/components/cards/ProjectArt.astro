@@ -217,19 +217,19 @@ const week = [2, 3, 1, 0, 2, 3, 2];
     transition-delay: 60ms;
   }
   @media (hover: hover) {
-    :global(.project-card:hover) .front {
+    :global(:is(.project-card, .project-row):hover) .front {
       transform: translateY(-0.75rem) rotate(-1deg);
     }
-    :global(.project-card:hover) .back {
+    :global(:is(.project-card, .project-row):hover) .back {
       transform: translateY(-0.35rem) rotate(8deg);
     }
-    :global(.project-card:hover) .t1 {
+    :global(:is(.project-card, .project-row):hover) .t1 {
       transform: translateY(-0.75rem) rotate(-1.5deg);
     }
-    :global(.project-card:hover) .t2 {
+    :global(:is(.project-card, .project-row):hover) .t2 {
       transform: translateY(-0.25rem) rotate(7deg) translateX(1.1rem);
     }
-    :global(.project-card:hover) .t3 {
+    :global(:is(.project-card, .project-row):hover) .t3 {
       transform: rotate(12deg) translateX(2.25rem);
     }
   }

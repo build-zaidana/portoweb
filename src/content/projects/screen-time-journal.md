@@ -8,6 +8,17 @@ startedAt: 2026-07-02
 tint: tan
 heroNote: stays on your phone
 art: chart
+callouts:
+  - label: Stays on the device
+    note: No server and no account. Entries live in IndexedDB on the phone.
+    x: 22
+    y: 18
+    side: left
+  - label: Feelings, not minutes
+    note: Each day is one color for how an app made you feel, not how long you used it.
+    x: 50
+    y: 38
+    side: right
 sample: true
 ---
 
