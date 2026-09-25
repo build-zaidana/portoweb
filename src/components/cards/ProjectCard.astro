@@ -53,6 +53,27 @@ const Heading = `h${headingLevel}` as const;
     border-radius: var(--radius-xl);
     background-color: var(--card-tint);
     overflow: hidden;
+    transition:
+      transform var(--dur-4) var(--ease-spring),
+      box-shadow var(--dur-3) var(--ease-out);
+  }
+  /* Hover (pointer devices only): the card lifts on a spring and casts a warm shadow;
+     the illustration inside moves a beat later (see ProjectArt). */
+  @media (hover: hover) {
+    .project-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-lift);
+    }
+  }
+  .project-card:active {
+    transform: translateY(-2px) scale(0.99);
+    transition-duration: var(--dur-1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .project-card:hover,
+    .project-card:active {
+      transform: none;
+    }
   }
   .project-card[data-tint="sky"] {
     --card-tint: var(--tint-sky);

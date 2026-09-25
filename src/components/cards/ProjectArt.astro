@@ -88,7 +88,7 @@ const week = [2, 3, 1, 0, 2, 3, 2];
     background-color: var(--surface-raised);
     border: 1px solid var(--line);
     box-shadow: var(--shadow-lift);
-    transition: transform var(--dur-3) var(--ease-out);
+    transition: transform var(--dur-4) var(--ease-spring);
   }
   .line {
     display: block;
@@ -209,17 +209,28 @@ const week = [2, 3, 1, 0, 2, 3, 2];
     background-color: var(--tan);
   }
 
-  /* Hover on the parent card (user-triggered): the front panel lifts and straightens. */
-  :global(.project-card:hover) .front {
-    transform: translateY(-0.5rem) rotate(-1.5deg);
+  /* Hover on the parent card (user-triggered): panels lift and straighten on a spring.
+     The back layer follows 60ms later, which gives the stack a sense of depth. */
+  .back,
+  .t2,
+  .t3 {
+    transition-delay: 60ms;
   }
-  :global(.project-card:hover) .back {
-    transform: translateY(-0.25rem) rotate(7deg);
-  }
-  :global(.project-card:hover) .t1 {
-    transform: translateY(-0.5rem) rotate(-2deg);
-  }
-  :global(.project-card:hover) .t2 {
-    transform: rotate(6deg) translateX(1rem);
+  @media (hover: hover) {
+    :global(.project-card:hover) .front {
+      transform: translateY(-0.75rem) rotate(-1deg);
+    }
+    :global(.project-card:hover) .back {
+      transform: translateY(-0.35rem) rotate(8deg);
+    }
+    :global(.project-card:hover) .t1 {
+      transform: translateY(-0.75rem) rotate(-1.5deg);
+    }
+    :global(.project-card:hover) .t2 {
+      transform: translateY(-0.25rem) rotate(7deg) translateX(1.1rem);
+    }
+    :global(.project-card:hover) .t3 {
+      transform: rotate(12deg) translateX(2.25rem);
+    }
   }
 </style>

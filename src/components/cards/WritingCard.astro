@@ -69,6 +69,17 @@ const Heading = `h${headingLevel}` as const;
     padding: clamp(1.25rem, 1rem + 1vw, 1.75rem);
     padding-block-end: calc(var(--notch) + 0.5rem);
     padding-inline-end: calc(var(--notch) * 0.5);
+    transition: transform var(--dur-4) var(--ease-spring);
+  }
+  /* Hover (pointer devices only): the whole notched card lifts on a spring. */
+  @media (hover: hover) {
+    .writing-card:hover {
+      transform: translateY(-4px);
+    }
+  }
+  .writing-card:active {
+    transform: scale(0.99);
+    transition-duration: var(--dur-1);
   }
   /* Deep tones share the on-deep text colors; only the surface and tile differ. */
   .writing-card:is([data-tone="sage"], [data-tone="ink"]) {
@@ -173,7 +184,7 @@ const Heading = `h${headingLevel}` as const;
     background-repeat: no-repeat;
     background-position: 0 100%;
     background-size: 0% 1px;
-    transition: background-size var(--dur-3) var(--ease-out);
+    transition: background-size var(--dur-4) var(--ease-out);
     box-decoration-break: clone;
     -webkit-box-decoration-break: clone;
   }
@@ -193,17 +204,27 @@ const Heading = `h${headingLevel}` as const;
     background-color: var(--tile-bg);
     color: var(--on-fill);
     transition:
-      transform var(--dur-4) var(--ease-soft),
+      transform var(--dur-4) var(--ease-spring),
       background-color var(--dur-3) var(--ease-soft);
   }
   .tile :global(svg) {
-    transition: transform var(--dur-4) var(--ease-soft);
+    transition: transform var(--dur-4) var(--ease-spring);
+    will-change: transform; /* keeps the sketch filter from re-rendering while it moves */
   }
-  /* Hover: the tile settles into the notch and the arrow nudges forward. */
+  /* Hover: the tile settles deeper into the notch and the arrow nudges forward. */
   .writing-card:hover .tile {
-    transform: scale(0.9);
+    transform: scale(0.88);
   }
   .writing-card:hover .tile :global(svg) {
-    transform: translateX(3px);
+    transform: translateX(4px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .writing-card:hover,
+    .writing-card:active,
+    .writing-card:hover .tile,
+    .writing-card:hover .tile :global(svg) {
+      transform: none;
+    }
   }
 </style>

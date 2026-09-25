@@ -89,20 +89,21 @@
 }
 
 @layer components {
-  /* Inline text link: underline sits low and thickens on hover (user-triggered feedback). */
+  /* Inline text link: on hover the underline rises toward the text and darkens.
+     (text-underline-offset interpolates smoothly; decoration thickness does not.) */
   .link {
     color: var(--accent);
     text-decoration-line: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.22em;
-    text-decoration-color: color-mix(in oklab, var(--accent) 45%, transparent);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.3em;
+    text-decoration-color: color-mix(in oklab, var(--accent) 40%, transparent);
     transition:
       text-decoration-color var(--dur-2) var(--ease-out),
-      text-decoration-thickness var(--dur-2) var(--ease-out);
+      text-underline-offset var(--dur-3) var(--ease-spring);
   }
   .link:hover {
     text-decoration-color: var(--accent);
-    text-decoration-thickness: 2px;
+    text-underline-offset: 0.16em;
   }
 
   /* Frosted glass surface (wabi.ai). Reserved for the nav pill and the main CTA. */
@@ -125,4 +126,54 @@
   .measure {
     max-width: var(--measure);
   }
+}
+
+/*
+ * Theme switch ("the sky changes"). ThemeToggle sets data-theme-switching on <html>
+ * for the length of one view transition:
+ * - every element joins the root snapshot (no per-element crossfades),
+ * - other CSS transitions are frozen so colors don't animate twice,
+ * - the new theme is revealed by a growing circle (animated from ThemeToggle).
+ */
+:root[data-theme-switching] * {
+  view-transition-name: none !important;
+}
+:root[data-theme-switching] :not(.theme-toggle, .theme-toggle *) {
+  transition: none !important;
+}
+:root[data-theme-switching]::view-transition-old(root),
+:root[data-theme-switching]::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* ── Page transitions (used by src/lib/motion.ts) ─────────────────────── */
+@keyframes page-leave-up {
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+@keyframes page-enter-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+@keyframes page-leave-down {
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes page-enter-down {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}
+/* The active nav pill glides to its new link on a gentle spring. */
+::view-transition-group(nav-indicator) {
+  animation-duration: 400ms;
+  animation-timing-function: var(--ease-spring);
 }

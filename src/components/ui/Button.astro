@@ -36,6 +36,13 @@ const typeAttr = href ? {} : { type: (rest as HTMLAttributes<"button">).type ?? 
 </Tag>
 
 <style>
+  /*
+   * Motion model (same for every variant, only the surface differs):
+   *   hover  → lifts 2px on a spring, color/shadow ease in (only on devices that can hover)
+   *   press  → drops back and shrinks to 97% quickly (150ms)
+   *   release→ springs back (--ease-spring, 400ms)
+   * Reduced motion: no movement; colors still change instantly.
+   */
   .btn {
     --btn-h: 2.75rem; /* 44px minimum touch target */
     position: relative;
@@ -55,49 +62,68 @@ const typeAttr = href ? {} : { type: (rest as HTMLAttributes<"button">).type ?? 
     text-decoration: none;
     white-space: nowrap;
     cursor: pointer;
+    overflow: hidden; /* clips the secondary fill and the glass sheen to the pill */
     transition:
+      transform var(--dur-4) var(--ease-spring),
       background-color var(--dur-2) var(--ease-out),
       border-color var(--dur-2) var(--ease-out),
       color var(--dur-2) var(--ease-out),
-      box-shadow var(--dur-2) var(--ease-out),
-      transform var(--dur-1) var(--ease-out);
+      box-shadow var(--dur-2) var(--ease-out);
   }
   .btn--lg {
     --btn-h: 3.25rem;
     padding-inline: 1.625rem;
     font-size: var(--text-step-0);
   }
-  /* Press feedback shared by all variants. */
-  .btn:active {
-    transform: scale(0.97);
+  .btn__label {
+    position: relative; /* above the ::before fill */
   }
 
-  /* ── Primary ─────────────────────────────────────────────── */
+  @media (hover: hover) {
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+  }
+  .btn:active {
+    transform: translateY(0) scale(0.97);
+    transition-duration: var(--dur-1);
+  }
+
+  /* ── Primary: solid ink, gains a soft shadow as it lifts ───────── */
   .btn--primary {
     background-color: var(--ink);
     color: var(--paper);
   }
   .btn--primary:hover {
-    background-color: color-mix(in oklab, var(--ink) 86%, var(--sage));
+    background-color: color-mix(in oklab, var(--ink) 88%, var(--sage));
+    box-shadow: var(--shadow-lift);
   }
 
-  /* ── Secondary ───────────────────────────────────────────── */
+  /* ── Secondary: outline that fills with ink from the bottom ────── */
   .btn--secondary {
     border: 1px solid var(--line-strong);
     color: var(--ink);
   }
+  .btn--secondary::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: var(--ink);
+    clip-path: inset(100% 0 0 0);
+    transition: clip-path var(--dur-3) var(--ease-out);
+  }
   .btn--secondary:hover {
     border-color: var(--ink);
-    background-color: var(--line);
+    color: var(--paper);
+  }
+  .btn--secondary:hover::before {
+    clip-path: inset(0 0 0 0);
   }
 
-  /* ── Glass (wabi.ai reference) ───────────────────────────────
-     Frosted surface (global .glass). On hover a light band
-     sweeps across once, which reads as light moving over real glass. */
+  /* ── Glass (wabi.ai): frosted surface from global .glass + a light sweep ── */
   .btn--glass {
-    /* Surface comes from the global .glass class; this adds the sheen. */
     color: var(--ink);
-    overflow: hidden;
   }
   .btn--glass::after {
     content: "";
@@ -124,6 +150,7 @@ const typeAttr = href ? {} : { type: (rest as HTMLAttributes<"button">).type ?? 
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .btn:hover,
     .btn:active {
       transform: none;
     }
