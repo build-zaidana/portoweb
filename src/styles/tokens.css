@@ -1,0 +1,135 @@
+/*
+ * Design tokens — single source of truth for color, type, space, radius, motion.
+ *
+ * Every color token is written ONCE with `light-dark(<light>, <dark>)`.
+ * The active mode comes from `color-scheme` on <html>:
+ *   - no JS / no stored choice  → `color-scheme: light dark` follows the OS
+ *   - data-theme="light|dark"   → set by ThemeScript before first paint
+ *
+ * Contrast of every text pair is computed from this file (see
+ * `npm run contrast` and /styleguide). Keep the format `--name: light-dark(#hex, #hex);`
+ * for color tokens so the parser in src/lib/contrast.ts can read them.
+ */
+
+:root {
+  color-scheme: light dark;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+:root {
+  /* ── Base surfaces ────────────────────────────────────────────
+     Light: warm-neutral paper (greyer than the "AI cream" #F4F1EA).
+     Dark: green-tinted night, lifted in steps instead of shadows. */
+  --paper: light-dark(#f3f2ee, #161915);
+  --surface: light-dark(#e9e7e1, #1f231e);
+  --surface-raised: light-dark(#fbfaf7, #292e28);
+
+  /* ── Ink ─────────────────────────────────────────────────── */
+  --ink: light-dark(#2a2a2a, #eceae4);
+  --ink-soft: light-dark(#5c5a55, #a8a79e);
+
+  /* ── Accent: sage (primary) ──────────────────────────────────
+     --sage is a surface/illustration color (2.6:1, never for text).
+     --accent is the text-safe sage used for links + focus ring. */
+  --sage: light-dark(#8b9d83, #8b9d83);
+  --accent: light-dark(#4a5d44, #aec2a5);
+
+  /* ── Supporting accents (surfaces only) ───────────────────── */
+  --sky: light-dark(#a8c5d6, #b4cfdd);
+  --tan: light-dark(#c9a88c, #d6bca5);
+  /* Text placed ON a sage/sky/tan fill stays dark in both modes. */
+  --on-fill: light-dark(#2a2a2a, #161915);
+
+  /* ── Pastel card tints (craft-style project cards) ──────────── */
+  --tint-sage: light-dark(#e1e7dc, #222a20);
+  --tint-sky: light-dark(#dfeaf0, #1d262b);
+  --tint-tan: light-dark(#efe4d8, #2b241e);
+
+  /* ── Deep card surfaces (integratedbio-style rhythm) ──────────
+     Text on these always uses --on-deep. */
+  --deep-sage: light-dark(#3e4b39, #33402f);
+  --deep-ink: light-dark(#2a2a2a, #0f110e);
+  --on-deep: light-dark(#f3f2ee, #eceae4);
+
+  /* ── Lines & states ───────────────────────────────────────── */
+  --line: light-dark(rgb(42 42 42 / 0.12), rgb(236 234 228 / 0.1));
+  --line-strong: light-dark(rgb(42 42 42 / 0.22), rgb(236 234 228 / 0.2));
+  --focus: var(--accent);
+
+  /* Glass (CTA + nav only) */
+  --glass-fill: light-dark(rgb(251 250 247 / 0.62), rgb(41 46 40 / 0.55));
+  --glass-edge: light-dark(rgb(255 255 255 / 0.85), rgb(236 234 228 / 0.14));
+  --glass-shine: light-dark(rgb(255 255 255 / 0.7), rgb(236 234 228 / 0.16));
+
+  /* Shadows are warm and only used where something is "lifted".
+     In dark mode depth comes from surface lightness, so the tint is transparent. */
+  --shadow-tint: light-dark(rgb(74 60 44 / 0.16), transparent);
+
+  /* ── Layout (not Tailwind namespaces, used in component CSS) ── */
+  --measure: 66ch;
+  --gutter: clamp(1.25rem, 0.8rem + 2.2vw, 2.5rem);
+
+  /* ── Motion durations (zeroed for reduced motion below) ───── */
+  --dur-1: 150ms; /* press, color */
+  --dur-2: 220ms; /* hover */
+  --dur-3: 320ms; /* open/close, lift */
+  --dur-4: 400ms; /* card travel, sheen */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-1: 0ms;
+    --dur-2: 0ms;
+    --dur-3: 0ms;
+    --dur-4: 0ms;
+  }
+}
+
+/*
+ * Static tokens (same in both modes). `@theme static` makes Tailwind emit them as
+ * CSS variables on :root AND generate utilities (font-display, text-step-3,
+ * rounded-lg, ease-out, shadow-lift…). `static` keeps unused ones too, because
+ * scoped component CSS reads them with var().
+ */
+@theme static {
+  /* ── Type ─────────────────────────────────────────────────── */
+  /* The --font-* families on the right come from the Astro Fonts API (astro.config.mjs). */
+  --font-display: var(--font-instrument-serif), "Iowan Old Style", Georgia, serif;
+  --font-sans: var(--font-general-sans), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+
+  /* Body steps ~1.2 ratio; display steps jump harder and are fluid. */
+  --text-step--1: 0.875rem; /* 14px — captions, meta */
+  --text-step--1--line-height: 1.45;
+  --text-step-0: 1.0625rem; /* 17px — body */
+  --text-step-0--line-height: 1.6;
+  --text-step-1: 1.25rem; /* 20px — lead */
+  --text-step-1--line-height: 1.5;
+  --text-step-2: 1.625rem; /* 26px — card titles (serif) */
+  --text-step-2--line-height: 1.15;
+  --text-step-3: clamp(2rem, 1.5rem + 1.8vw, 2.75rem); /* section titles */
+  --text-step-3--line-height: 1.04;
+  --text-step-4: clamp(2.75rem, 1.7rem + 4vw, 4.75rem); /* page titles */
+  --text-step-4--line-height: 0.98;
+  --text-step-5: clamp(3.5rem, 1.6rem + 7.5vw, 8rem); /* hero, wordmark */
+  --text-step-5--line-height: 0.9;
+
+  /* ── Radius: scales with hierarchy, not one value for everything ── */
+  --radius-sm: 0.5rem; /* chips, inputs */
+  --radius-md: 0.875rem; /* mini-UI, icon tiles, arrow buttons */
+  --radius-lg: 1.375rem; /* cards */
+  --radius-xl: 2rem; /* calm cards, framed hero */
+
+  /* ── Easing ───────────────────────────────────────────────── */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1); /* measured on wabi.ai */
+  --ease-soft: cubic-bezier(0.25, 1, 0.5, 1); /* measured on integratedbio */
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* ── Elevation (warm; transparent in dark mode via --shadow-tint) ── */
+  --shadow-lift: 0 1px 1px var(--shadow-tint), 0 10px 28px -12px var(--shadow-tint);
+}

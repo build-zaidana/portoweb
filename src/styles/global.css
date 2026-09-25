@@ -1,0 +1,123 @@
+@import "tailwindcss";
+@import "./tokens.css";
+
+/* `dark:` utilities follow the resolved theme on <html data-theme>.
+   Most styling does NOT need `dark:` because tokens already switch via light-dark(). */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/*
+ * Map design tokens to Tailwind utilities (bg-paper, text-ink, font-display, rounded-lg…).
+ * `inline` makes the utility use the var() itself, so values keep switching with the theme.
+ */
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-accent: var(--accent);
+  --color-sage: var(--sage);
+  --color-sky: var(--sky);
+  --color-tan: var(--tan);
+  --color-on-fill: var(--on-fill);
+  --color-tint-sage: var(--tint-sage);
+  --color-tint-sky: var(--tint-sky);
+  --color-tint-tan: var(--tint-tan);
+  --color-deep-sage: var(--deep-sage);
+  --color-deep-ink: var(--deep-ink);
+  --color-on-deep: var(--on-deep);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+}
+
+@layer base {
+  html {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-padding-top: 6rem;
+  }
+
+  body {
+    min-height: 100dvh;
+    font-size: var(--text-step-0);
+    line-height: var(--text-step-0--line-height);
+    font-kerning: normal;
+  }
+
+  /* Serif display type: tight tracking at large sizes, balanced lines. */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.012em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: var(--tint-sage);
+    color: var(--ink);
+  }
+
+  /* One focus style everywhere: visible on every surface, never removed. */
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  code,
+  kbd,
+  pre {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+  }
+}
+
+@layer components {
+  /* Inline text link: underline sits low and thickens on hover (user-triggered feedback). */
+  .link {
+    color: var(--accent);
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.22em;
+    text-decoration-color: color-mix(in oklab, var(--accent) 45%, transparent);
+    transition:
+      text-decoration-color var(--dur-2) var(--ease-out),
+      text-decoration-thickness var(--dur-2) var(--ease-out);
+  }
+  .link:hover {
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2px;
+  }
+
+  /* Frosted glass surface (wabi.ai). Reserved for the nav pill and the main CTA. */
+  .glass {
+    background-color: var(--glass-fill);
+    border: 1px solid var(--glass-edge);
+    box-shadow:
+      inset 0 1px 0 var(--glass-shine),
+      var(--shadow-lift);
+    backdrop-filter: blur(14px) saturate(1.5);
+    -webkit-backdrop-filter: blur(14px) saturate(1.5);
+  }
+
+  /* Page gutter + max width. Sections choose their own inner widths. */
+  .wrap {
+    width: min(100% - 2 * var(--gutter), 76rem);
+    margin-inline: auto;
+  }
+
+  .measure {
+    max-width: var(--measure);
+  }
+}
