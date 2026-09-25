@@ -46,7 +46,8 @@ export const newsletter: { username: string | null } = {
 export const siteProgress: readonly { label: string; done: boolean }[] = [
   { label: "Foundations", done: true },
   { label: "Home and About", done: true },
-  { label: "Projects and writing", done: false },
+  { label: "Projects and writing", done: true },
+  { label: "Copy and real projects", done: false },
 ];
 
 export interface NavItem {
