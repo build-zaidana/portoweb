@@ -11,11 +11,11 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import ProjectArt from "../../components/cards/ProjectArt.astro";
 import StatusChip from "../../components/ui/StatusChip.astro";
 import SampleBadge from "../../components/ui/SampleBadge.astro";
-import WhereNext from "../../components/WhereNext.astro";
-import { getProjects, getWriting, getLatestNow } from "../../lib/content";
+import { getProjects } from "../../lib/content";
 import { formatMonth, isoDate } from "../../lib/format";
+import { profile } from "../../lib/site";
 
-const [projects, writing, now] = await Promise.all([getProjects(), getWriting(), getLatestNow()]);
+const projects = await getProjects();
 
 const count = (status: string) => projects.filter((p) => p.data.status === status).length;
 const filters = [
@@ -29,26 +29,31 @@ const filters = [
 const emptyText: Record<string, string> = {
   building: "Nothing in progress right now. The next build starts from the ideas list.",
   idea: "No open ideas at the moment.",
-  shipped: "Nothing shipped yet. The first one is on its way.",
+  shipped: "Nothing shipped yet. The ones under Building are closest.",
 };
 ---
 
 <BaseLayout
   title="Projects"
-  description="Small tools for students and young learners, each written up as problem, approach, result, and what I learned."
+  description="Projects by Zaidana, each written up as problem, approach, result, and what I learned."
 >
   <section class="head wrap" aria-labelledby="projects-title">
     <h1 id="projects-title" class="page-title">
       Projects
     </h1>
     <p class="lead">
-      Small tools for students and young learners. Each write-up covers the problem, my approach, what
-      happened, and what I learned, including what didn't work.
+      Things I've built or plan to build. Each write-up covers the problem, my approach, what happened, and
+      what I learned, including what didn't work.
     </p>
   </section>
 
   {projects.length === 0 ? (
-    <p class="wrap none">The first project write-up is on its way. Until then, the code is on GitHub.</p>
+    <p class="wrap none">
+      No project write-ups yet. My practice code is on{" "}
+      <a class="link" href={profile.github.href} target="_blank" rel="noopener">
+        GitHub<span class="sr-only"> (opens in a new tab)</span>
+      </a>
+    </p>
   ) : (
     <div class="wrap listing" data-listing>
       <fieldset class="seg" data-seg>
@@ -125,13 +130,6 @@ const emptyText: Record<string, string> = {
       ))}
     </div>
   )}
-
-  <WhereNext
-    hints={{
-      writing: writing[0] ? `Latest: ${writing[0].data.title}` : undefined,
-      now: now ? `Updated ${formatMonth(now.data.month)}` : undefined,
-    }}
-  />
 </BaseLayout>
 
 <script>
@@ -203,7 +201,7 @@ const emptyText: Record<string, string> = {
     position: relative;
     display: inline-flex;
     align-items: center;
-    min-block-size: 2.5rem;
+    min-block-size: 2.75rem;
     padding-inline: 1rem;
     border-radius: 999px;
     color: var(--ink-soft);

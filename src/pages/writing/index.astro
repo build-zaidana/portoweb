@@ -34,7 +34,13 @@ const years = Map.groupBy(posts, (post) => post.data.publishedAt.getUTCFullYear(
 
   <div class="years wrap">
     {posts.length === 0 && (
-      <p class="empty">The first note is being written. It will appear here, with its date.</p>
+      <p class="empty">
+        No notes published yet.{" "}
+        <a class="link" href="/rss.xml">
+          Follow with RSS
+        </a>{" "}
+        to get the first one.
+      </p>
     )}
     {[...years].map(([year, list]) => (
       <section class="year" aria-labelledby={`year-${year}`}>

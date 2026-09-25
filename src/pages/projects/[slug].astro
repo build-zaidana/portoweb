@@ -67,7 +67,7 @@ const outline = headings.filter((heading) => heading.depth === 2);
               Repository<span class="sr-only"> (opens in a new tab)</span>
             </a>
           ) : (
-            <span class="soft">Not public yet</span>
+            <span class="soft">Not public</span>
           )}
         </dd>
       </div>
@@ -79,7 +79,7 @@ const outline = headings.filter((heading) => heading.depth === 2);
               Live demo<span class="sr-only"> (opens in a new tab)</span>
             </a>
           ) : (
-            <span class="soft">{status === "shipped" ? "Offline for now" : "Not built yet"}</span>
+            <span class="soft">No live demo yet</span>
           )}
         </dd>
       </div>

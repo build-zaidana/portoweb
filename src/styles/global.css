@@ -191,8 +191,12 @@
     font-size: var(--text-step--1);
     color: var(--danger);
   }
-  .field:has(.input:user-invalid) .field-error {
+  .field:has(.input:user-invalid) .field-error,
+  [data-submitted] .field:has(.input:invalid) .field-error {
     display: block;
+  }
+  [data-submitted] .input:invalid {
+    border-color: var(--danger);
   }
 
   /*

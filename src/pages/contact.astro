@@ -97,6 +97,7 @@ const topics = [
         data-netlify="true"
         netlify-honeypot="company"
         data-contact-form
+        data-fallback={profile.github.href}
         data-astro-reload
       >
         <input type="hidden" name="form-name" value="contact" />
@@ -110,8 +111,18 @@ const topics = [
           <label class="field-label" for="contact-name">
             Name
           </label>
-          <input class="input" id="contact-name" name="name" autocomplete="name" required maxlength="100" />
-          <p class="field-error">Please tell me your name.</p>
+          <input
+            class="input"
+            id="contact-name"
+            name="name"
+            autocomplete="name"
+            required
+            maxlength="100"
+            aria-describedby="contact-name-error"
+          />
+          <p class="field-error" id="contact-name-error">
+            Please tell me your name.
+          </p>
         </div>
 
         <div class="field">
@@ -125,12 +136,14 @@ const topics = [
             type="email"
             autocomplete="email"
             required
-            aria-describedby="contact-email-hint"
+            aria-describedby="contact-email-hint contact-email-error"
           />
           <p class="field-hint" id="contact-email-hint">
             I'll reply to this address.
           </p>
-          <p class="field-error">Enter an email address like name@example.com.</p>
+          <p class="field-error" id="contact-email-error">
+            Enter an email address like name@example.com.
+          </p>
         </div>
 
         <fieldset class="topics">
@@ -158,8 +171,14 @@ const topics = [
             required
             minlength="10"
             maxlength="5000"
+            aria-describedby="contact-message-hint contact-message-error"
           ></textarea>
-          <p class="field-error">Write a short message (at least 10 characters).</p>
+          <p class="field-hint" id="contact-message-hint">
+            If it's about a role, a link to the job post helps.
+          </p>
+          <p class="field-error" id="contact-message-error">
+            Write a short message (at least 10 characters).
+          </p>
         </div>
 
         <div class="submit-row">
@@ -171,15 +190,22 @@ const topics = [
       </form>
 
       <div class="sent" data-sent hidden tabindex="-1">
-        <h3 class="sent-title">Thanks, your message is on its way.</h3>
-        <p>I'll reply to the email address you gave. If it's about a role, a link to the job post helps.</p>
+        <h3 class="sent-title">Thanks, your message was sent.</h3>
+        <p>I'll reply to the email address you gave.</p>
       </div>
     </section>
   </div>
 </BaseLayout>
 
 <script>
-  /** Sends the Netlify form in place. Without JS (or if this fails to load) the normal POST still works. */
+  /**
+   * Progressive enhancement for the Netlify form. Without JS the browser validates and the
+   * normal POST lands on /contact/thanks. With JS:
+   *   - one validation style: native bubbles are off, the inline messages show instead
+   *     (after a submit attempt, even for fields the visitor never touched), and
+   *     aria-invalid tells screen readers which field is wrong
+   *   - the form sends in place and the confirmation takes focus
+   */
   function initContactForm() {
     const form = document.querySelector<HTMLFormElement>("[data-contact-form]");
     const sent = document.querySelector<HTMLElement>("[data-sent]");
@@ -187,9 +213,23 @@ const topics = [
     const button = form?.querySelector<HTMLButtonElement>("[data-submit]");
     if (!form || !sent || !status || !button) return;
 
+    form.noValidate = true;
+    const fields = [...form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(".input")];
+    const mark = (field: HTMLInputElement | HTMLTextAreaElement) =>
+      field.setAttribute("aria-invalid", String(!field.validity.valid));
+    for (const field of fields) {
+      field.addEventListener("blur", () => field.value && mark(field));
+      field.addEventListener("input", () => field.hasAttribute("aria-invalid") && mark(field));
+    }
+
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
-      if (!form.reportValidity()) return;
+      if (!form.checkValidity()) {
+        form.dataset.submitted = "";
+        fields.forEach(mark);
+        fields.find((field) => !field.validity.valid)?.focus();
+        return;
+      }
       button.disabled = true;
       button.setAttribute("aria-busy", "true");
       status.textContent = "Sending…";
@@ -205,7 +245,7 @@ const topics = [
         sent.hidden = false;
         sent.focus();
       } catch {
-        status.textContent = "It didn't send. Please try again in a moment.";
+        status.innerHTML = `It didn't send. Please try again, or reach me on <a class="link" href="${form.dataset.fallback}">GitHub</a>.`;
         button.disabled = false;
         button.removeAttribute("aria-busy");
       }
@@ -296,7 +336,7 @@ const topics = [
   .chip {
     display: inline-flex;
     align-items: center;
-    min-block-size: 2.5rem;
+    min-block-size: 2.75rem;
     padding-inline: 1rem;
     border: 1px solid var(--line-strong);
     border-radius: 999px;

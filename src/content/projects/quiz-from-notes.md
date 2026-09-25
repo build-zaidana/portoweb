@@ -16,8 +16,8 @@ callouts:
     side: left
   - label: Answers link to the source
     note: Every answer points back to the sentence it came from, so a wrong question is easy to spot.
-    x: 60
-    y: 62
+    x: 72
+    y: 60
     side: right
 featured: true
 sample: true

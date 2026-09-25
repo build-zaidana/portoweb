@@ -2,126 +2,127 @@
 /**
  * /now (nownownow.com): what Zaidana is focused on this month. Cheap to update and the
  * clearest sign of activity while the project list is short (PRD §5).
- * Current month as three editorial rows (learning / building / reading); earlier months
- * fold into an archive below, so progress over time stays visible.
+ *
+ * Written like a short monthly letter: one narrow column, the month as the big headline,
+ * plain section names. Deliberately unlike the split headers and label rows of
+ * Projects and Writing. Earlier months fold into an archive below.
  */
 import { Code } from "astro:components";
 import { render } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import SampleBadge from "../components/ui/SampleBadge.astro";
-import SketchIcon, { type IconName } from "../components/ui/SketchIcon.astro";
-import WhereNext from "../components/WhereNext.astro";
-import { getNowEntries, getProjects, getWriting } from "../lib/content";
+import { getNowEntries } from "../lib/content";
 import { formatMonth, isoDate } from "../lib/format";
+import { profile } from "../lib/site";
 
-const [entries, projects, writing] = await Promise.all([getNowEntries(), getProjects(), getWriting()]);
+const entries = await getNowEntries();
 const [current, ...earlier] = entries;
-const notes = current ? await render(current) : undefined;
+const notes = current?.body?.trim() ? await render(current) : undefined;
 
-type Row = { key: "learning" | "building" | "reading"; label: string; icon: IconName };
-const rows: Row[] = [
-  { key: "learning", label: "Learning", icon: "book" },
-  { key: "building", label: "Building", icon: "build" },
-  { key: "reading", label: "Reading", icon: "spark" },
-];
+const sections = [
+  { key: "learning", label: "Learning" },
+  { key: "building", label: "Building" },
+  { key: "reading", label: "Reading" },
+] as const;
 ---
 
-<BaseLayout
-  title="Now"
-  description="What Zaidana is learning, building, and reading this month. Updated every month."
->
-  <section class="head wrap" aria-labelledby="now-title">
-    <h1 id="now-title" class="page-title">
-      Now
-    </h1>
-    {current ? (
-      <div class="intro">
-        <p class="lead">
-          What I'm focused on in{" "}
-          <time datetime={isoDate(current.data.month)}>{formatMonth(current.data.month)}</time>
-          {current.data.location && <>, from {current.data.location}</>}.
+<BaseLayout title="Now" description="What Zaidana is learning, building, and reading this month.">
+  <article class="letter wrap">
+    <header class="head">
+      <h1 class="kicker">Now</h1>
+      {current ? (
+        <>
+          <p class="month">
+            <time datetime={isoDate(current.data.month)}>{formatMonth(current.data.month)}</time>
+          </p>
+          <p class="meta">
+            <span>
+              {current.data.location ? `Written from ${current.data.location}. ` : ""}I update this{" "}
+              <a class="link" href="https://nownownow.com/about" target="_blank" rel="noopener">
+                now page<span class="sr-only"> (opens in a new tab)</span>
+              </a>{" "}
+              about once a month.
+            </span>
+            {current.data.sample && <SampleBadge />}
+          </p>
+        </>
+      ) : (
+        <p class="meta">
+          No update yet. See what I'm building on{" "}
+          <a class="link" href={profile.github.href} target="_blank" rel="noopener">
+            GitHub<span class="sr-only"> (opens in a new tab)</span>
+          </a>
         </p>
-        <p class="about">
-          <span>
-            I update this{" "}
-            <a class="link" href="https://nownownow.com/about" target="_blank" rel="noopener">
-              now page<span class="sr-only"> (opens in a new tab)</span>
-            </a>{" "}
-            at the start of every month.
-          </span>
-          {current.data.sample && <SampleBadge />}
-        </p>
-      </div>
-    ) : (
-      <p class="lead">The first monthly update is on its way.</p>
-    )}
-  </section>
+      )}
+    </header>
 
-  {current && (
-    <div class="rows wrap">
-      {rows.map((row) => {
-        const items = current.data[row.key];
+    {current &&
+      sections.map((section) => {
+        const items = current.data[section.key];
         if (items.length === 0) return null;
         return (
-          <section class="row" aria-labelledby={`now-${row.key}`}>
-            <h2 id={`now-${row.key}`} class="row-label">
-              <span class="row-icon" aria-hidden="true">
-                <SketchIcon name={row.icon} size={28} />
-              </span>
-              {row.label}
+          <section class="part" aria-labelledby={`now-${section.key}`}>
+            <h2 id={`now-${section.key}`} class="part-title">
+              {section.label}
             </h2>
-            <div class="row-body">
-              <ul class="items" role="list">
-                {items.map((item) => (
-                  <li>{item}</li>
-                ))}
-              </ul>
-              {row.key === "learning" && current.data.snippet && (
-                <figure class="snippet">
-                  <Code code={current.data.snippet} lang="ts" theme="css-variables" />
-                  {current.data.heroNote && <figcaption class="hand">{current.data.heroNote}</figcaption>}
-                </figure>
-              )}
-            </div>
+            <ul class="items" role="list">
+              {items.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+            {section.key === "learning" && current.data.snippet && (
+              <figure class="snippet">
+                <Code code={current.data.snippet} lang="ts" theme="css-variables" />
+                {current.data.heroNote && <figcaption class="hand">{current.data.heroNote}</figcaption>}
+              </figure>
+            )}
           </section>
         );
       })}
 
-      {notes && current.body?.trim() && (
-        <section class="row" aria-labelledby="now-notes">
-          <h2 id="now-notes" class="row-label">
-            <span class="row-icon" aria-hidden="true">
-              <SketchIcon name="cloud" size={28} />
-            </span>
-            Notes
-          </h2>
-          <div class="row-body markdown">
-            <notes.Content />
-          </div>
-        </section>
-      )}
-    </div>
-  )}
+    {notes && (
+      <section class="part" aria-labelledby="now-also">
+        <h2 id="now-also" class="part-title">
+          Also this month
+        </h2>
+        <div class="markdown">
+          <notes.Content />
+        </div>
+      </section>
+    )}
+
+    <p class="more">
+      More:{" "}
+      <a class="link" href="/projects">
+        what I'm building
+      </a>{" "}
+      and{" "}
+      <a class="link" href="/writing">
+        what I've written
+      </a>
+      .
+    </p>
+  </article>
 
   {earlier.length > 0 && (
     <section class="archive wrap" aria-labelledby="archive-title">
-      <h2 id="archive-title" class="section-title">
+      <h2 id="archive-title" class="archive-title">
         Earlier months
       </h2>
       <div class="months">
         {earlier.map((entry) => (
-          <details class="month">
+          <details class="month-entry">
             <summary>
               <time datetime={isoDate(entry.data.month)}>{formatMonth(entry.data.month)}</time>
               {entry.data.sample && <SampleBadge />}
             </summary>
             <dl class="month-body">
-              {rows.map(
-                (row) =>
-                  entry.data[row.key].length > 0 && (
+              {sections.map(
+                (section) =>
+                  entry.data[section.key].length > 0 && (
                     <div>
-                      <dt>{row.label}</dt>
-                      <dd>{entry.data[row.key].join("; ")}</dd>
+                      <dt>{section.label}</dt>
+                      <dd>{entry.data[section.key].join("; ")}</dd>
                     </div>
                   ),
               )}
@@ -131,94 +132,60 @@ const rows: Row[] = [
       </div>
     </section>
   )}
-
-  <WhereNext
-    hints={{
-      projects: projects.length > 0 ? `${projects.length} so far` : undefined,
-      writing: writing[0] ? `Latest: ${writing[0].data.title}` : undefined,
-      now: "You're here",
-    }}
-  />
 </BaseLayout>
 
 <style>
+  /* One narrow column, like a letter. */
+  .letter,
+  .archive {
+    max-inline-size: 40rem;
+  }
+  .letter {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr); /* the code block scrolls instead of widening the column */
+    gap: 2.75rem;
+    padding-block: clamp(2.5rem, 1.5rem + 4vw, 5rem) clamp(3rem, 2rem + 4vw, 5rem);
+  }
   .head {
     display: grid;
-    gap: 1.25rem;
-    padding-block: clamp(2.5rem, 1.5rem + 4vw, 5rem) clamp(2rem, 1.5rem + 2vw, 3.5rem);
-  }
-  @media (min-width: 64rem) {
-    .head {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      align-items: end;
-    }
-  }
-  .intro {
-    display: grid;
     gap: 0.75rem;
   }
-  .lead {
-    max-inline-size: 30ch;
-    font-family: var(--font-display);
-    font-size: var(--text-step-2);
-    line-height: var(--text-step-2--line-height);
-  }
-  .about {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.4rem;
-    color: var(--ink-soft);
-  }
-
-  /* ── Rows: label on the left, the month's items on the right ── */
-  .rows {
-    padding-block-end: clamp(3rem, 2rem + 4vw, 6rem);
-  }
-  .row {
-    display: grid;
-    align-items: start;
-    gap: 1rem;
-    padding-block: 2rem;
-    border-block-start: 1px solid var(--line);
-  }
-  .row:last-child {
-    border-block-end: 1px solid var(--line);
-  }
-  @media (min-width: 56rem) {
-    .row {
-      grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
-      gap: 3rem;
-    }
-  }
-  .row-label {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
+  /* The page name is small; the month is the headline. */
+  .kicker {
     font-family: var(--font-sans);
     font-size: var(--text-step-0);
     font-weight: 600;
     letter-spacing: 0;
-  }
-  .row-icon {
-    display: grid;
-    place-items: center;
-    inline-size: 2.75rem;
-    block-size: 2.75rem;
-    border-radius: var(--radius-md);
-    background-color: var(--surface);
     color: var(--accent);
   }
-  .row-body {
+  .month {
+    font-family: var(--font-display);
+    font-size: var(--text-step-5);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-block-start: 0.5rem;
+    color: var(--ink-soft);
+  }
+
+  .part {
     display: grid;
-    gap: 1.5rem;
-    max-inline-size: 44rem;
+    gap: 0.9rem;
+  }
+  .part-title {
+    font-size: var(--text-step-2);
+    line-height: var(--text-step-2--line-height);
   }
   .items {
     display: grid;
-    gap: 0.75rem;
+    gap: 0.6rem;
     font-size: var(--text-step-1);
-    line-height: 1.45;
+    line-height: 1.5;
   }
   .items li {
     display: flex;
@@ -229,7 +196,7 @@ const rows: Row[] = [
     flex: none;
     inline-size: 0.45rem;
     block-size: 0.45rem;
-    margin-block-start: 0.6em;
+    margin-block-start: 0.65em;
     border-radius: 999px;
     background-color: var(--sage);
   }
@@ -238,6 +205,7 @@ const rows: Row[] = [
     display: grid;
     gap: 0.5rem;
     justify-items: start;
+    margin-block-start: 0.5rem;
   }
   .snippet :global(pre) {
     inline-size: 100%;
@@ -256,37 +224,47 @@ const rows: Row[] = [
     rotate: -1.5deg;
   }
 
+  .more {
+    padding-block-start: 1.5rem;
+    border-block-start: 1px solid var(--line);
+    color: var(--ink-soft);
+  }
+
   /* ── Archive ── */
   .archive {
     display: grid;
-    gap: 1.5rem;
+    gap: 1rem;
     padding-block-end: clamp(3rem, 2rem + 4vw, 6rem);
+  }
+  .archive-title {
+    font-size: var(--text-step-2);
+    line-height: var(--text-step-2--line-height);
   }
   .months {
     display: grid;
     gap: 0.5rem;
   }
-  .month {
+  .month-entry {
     border-radius: var(--radius-lg);
     background-color: var(--surface);
+    /* Height animates open/closed where supported (::details-content + interpolate-size). */
+    interpolate-size: allow-keywords;
   }
-  .month summary {
+  .month-entry summary {
     display: flex;
     align-items: center;
     gap: 0.6rem;
     min-block-size: 3.5rem;
     padding-inline: 1.25rem;
     font-weight: 500;
+    list-style: none;
     cursor: pointer;
   }
-  /* A small hand-drawn-weight chevron turns when the month opens. */
-  .month summary {
-    list-style: none;
-  }
-  .month summary::-webkit-details-marker {
+  .month-entry summary::-webkit-details-marker {
     display: none;
   }
-  .month summary::after {
+  /* Chevron turns when the month opens. */
+  .month-entry summary::after {
     content: "";
     inline-size: 0.55rem;
     block-size: 0.55rem;
@@ -296,21 +274,17 @@ const rows: Row[] = [
     rotate: 45deg;
     transition: rotate var(--dur-3) var(--ease-spring);
   }
-  .month[open] summary::after {
+  .month-entry[open] summary::after {
     rotate: 225deg;
   }
-  /* Height animates open/closed where supported (::details-content + interpolate-size). */
-  .month {
-    interpolate-size: allow-keywords;
-  }
-  .month::details-content {
+  .month-entry::details-content {
     block-size: 0;
     overflow: clip;
     transition:
       block-size var(--dur-3) var(--ease-out),
       content-visibility var(--dur-3) allow-discrete;
   }
-  .month[open]::details-content {
+  .month-entry[open]::details-content {
     block-size: auto;
   }
   .month-body {

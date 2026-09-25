@@ -58,8 +58,6 @@ const { Content } = await render(post);
   </article>
 
   <div class="after wrap">
-    <Newsletter context="article" />
-
     {(older || newer) && (
       <nav class="neighbours" aria-label="More writing">
         {older && (
@@ -76,6 +74,8 @@ const { Content } = await render(post);
         )}
       </nav>
     )}
+
+    <Newsletter context="article" />
   </div>
 </BaseLayout>
 

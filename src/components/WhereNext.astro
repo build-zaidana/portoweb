@@ -13,7 +13,7 @@ interface Props {
   /** Real, current details shown under each door (pages pass them from content). Generic text otherwise. */
   hints?: Partial<Record<"projects" | "writing" | "now" | "contact", string>>;
 }
-const { title = "Where to next?", lead = "Four ways to see more of the work.", hints = {} } = Astro.props;
+const { title = "Where to next?", lead = "Keep looking around.", hints = {} } = Astro.props;
 
 const doors: { label: string; href: string; icon: IconName; hint: string }[] = [
   { label: "Projects", href: "/projects", icon: "build", hint: hints.projects ?? "What I'm building" },
@@ -99,7 +99,10 @@ const doors: { label: string; href: string; icon: IconName; hint: string }[] = [
     transition: transform var(--dur-4) var(--ease-spring);
   }
   .door-bar {
+    /* Fills the rest of the card, so rows with one- and two-line hints end level. */
+    flex: 1;
     display: grid;
+    align-content: start;
     gap: 0.1rem;
     padding: 0.75rem 1rem 0.9rem;
     background-color: color-mix(in oklab, var(--ink) 6%, transparent);

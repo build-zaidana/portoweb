@@ -19,7 +19,7 @@ interface Props {
 const { title, art, callouts } = Astro.props.project.data;
 ---
 
-<figure class="figure" aria-label={`${title}: picture with notes`}>
+<figure class="figure" aria-label={`${title}, annotated`}>
   <div class="stage">
     <div class="art-box">
       <ProjectArt variant={art} />
@@ -200,7 +200,7 @@ const { title, art, callouts } = Astro.props.project.data;
     }
     .card {
       flex: none;
-      inline-size: min(15rem, 22vw);
+      inline-size: min(16.5rem, 22vw);
       padding: 0.85rem 1rem;
       border-radius: var(--radius-md);
       background-color: var(--surface-raised);
