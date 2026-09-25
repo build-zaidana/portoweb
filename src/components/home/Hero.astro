@@ -8,7 +8,7 @@
 import type { HeroCard } from "../../lib/hero";
 import { contactHref, profile } from "../../lib/site";
 import Button from "../ui/Button.astro";
-import Sticker from "../ui/Sticker.astro";
+import LabelStrip from "../ui/LabelStrip.astro";
 import SampleBadge from "../ui/SampleBadge.astro";
 import SketchIcon from "../ui/SketchIcon.astro";
 import SkyBackdrop from "./SkyBackdrop.astro";
@@ -78,12 +78,7 @@ const first = cards[0];
       <SkyBackdrop seed={4} />
       <HeroStack cards={cards} />
     </div>
-    <Sticker
-      class="hero-sticker"
-      text="Open to remote roles"
-      label="Open to remote internships and junior roles"
-      icon="spark"
-    />
+    <LabelStrip class="hero-label" text="Open to remote roles" />
   </div>
 </section>
 
@@ -225,19 +220,18 @@ const first = cards[0];
       overflow: clip;
     }
   }
-  /* Sticker sits on the bottom-right corner of the sky, away from the cards' top edge. */
-  .visual :global(.hero-sticker) {
+  /* Label strip overlaps the sky's top-right corner, clear of the cards and the stack controls. */
+  .visual :global(.hero-label) {
     position: absolute;
-    inset-block-end: -1.5rem;
-    inset-inline-end: -1rem;
+    inset-block-start: -1.1rem;
+    inset-inline-end: -1.25rem;
     z-index: 2;
   }
   @media (max-width: 47.99rem) {
-    /* Phones: top-right, so it never covers the stack's Next button at the bottom. */
-    .visual :global(.hero-sticker) {
-      inset-block: -2rem auto;
-      inset-inline-end: -0.25rem;
-      scale: 0.8;
+    /* Phones: tucked inside the gutter so it never causes sideways scroll. */
+    .visual :global(.hero-label) {
+      inset-inline-end: 0.25rem;
+      rotate: -3deg;
     }
   }
 
