@@ -1,7 +1,9 @@
 ---
 /**
- * Project card (craft.do reference): pastel surface per project + a tilted
- * mini-UI illustration that bleeds off the bottom edge.
+ * Project card (craft.do reference): a tilted mini-UI illustration that bleeds off
+ * the bottom edge. The surface follows the status, so color carries meaning:
+ * building = solid sage, idea = dashed outline (a sketch, not built yet),
+ * shipped = deep sage. The status chip still says it in words (WCAG 1.4.1).
  * The whole card is clickable through one real link (the title), so screen
  * readers hear a single, meaningful link instead of a wrapped block.
  */
@@ -16,11 +18,11 @@ interface Props {
 }
 
 const { project, headingLevel = 3 } = Astro.props;
-const { title, summary, status, stack, tint, art, sample } = project.data;
+const { title, summary, status, stack, art, sample } = project.data;
 const Heading = `h${headingLevel}` as const;
 ---
 
-<article class="project-card" data-tint={tint}>
+<article class="project-card" data-status={status}>
   <div class="meta">
     <StatusChip status={status} />
     {sample && <SampleBadge />}
@@ -42,7 +44,7 @@ const Heading = `h${headingLevel}` as const;
 
 <style>
   .project-card {
-    --card-tint: var(--tint-sage);
+    --card-tint: var(--tint-building);
     position: relative;
     display: flex;
     flex-direction: column;
@@ -75,11 +77,18 @@ const Heading = `h${headingLevel}` as const;
       transform: none;
     }
   }
-  .project-card[data-tint="sky"] {
-    --card-tint: var(--tint-sky);
+  .project-card[data-status="idea"] {
+    --card-tint: transparent;
+    border: 1.5px dashed var(--line-strong);
   }
-  .project-card[data-tint="tan"] {
-    --card-tint: var(--tint-tan);
+  .project-card[data-status="shipped"] {
+    --card-tint: var(--deep-sage);
+    --badge-fg: var(--on-deep-soft);
+    --badge-line: color-mix(in oklab, var(--on-deep) 40%, transparent);
+    color: var(--on-deep);
+  }
+  .project-card[data-status="shipped"] :is(.summary, .stack) {
+    color: var(--on-deep-soft);
   }
 
   .meta {
