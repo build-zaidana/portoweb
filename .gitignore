@@ -16,8 +16,12 @@ dist/
 # playwright MCP output
 .playwright-mcp/
 
+# logs
+npm-debug.log*
+
 # os / editor
 .DS_Store
 Thumbs.db
+.idea/
 .vscode/*
 !.vscode/extensions.json

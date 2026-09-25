@@ -1,0 +1,6 @@
+dist/
+.astro/
+node_modules/
+docs/references/
+package-lock.json
+.playwright-mcp/
