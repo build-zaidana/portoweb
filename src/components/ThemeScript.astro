@@ -1,0 +1,39 @@
+---
+/**
+ * Resolves the theme BEFORE first paint (no flash) and keeps it across
+ * ClientRouter navigations. Must stay inline and render inside <head>.
+ *
+ * Priority: stored choice ("light" | "dark") → OS preference.
+ * Without JS, `color-scheme: light dark` in tokens.css still follows the OS.
+ */
+---
+
+<script is:inline>
+  (() => {
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const stored = () => {
+      try {
+        const value = localStorage.getItem("theme");
+        return value === "light" || value === "dark" ? value : null;
+      } catch {
+        return null; // storage blocked (private mode): fall back to OS
+      }
+    };
+    const resolve = () => stored() ?? (media.matches ? "dark" : "light");
+    const apply = (doc) => {
+      doc.documentElement.dataset.theme = resolve();
+    };
+
+    apply(document);
+
+    // Listeners are registered once per tab, even though ClientRouter may re-run inline scripts.
+    if (window.__themeBound) return;
+    window.__themeBound = true;
+    // Set the theme on the incoming page before it is swapped in, so navigation never flashes.
+    document.addEventListener("astro:before-swap", (event) => apply(event.newDocument));
+    // Follow OS changes live, but only while the visitor has not picked a theme.
+    media.addEventListener("change", () => {
+      if (!stored()) apply(document);
+    });
+  })();
+</script>

@@ -1,0 +1,23 @@
+---
+/**
+ * Temporary home page for Phase 1. Phase 2 replaces it with the real hero
+ * (card stack) and sections. Kept honest: it says the site is being built.
+ */
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Button from "../components/ui/Button.astro";
+---
+
+<BaseLayout>
+  <section class="wrap pt-24 pb-16 sm:pt-32">
+    <h1 class="font-display text-step-5 max-w-[12ch]">Zaidana is building this site in public.</h1>
+    <p class="measure mt-8 text-step-1 text-ink-soft">
+      The foundations are in place: colors, type, and components. The home page, projects, and writing come
+      next.
+    </p>
+    <div class="mt-10 flex flex-wrap gap-3">
+      <Button href="/styleguide" variant="primary" size="lg">
+        See the styleguide
+      </Button>
+    </div>
+  </section>
+</BaseLayout>

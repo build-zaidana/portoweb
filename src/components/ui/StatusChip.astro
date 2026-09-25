@@ -1,0 +1,44 @@
+---
+/**
+ * Project status. The word carries the meaning; the dot color is a secondary cue
+ * (never the only signal, per WCAG 1.4.1).
+ */
+interface Props {
+  status: "idea" | "building" | "shipped";
+}
+const { status } = Astro.props;
+const label = { idea: "Idea", building: "Building", shipped: "Shipped" }[status];
+---
+
+<span class="chip" data-status={status}>
+  <span class="dot" aria-hidden="true"></span>
+  {label}
+</span>
+
+<style>
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.625rem 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    background-color: color-mix(in oklab, var(--paper) 70%, transparent);
+    color: var(--ink);
+    font-size: var(--text-step--1);
+    font-weight: 500;
+    line-height: 1.2;
+  }
+  .dot {
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    border-radius: 999px;
+    background-color: var(--tan);
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--ink) 18%, transparent);
+  }
+  [data-status="building"] .dot {
+    background-color: var(--sky);
+  }
+  [data-status="shipped"] .dot {
+    background-color: var(--sage);
+  }
+</style>

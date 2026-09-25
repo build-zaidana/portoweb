@@ -1,0 +1,817 @@
+---
+/**
+ * Living styleguide: every token and component, in the current theme.
+ * Color values and contrast ratios are computed at build time from tokens.css,
+ * so this page can never drift from the real CSS.
+ */
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Button from "../components/ui/Button.astro";
+import StatusChip from "../components/ui/StatusChip.astro";
+import SampleBadge from "../components/ui/SampleBadge.astro";
+import SketchIcon, { type IconName } from "../components/ui/SketchIcon.astro";
+import ProjectCard from "../components/cards/ProjectCard.astro";
+import WritingCard from "../components/cards/WritingCard.astro";
+import CalmCard from "../components/cards/CalmCard.astro";
+import ThemeToggle from "../components/ThemeToggle.astro";
+import { getProjects, getWriting } from "../lib/content";
+import { AA_TEXT, TEXT_PAIRS, checkPairs, parsePalette } from "../lib/contrast";
+import tokensCss from "../styles/tokens.css?raw";
+
+const palette = parsePalette(tokensCss);
+const contrast = checkPairs(palette, TEXT_PAIRS);
+const contrastRows = TEXT_PAIRS.map((pair) => ({
+  ...pair,
+  light: contrast.find((r) => r.mode === "light" && r.fg === pair.fg && r.bg === pair.bg),
+  dark: contrast.find((r) => r.mode === "dark" && r.fg === pair.fg && r.bg === pair.bg),
+}));
+
+interface Swatch {
+  token: string;
+  role: string;
+}
+const swatchGroups: { title: string; note: string; swatches: Swatch[] }[] = [
+  {
+    title: "Surfaces",
+    note: "Depth comes from tone steps. Dark mode never uses shadows.",
+    swatches: [
+      { token: "paper", role: "Page" },
+      { token: "surface", role: "Calm cards" },
+      { token: "surface-raised", role: "Panels, nav" },
+      { token: "ink", role: "Text, primary button" },
+      { token: "ink-soft", role: "Secondary text" },
+    ],
+  },
+  {
+    title: "Accents",
+    note: "Sage leads, sky supports, tan is for warm hover fills. Only --accent is used for text.",
+    swatches: [
+      { token: "accent", role: "Links, focus ring" },
+      { token: "sage", role: "Surface, illustration" },
+      { token: "sky", role: "Surface, arrow tiles" },
+      { token: "tan", role: "Hover fills" },
+    ],
+  },
+  {
+    title: "Card tones",
+    note: "Each project gets one pastel. Writing cards move light → deep sage → charcoal.",
+    swatches: [
+      { token: "tint-sage", role: "Project card" },
+      { token: "tint-sky", role: "Project card" },
+      { token: "tint-tan", role: "Project card" },
+      { token: "deep-sage", role: "Writing card" },
+      { token: "deep-ink", role: "Writing card" },
+    ],
+  },
+];
+
+const typeScale = [
+  { token: "step-5", size: "56 → 128px", use: "Hero, footer wordmark", serif: true },
+  { token: "step-4", size: "44 → 76px", use: "Page titles", serif: true },
+  { token: "step-3", size: "32 → 44px", use: "Section titles", serif: true },
+  { token: "step-2", size: "26px", use: "Card titles", serif: true },
+  { token: "step-1", size: "20px", use: "Lead paragraphs", serif: false },
+  { token: "step-0", size: "17px", use: "Body", serif: false },
+  { token: "step--1", size: "14px", use: "Meta, captions, buttons", serif: false },
+];
+
+const motion = [
+  { token: "--dur-1", value: "150ms", use: "Press, color change" },
+  { token: "--dur-2", value: "220ms", use: "Hover" },
+  { token: "--dur-3", value: "320ms", use: "Open, close, lift" },
+  { token: "--dur-4", value: "400ms", use: "Card travel, glass sheen" },
+  { token: "--ease-out", value: "cubic-bezier(.22, 1, .36, 1)", use: "Default. Fast start, long settle" },
+  { token: "--ease-soft", value: "cubic-bezier(.25, 1, .5, 1)", use: "Notched card tile" },
+];
+
+const icons: IconName[] = ["arrow", "build", "spark", "book", "cloud"];
+
+const projects = await getProjects();
+const writing = await getWriting();
+const [featuredPost, ...otherPosts] = writing;
+
+const sections = [
+  ["color", "Color"],
+  ["contrast", "Contrast"],
+  ["type", "Type"],
+  ["actions", "Buttons & links"],
+  ["labels", "Labels"],
+  ["cards", "Cards"],
+  ["icons", "Icons"],
+  ["motion", "Motion"],
+] as const;
+---
+
+<BaseLayout
+  title="Styleguide"
+  description="The colors, type, and components this site is built from, with contrast checked in both themes."
+  noindex
+>
+  <div class="wrap guide">
+    <aside class="toc" aria-label="Styleguide sections">
+      <ol role="list">
+        {sections.map(([id, label]) => (
+          <li>
+            <a href={`#${id}`}>{label}</a>
+          </li>
+        ))}
+      </ol>
+    </aside>
+
+    <div class="content">
+      <header class="intro">
+        <h1 class="font-display text-step-4">Styleguide</h1>
+        <p class="lead">
+          What this site is made of. Every text color below is checked against WCAG AA in light and dark,
+          using the same CSS the pages use.
+        </p>
+        <div class="theme-hint">
+          <ThemeToggle />
+          <span>Switch the theme to compare both modes.</span>
+        </div>
+      </header>
+
+      <!-- ── Color ───────────────────────────────────────────── -->
+      <section id="color" aria-labelledby="color-title">
+        <h2 id="color-title" class="section-title">
+          Color
+        </h2>
+        {swatchGroups.map((group) => (
+          <div class="swatch-group">
+            <div class="group-head">
+              <h3>{group.title}</h3>
+              <p>{group.note}</p>
+            </div>
+            <ul class="swatches" role="list">
+              {group.swatches.map(({ token, role }) => (
+                <li class="swatch">
+                  <span class="chip-color" style={`background-color: var(--${token})`} />
+                  <span class="swatch-name">{role}</span>
+                  <code>--{token}</code>
+                  <span class="hex">
+                    {palette.light[token]} / {palette.dark[token]}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </section>
+
+      <!-- ── Contrast ────────────────────────────────────────── -->
+      <section id="contrast" aria-labelledby="contrast-title">
+        <h2 id="contrast-title" class="section-title">
+          Contrast
+        </h2>
+        <p class="section-note">
+          Minimum for body text is {AA_TEXT}:1 (WCAG 1.4.3). Ratios are computed at build time.
+        </p>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Contrast ratios">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Sample</th>
+                <th scope="col">Pair</th>
+                <th scope="col">Used for</th>
+                <th scope="col">Light</th>
+                <th scope="col">Dark</th>
+              </tr>
+            </thead>
+            <tbody>
+              {contrastRows.map((row) => (
+                <tr>
+                  <td>
+                    <span
+                      class="pair-sample"
+                      style={`color: var(--${row.fg}); background-color: var(--${row.bg})`}
+                    >
+                      Aa
+                    </span>
+                  </td>
+                  <td>
+                    <code>--{row.fg}</code> on <code>--{row.bg}</code>
+                  </td>
+                  <td>{row.usage}</td>
+                  <td class:list={["ratio", { fail: !row.light?.passes }]}>
+                    {row.light?.ratio.toFixed(2)}:1 {row.light?.passes ? "Pass" : "Fail"}
+                  </td>
+                  <td class:list={["ratio", { fail: !row.dark?.passes }]}>
+                    {row.dark?.ratio.toFixed(2)}:1 {row.dark?.passes ? "Pass" : "Fail"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ── Type ────────────────────────────────────────────── -->
+      <section id="type" aria-labelledby="type-title">
+        <h2 id="type-title" class="section-title">
+          Type
+        </h2>
+        <div class="families">
+          <div>
+            <p class="family-sample font-display">Instrument Serif</p>
+            <p class="family-note">Headlines only, 32px and up. One weight, regular.</p>
+          </div>
+          <div>
+            <p class="family-sample font-sans">General Sans</p>
+            <p class="family-note">Body, UI, buttons. 400, 500, 600.</p>
+          </div>
+          <div>
+            <p class="family-sample font-mono">JetBrains Mono</p>
+            <p class="family-note">Code only. Never for labels.</p>
+          </div>
+        </div>
+
+        <ol class="scale" role="list">
+          {typeScale.map((step) => (
+            <li>
+              <span class="scale-meta">
+                <code>{step.token}</code>
+                <span>{step.size}</span>
+                <span>{step.use}</span>
+              </span>
+              <span
+                class:list={["scale-sample", { "font-display": step.serif }]}
+                style={`font-size: var(--text-${step.token}); line-height: var(--text-${step.token}--line-height)`}
+              >
+                Learning to build software that helps people
+              </span>
+            </li>
+          ))}
+        </ol>
+
+        <div class="prose-sample measure">
+          <p>
+            Body copy is set in General Sans at 17px with a 1.6 line height and stays under 70 characters per
+            line. Links look like{" "}
+            <a class="link" href="#type">
+              this
+            </a>{" "}
+            and inline code like <code>getCollection()</code>.
+          </p>
+          <pre><code>const posts = await getWriting(); // newest first, samples hidden in production</code></pre>
+        </div>
+      </section>
+
+      <!-- ── Buttons & links ────────────────────────────────── -->
+      <section id="actions" aria-labelledby="actions-title">
+        <h2 id="actions-title" class="section-title">
+          Buttons & links
+        </h2>
+        <p class="section-note">
+          One primary action per screen. Glass is reserved for the hero and nav CTA. Hover, press, and Tab
+          through them to see each state.
+        </p>
+        <div class="demo-row">
+          <Button variant="primary">Read the case study</Button>
+          <Button variant="secondary">See all projects</Button>
+          <Button variant="glass">Let's talk</Button>
+        </div>
+        <div class="demo-row">
+          <Button variant="primary" size="lg">
+            Download CV
+          </Button>
+          <Button variant="secondary" size="lg">
+            Subscribe
+          </Button>
+          <Button variant="glass" size="lg">
+            Get in touch
+          </Button>
+        </div>
+        <p class="measure">
+          Inline links use the text-safe sage:{" "}
+          <a class="link" href="#actions">
+            read how the notch is drawn
+          </a>
+          . The underline thickens on hover.
+        </p>
+      </section>
+
+      <!-- ── Labels ─────────────────────────────────────────── -->
+      <section id="labels" aria-labelledby="labels-title">
+        <h2 id="labels-title" class="section-title">
+          Labels
+        </h2>
+        <p class="section-note">
+          Sentence case, never all caps. The word carries the meaning; color is a hint.
+        </p>
+        <div class="demo-row">
+          <StatusChip status="idea" />
+          <StatusChip status="building" />
+          <StatusChip status="shipped" />
+          <SampleBadge />
+        </div>
+      </section>
+
+      <!-- ── Cards ──────────────────────────────────────────── -->
+      <section id="cards" aria-labelledby="cards-title">
+        <h2 id="cards-title" class="section-title">
+          Cards
+        </h2>
+        <p class="section-note">
+          Three card styles, one per section type. They share padding, chip, and type rules and only differ in
+          surface and shape.
+        </p>
+
+        <h3 class="sub-title">Projects: pastel with a tilted illustration</h3>
+        {projects.length > 0 ? (
+          <div class="grid-3">
+            {projects.map((project) => (
+              <ProjectCard project={project} headingLevel={3} />
+            ))}
+          </div>
+        ) : (
+          <p class="empty">No projects in this build. Samples appear in development builds only.</p>
+        )}
+
+        <h3 class="sub-title">Writing: notched corner</h3>
+        {featuredPost ? (
+          <div class="writing-grid">
+            <WritingCard post={featuredPost} featured tone="light" />
+            {otherPosts.map((post, i) => (
+              <WritingCard post={post} tone={i % 2 === 0 ? "sage" : "ink"} />
+            ))}
+            {otherPosts.length < 2 && <WritingCard post={featuredPost} tone="ink" />}
+          </div>
+        ) : (
+          <p class="empty">No articles in this build. Samples appear in development builds only.</p>
+        )}
+
+        <h3 class="sub-title">Now and About: calm</h3>
+        <div class="grid-2">
+          <CalmCard>
+            <Fragment slot="label">
+              <SketchIcon name="build" size={18} /> Building
+            </Fragment>
+            <h4>This website, one phase at a time</h4>
+            <p>Foundations are done. The home page and the card stack come next.</p>
+            <div slot="art" class="mini-ui" aria-hidden="true">
+              <span class="mini-row">
+                <i class="done"></i>Tokens and themes
+              </span>
+              <span class="mini-row">
+                <i class="done"></i>Content collections
+              </span>
+              <span class="mini-row">
+                <i></i>Home and About
+              </span>
+            </div>
+            <Button slot="action" variant="secondary" href="/now">
+              What I'm doing now
+            </Button>
+          </CalmCard>
+          <CalmCard>
+            <Fragment slot="label">
+              <SketchIcon name="book" size={18} /> Learning
+            </Fragment>
+            <h4>TypeScript generics</h4>
+            <p>Rewriting old JavaScript exercises with types, one function at a time.</p>
+            <pre
+              slot="art"
+              class="mini-code"
+              aria-label="Code example"
+            ><code>function first&lt;T&gt;(items: T[]): T | undefined {'{'}
+  return items[0];
+{'}'}</code></pre>
+          </CalmCard>
+        </div>
+      </section>
+
+      <!-- ── Icons ──────────────────────────────────────────── -->
+      <section id="icons" aria-labelledby="icons-title">
+        <h2 id="icons-title" class="section-title">
+          Icons
+        </h2>
+        <p class="section-note">
+          One hand-drawn style for the whole site. These are placeholders until the final set is drawn by
+          hand.
+        </p>
+        <ul class="icon-row" role="list">
+          {icons.map((name) => (
+            <li>
+              <span class="icon-tile">
+                <SketchIcon name={name} size={32} />
+              </span>
+              <code>{name}</code>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <!-- ── Motion ─────────────────────────────────────────── -->
+      <section id="motion" aria-labelledby="motion-title">
+        <h2 id="motion-title" class="section-title">
+          Motion
+        </h2>
+        <p class="section-note">
+          Motion answers what you do (hover, press, open, switch theme). Only one moment on the site moves by
+          itself. With reduced motion turned on, every duration becomes 0.
+        </p>
+        <dl class="motion-list">
+          {motion.map((m) => (
+            <div>
+              <dt>
+                <code>{m.token}</code>
+              </dt>
+              <dd>
+                <span class="motion-value">{m.value}</span>
+                <span>{m.use}</span>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .guide {
+    display: grid;
+    gap: 2rem;
+    padding-block: 3rem 0;
+  }
+  @media (min-width: 64rem) {
+    .guide {
+      grid-template-columns: 11rem minmax(0, 1fr);
+      gap: 4rem;
+      padding-block-start: 5rem;
+    }
+  }
+
+  /* ── Table of contents ── */
+  .toc {
+    display: none;
+  }
+  @media (min-width: 64rem) {
+    .toc {
+      display: block;
+      position: sticky;
+      inset-block-start: 7rem;
+      align-self: start;
+    }
+  }
+  .toc ol {
+    display: grid;
+    gap: 0.125rem;
+    border-inline-start: 1px solid var(--line);
+  }
+  .toc a {
+    display: block;
+    padding: 0.375rem 0 0.375rem 1rem;
+    margin-inline-start: -1px;
+    border-inline-start: 1px solid transparent;
+    color: var(--ink-soft);
+    font-size: var(--text-step--1);
+    text-decoration: none;
+    transition:
+      color var(--dur-2) var(--ease-out),
+      border-color var(--dur-2) var(--ease-out);
+  }
+  .toc a:hover {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+
+  /* ── Rhythm ── */
+  .content > section {
+    padding-block: 4rem;
+    border-block-start: 1px solid var(--line);
+  }
+  .intro {
+    padding-block-end: 3rem;
+  }
+  .lead {
+    max-inline-size: 52ch;
+    margin-block-start: 1.25rem;
+    font-size: var(--text-step-1);
+    line-height: var(--text-step-1--line-height);
+    color: var(--ink-soft);
+  }
+  .theme-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-block-start: 1.5rem;
+    margin-inline-start: -0.5rem;
+    color: var(--ink-soft);
+    font-size: var(--text-step--1);
+  }
+  .section-title {
+    font-size: var(--text-step-3);
+    line-height: var(--text-step-3--line-height);
+  }
+  .section-note {
+    max-inline-size: 60ch;
+    margin-block: 0.75rem 2rem;
+    color: var(--ink-soft);
+  }
+  .sub-title {
+    margin-block: 3rem 1.25rem;
+    font-family: var(--font-sans);
+    font-size: var(--text-step-0);
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+  .empty {
+    padding: 1.5rem;
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius-lg);
+    color: var(--ink-soft);
+  }
+
+  /* ── Swatches ── */
+  .swatch-group {
+    display: grid;
+    gap: 1.25rem;
+    margin-block-start: 2.5rem;
+  }
+  @media (min-width: 48rem) {
+    .swatch-group {
+      grid-template-columns: 14rem minmax(0, 1fr);
+      gap: 2rem;
+    }
+  }
+  .group-head h3 {
+    font-family: var(--font-sans);
+    font-size: var(--text-step-0);
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+  .group-head p {
+    margin-block-start: 0.375rem;
+    font-size: var(--text-step--1);
+    color: var(--ink-soft);
+  }
+  .swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+    gap: 1.25rem 1rem;
+  }
+  .swatch {
+    display: grid;
+    gap: 0.2rem;
+    font-size: var(--text-step--1);
+  }
+  .chip-color {
+    display: block;
+    block-size: 4.5rem;
+    margin-block-end: 0.5rem;
+    border-radius: var(--radius-md);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .swatch-name {
+    font-weight: 500;
+  }
+  .swatch code,
+  .hex {
+    color: var(--ink-soft);
+  }
+  .hex {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Contrast table ── */
+  .table-scroll {
+    overflow-x: auto;
+    border-radius: var(--radius-lg);
+    background-color: var(--surface);
+  }
+  table {
+    inline-size: 100%;
+    min-inline-size: 40rem;
+    border-collapse: collapse;
+    font-size: var(--text-step--1);
+  }
+  th,
+  td {
+    padding: 0.75rem 1rem;
+    text-align: start;
+    vertical-align: middle;
+  }
+  th {
+    font-weight: 500;
+    color: var(--ink-soft);
+  }
+  tbody tr {
+    border-block-start: 1px solid var(--line);
+  }
+  .pair-sample {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 2.5rem;
+    block-size: 2rem;
+    border-radius: var(--radius-sm);
+    box-shadow: inset 0 0 0 1px var(--line);
+    font-weight: 600;
+  }
+  .ratio {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .ratio.fail {
+    font-weight: 600;
+    text-decoration: underline wavy;
+  }
+
+  /* ── Type ── */
+  .families {
+    display: grid;
+    gap: 1.5rem;
+    margin-block: 2rem 3rem;
+  }
+  @media (min-width: 48rem) {
+    .families {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  .family-sample {
+    font-size: 2rem;
+    line-height: 1.1;
+  }
+  .family-sample.font-mono {
+    font-size: 1.5rem;
+  }
+  .family-note {
+    margin-block-start: 0.375rem;
+    font-size: var(--text-step--1);
+    color: var(--ink-soft);
+  }
+  .scale {
+    display: grid;
+  }
+  .scale li {
+    display: grid;
+    gap: 0.5rem;
+    padding-block: 1.25rem;
+    border-block-start: 1px solid var(--line);
+  }
+  @media (min-width: 48rem) {
+    .scale li {
+      grid-template-columns: 12rem minmax(0, 1fr);
+      align-items: baseline;
+      gap: 2rem;
+    }
+  }
+  .scale-meta {
+    display: grid;
+    font-size: var(--text-step--1);
+    color: var(--ink-soft);
+  }
+  .scale-meta code {
+    color: var(--ink);
+  }
+  .scale-sample {
+    overflow-wrap: anywhere;
+  }
+  .prose-sample {
+    margin-block-start: 2.5rem;
+  }
+  .prose-sample pre {
+    margin-block-start: 1.25rem;
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-md);
+    background-color: var(--surface);
+    overflow-x: auto;
+    font-size: var(--text-step--1);
+  }
+
+  /* ── Demos ── */
+  .demo-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-block-end: 1.25rem;
+  }
+  .grid-3 {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 48rem) {
+    .grid-3 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 72rem) {
+    .grid-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  .writing-grid {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 48rem) {
+    .writing-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .writing-grid > :first-child {
+      grid-column: 1 / -1;
+    }
+  }
+  .grid-2 {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 48rem) {
+    .grid-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /* Mini-UI inside calm cards (letters.app) */
+  .mini-ui {
+    display: grid;
+    gap: 0.5rem;
+    inline-size: min(100%, 17rem);
+    padding: 0.875rem;
+    border-radius: var(--radius-md);
+    background-color: var(--surface-raised);
+    box-shadow: var(--shadow-lift);
+    font-size: var(--text-step--1);
+  }
+  .mini-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .mini-row i {
+    inline-size: 0.875rem;
+    block-size: 0.875rem;
+    border-radius: 0.25rem;
+    border: 1.5px solid var(--line-strong);
+  }
+  .mini-row i.done {
+    border-color: var(--sage);
+    background-color: var(--sage);
+  }
+  .mini-code {
+    inline-size: min(100%, 20rem);
+    padding: 0.875rem 1rem;
+    border-radius: var(--radius-md);
+    background-color: var(--surface-raised);
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    overflow-x: auto;
+  }
+
+  /* ── Icons ── */
+  .icon-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .icon-row li {
+    display: grid;
+    justify-items: center;
+    gap: 0.5rem;
+    font-size: var(--text-step--1);
+    color: var(--ink-soft);
+  }
+  .icon-tile {
+    display: grid;
+    place-items: center;
+    inline-size: 4.5rem;
+    block-size: 4.5rem;
+    border-radius: var(--radius-md);
+    background-color: var(--surface);
+    color: var(--ink);
+    transition:
+      background-color var(--dur-2) var(--ease-out),
+      color var(--dur-2) var(--ease-out);
+  }
+  .icon-tile:hover {
+    background-color: var(--tan);
+    color: var(--on-fill);
+  }
+
+  /* ── Motion ── */
+  .motion-list {
+    display: grid;
+  }
+  .motion-list > div {
+    display: grid;
+    gap: 0.25rem;
+    padding-block: 0.875rem;
+    border-block-start: 1px solid var(--line);
+  }
+  @media (min-width: 48rem) {
+    .motion-list > div {
+      grid-template-columns: 12rem minmax(0, 1fr);
+      gap: 2rem;
+    }
+  }
+  .motion-list dd {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.5rem;
+    color: var(--ink-soft);
+  }
+  .motion-value {
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+</style>

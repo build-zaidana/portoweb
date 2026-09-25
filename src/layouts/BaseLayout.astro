@@ -1,0 +1,96 @@
+---
+/**
+ * Every page renders inside this layout.
+ * Head order matters: ThemeScript runs before any paint, fonts preload early.
+ */
+import { Font } from "astro:assets";
+import { ClientRouter } from "astro:transitions";
+import ThemeScript from "../components/ThemeScript.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import { site } from "../lib/site";
+import "../styles/global.css";
+
+interface Props {
+  /** Page title without the site name. Omit on the home page. */
+  title?: string;
+  description?: string;
+  /** Absolute or root-relative OG image. Added for every page in Phase 6. */
+  image?: string;
+  /** Keep utility pages (e.g. /styleguide) out of search results. */
+  noindex?: boolean;
+}
+
+const { title, description = site.description, image, noindex = false } = Astro.props;
+const fullTitle = title ? `${title} · ${site.name}` : site.title;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = image ? new URL(image, Astro.site).href : undefined;
+---
+
+<!doctype html>
+<html lang={site.locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <ThemeScript />
+
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="en_US" />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
+
+    <!-- Browser UI color follows the page surface in each mode. -->
+    <meta name="theme-color" content="#f3f2ee" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#161915" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Only the display serif is above the fold on every page, so only it is preloaded. -->
+    <Font cssVariable="--font-instrument-serif" preload />
+    <Font cssVariable="--font-general-sans" />
+    <Font cssVariable="--font-jetbrains-mono" />
+
+    <ClientRouter />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">
+      Skip to content
+    </a>
+    <SiteHeader />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>
+
+<style>
+  .skip-link {
+    position: fixed;
+    inset-block-start: 0.75rem;
+    inset-inline-start: 0.75rem;
+    z-index: 100;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    background-color: var(--ink);
+    color: var(--paper);
+    font-weight: 500;
+    transform: translateY(-200%);
+    transition: transform var(--dur-2) var(--ease-out);
+  }
+  .skip-link:focus-visible {
+    transform: none;
+  }
+  main:focus {
+    outline: none;
+  }
+</style>

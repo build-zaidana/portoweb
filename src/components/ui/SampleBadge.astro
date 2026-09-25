@@ -1,0 +1,28 @@
+---
+/**
+ * Visible marker for dummy content (PRD F3). Dashed outline = "not final".
+ * The title attribute explains it on hover; the text alone is enough for screen readers.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<span class:list={["sample", className]} title="Placeholder content. It will be replaced with a real entry.">
+  Sample
+</span>
+
+<style>
+  .sample {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.55rem;
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius-sm);
+    color: var(--ink-soft);
+    font-size: var(--text-step--1);
+    font-weight: 500;
+    line-height: 1.2;
+  }
+</style>

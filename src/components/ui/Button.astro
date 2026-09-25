@@ -1,0 +1,134 @@
+---
+/**
+ * Pill button, rendered as <a> when `href` is given, otherwise <button>.
+ *
+ * Variants (one clear hierarchy per screen):
+ * - primary:   solid ink. The single main action.
+ * - secondary: outline. Everything else.
+ * - glass:     frosted pill with a moving sheen. ONLY for the hero CTA and the nav CTA.
+ */
+import type { HTMLAttributes } from "astro/types";
+
+type Variant = "primary" | "secondary" | "glass";
+type Size = "md" | "lg";
+
+type Props = {
+  variant?: Variant;
+  size?: Size;
+  href?: string;
+  class?: string;
+} & Omit<HTMLAttributes<"a"> & HTMLAttributes<"button">, "class">;
+
+const { variant = "primary", size = "md", href, class: className, ...rest } = Astro.props;
+const Tag = href ? "a" : "button";
+const typeAttr = href ? {} : { type: (rest as HTMLAttributes<"button">).type ?? "button" };
+---
+
+<Tag
+  href={href}
+  class:list={["btn", `btn--${variant}`, `btn--${size}`, { glass: variant === "glass" }, className]}
+  {...typeAttr}
+  {...rest}
+>
+  <span class="btn__label">
+    <slot />
+  </span>
+</Tag>
+
+<style>
+  .btn {
+    --btn-h: 2.75rem; /* 44px minimum touch target */
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-block-size: var(--btn-h);
+    padding-inline: 1.25rem;
+    border-radius: 999px;
+    font-family: var(--font-sans);
+    font-size: var(--text-step--1);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.005em;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color var(--dur-2) var(--ease-out),
+      border-color var(--dur-2) var(--ease-out),
+      color var(--dur-2) var(--ease-out),
+      box-shadow var(--dur-2) var(--ease-out),
+      transform var(--dur-1) var(--ease-out);
+  }
+  .btn--lg {
+    --btn-h: 3.25rem;
+    padding-inline: 1.625rem;
+    font-size: var(--text-step-0);
+  }
+  /* Press feedback shared by all variants. */
+  .btn:active {
+    transform: scale(0.97);
+  }
+
+  /* ── Primary ─────────────────────────────────────────────── */
+  .btn--primary {
+    background-color: var(--ink);
+    color: var(--paper);
+  }
+  .btn--primary:hover {
+    background-color: color-mix(in oklab, var(--ink) 86%, var(--sage));
+  }
+
+  /* ── Secondary ───────────────────────────────────────────── */
+  .btn--secondary {
+    border: 1px solid var(--line-strong);
+    color: var(--ink);
+  }
+  .btn--secondary:hover {
+    border-color: var(--ink);
+    background-color: var(--line);
+  }
+
+  /* ── Glass (wabi.ai reference) ───────────────────────────────
+     Frosted surface (global .glass). On hover a light band
+     sweeps across once, which reads as light moving over real glass. */
+  .btn--glass {
+    /* Surface comes from the global .glass class; this adds the sheen. */
+    color: var(--ink);
+    overflow: hidden;
+  }
+  .btn--glass::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(105deg, transparent 30%, var(--glass-shine) 48%, transparent 66%);
+    background-size: 250% 100%;
+    background-position: 130% 0;
+    opacity: 0;
+    transition:
+      background-position var(--dur-4) var(--ease-in-out),
+      opacity var(--dur-2) var(--ease-out);
+  }
+  .btn--glass:hover::after {
+    background-position: -30% 0;
+    opacity: 1;
+  }
+  .btn--glass:hover {
+    box-shadow:
+      inset 0 1px 0 var(--glass-shine),
+      0 1px 1px var(--shadow-tint),
+      0 14px 32px -12px var(--shadow-tint);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn:active {
+      transform: none;
+    }
+    .btn--glass::after {
+      display: none;
+    }
+  }
+</style>
