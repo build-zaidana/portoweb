@@ -1,0 +1,23 @@
+# dependencies & build
+node_modules/
+dist/
+.astro/
+.netlify/
+.vercel/
+
+# env
+.env
+.env.*
+!.env.example
+
+# claude code (personal, not shared)
+.claude/settings.local.json
+
+# playwright MCP output
+.playwright-mcp/
+
+# os / editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
