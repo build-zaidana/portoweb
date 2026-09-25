@@ -6,7 +6,7 @@
  * in dev/preview and excluded from production by src/lib/content.ts.
  */
 import { defineCollection } from "astro:content";
-import { glob } from "astro/loaders";
+import { file, glob } from "astro/loaders";
 import { z } from "astro/zod";
 
 /** Shared by every collection. */
@@ -61,4 +61,15 @@ const now = defineCollection({
   }),
 });
 
-export const collections = { projects, writing, now };
+/** Dated milestones for the learning timeline on /about (one YAML file, one entry per item). */
+const timeline = defineCollection({
+  loader: file("./src/content/timeline.yaml"),
+  schema: z.object({
+    date: z.coerce.date(),
+    title: z.string().max(80),
+    note: z.string().max(160).optional(),
+    sample,
+  }),
+});
+
+export const collections = { projects, writing, now, timeline };

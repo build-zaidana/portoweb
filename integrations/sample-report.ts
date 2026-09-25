@@ -15,14 +15,19 @@ import { loadEnv } from "vite";
 const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---/;
 const SAMPLE_FLAG = /^sample:\s*true\s*$/m;
 
+const SAMPLE_ENTRY = /^\s*sample:\s*true\s*$/gm;
+
+/** Markdown files with `sample: true` in frontmatter, plus data files (YAML/JSON) that contain sample entries. */
 export function findSampleFiles(contentDir: string): string[] {
-  return globSync("**/*.{md,mdx}", { cwd: contentDir })
-    .filter((file) => {
-      const frontmatter = FRONTMATTER.exec(readFileSync(`${contentDir}/${file}`, "utf8"))?.[1] ?? "";
-      return SAMPLE_FLAG.test(frontmatter);
-    })
-    .map((file) => file.replaceAll("\\", "/"))
-    .sort();
+  const markdown = globSync("**/*.{md,mdx}", { cwd: contentDir }).filter((file) => {
+    const frontmatter = FRONTMATTER.exec(readFileSync(`${contentDir}/${file}`, "utf8"))?.[1] ?? "";
+    return SAMPLE_FLAG.test(frontmatter);
+  });
+  const data = globSync("**/*.{yaml,yml,json}", { cwd: contentDir }).flatMap((file) => {
+    const count = readFileSync(`${contentDir}/${file}`, "utf8").match(SAMPLE_ENTRY)?.length ?? 0;
+    return count > 0 ? [`${file} (${count} ${count === 1 ? "entry" : "entries"})`] : [];
+  });
+  return [...markdown, ...data].map((file) => file.replaceAll("\\", "/")).sort();
 }
 
 export function sampleReport(): AstroIntegration {

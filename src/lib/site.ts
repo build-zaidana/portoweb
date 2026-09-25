@@ -9,6 +9,22 @@ export const site = {
   ogImage: "/og-default.png",
 } as const;
 
+/**
+ * Facts about Zaidana that the site may state. Source: PRD §1/§4 + answers from Zaidana (Phase 2).
+ * Anything not listed here must not be claimed on the site.
+ * Hours per week and start date were intentionally left out (not decided yet).
+ */
+export const profile = {
+  role: "Software Engineering student",
+  focus: "Fullstack + AI",
+  country: "Indonesia",
+  timezone: "WIB (UTC+7)",
+  seeking: "Remote internships and junior software roles",
+  github: { label: "github.com/build-zaidana", href: "https://github.com/build-zaidana" },
+  /** PRD F7: placeholder until the real CV exists. Keep `placeholder: true` so the UI says so. */
+  cv: { href: "/cv-placeholder.pdf", placeholder: true },
+} as const;
+
 export interface NavItem {
   label: string;
   href: string;

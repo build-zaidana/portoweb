@@ -1,0 +1,23 @@
+# Learning timeline for /about. Newest first is not required; the page sorts by date.
+# Entries marked `sample: true` are placeholders (hidden in production, labeled "Sample" in dev).
+- id: this-site
+  date: 2026-09-24
+  title: Started building this website in public
+  note: Astro, TypeScript, and Tailwind. Each phase is reviewed before the next one starts.
+
+- id: github
+  date: 2026-07-06
+  title: Opened my GitHub account
+  note: A home for practice repositories and small projects.
+
+- id: first-fullstack-app
+  date: 2025-11-01
+  title: Built my first app with a frontend and a database
+  note: Placeholder milestone. Replace with a real one.
+  sample: true
+
+- id: started-degree
+  date: 2024-08-01
+  title: Started studying Software Engineering
+  note: Placeholder date. Replace with the real start date.
+  sample: true

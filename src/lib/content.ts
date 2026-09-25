@@ -5,7 +5,7 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import { SHOW_SAMPLES } from "astro:env/server";
 
-type Collection = "projects" | "writing" | "now";
+type Collection = "projects" | "writing" | "now" | "timeline";
 
 /** Samples are visible while developing, and in preview builds that opt in with SHOW_SAMPLES=true. */
 export const samplesVisible: boolean = import.meta.env.DEV || SHOW_SAMPLES;
@@ -32,6 +32,12 @@ export async function getProjects(): Promise<CollectionEntry<"projects">[]> {
 export async function getWriting(): Promise<CollectionEntry<"writing">[]> {
   const entries = await getVisibleEntries("writing");
   return entries.sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
+}
+
+/** Timeline milestones, newest first. */
+export async function getTimeline(): Promise<CollectionEntry<"timeline">[]> {
+  const entries = await getVisibleEntries("timeline");
+  return entries.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 }
 
 /** The current /now entry is simply the most recent month. */
