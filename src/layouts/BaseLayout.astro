@@ -9,6 +9,7 @@ import ThemeScript from "../components/ThemeScript.astro";
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import SketchFilter from "../components/ui/SketchFilter.astro";
+import Analytics from "../components/Analytics.astro";
 import { site } from "../lib/site";
 import { pageTransition } from "../lib/motion";
 import "../styles/global.css";
@@ -80,6 +81,7 @@ const ogImage = new URL(image ?? site.ogImage, Astro.site).href;
     <Font cssVariable="--font-caveat" />
 
     <ClientRouter />
+    <Analytics />
   </head>
   <body>
     <SketchFilter />

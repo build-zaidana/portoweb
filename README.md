@@ -104,6 +104,7 @@ Semua fakta tentang kamu yang boleh tampil di situs ada di satu file ini. Isi sa
 | Email kerja | `contact.email` | Contact |
 | X / Instagram | `contact.social` (`{ label, href }`) | Contact |
 | Akun Buttondown | `newsletter.username` | Form newsletter di Home dan akhir artikel |
+| Kode GoatCounter (mis. `zaidana`) | `analytics.goatcounter` | Script analytics (hanya di production). Mencatat kunjungan + klik CV, kontak, GitHub |
 | Jam overlap, mulai kapan, jam/minggu | `profile.availability` | About, Contact |
 | CV asli | ganti `public/cv-placeholder.pdf`, lalu ubah `profile.cv` (`href`, `placeholder: false`) | About, Contact |
 | Progres situs | `siteProgress` | Card "This site" di hero |

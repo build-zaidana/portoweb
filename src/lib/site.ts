@@ -47,6 +47,14 @@ export const newsletter: { username: string | null } = {
   username: null,
 };
 
+/**
+ * Analytics (PRD F8). GoatCounter site code, e.g. "zaidana" for zaidana.goatcounter.com.
+ * null = no analytics script at all. Only production builds load it.
+ */
+export const analytics: { goatcounter: string | null } = {
+  goatcounter: null,
+};
+
 /** Real progress of this website, phase by phase (update at every gate). Shown on Home. */
 export const siteProgress: readonly { label: string; done: boolean }[] = [
   { label: "Foundations", done: true },

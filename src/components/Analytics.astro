@@ -1,0 +1,69 @@
+---
+/**
+ * GoatCounter (PRD F8): free, no cookies, no consent banner, no personal data.
+ * Loads only in production builds and only once `analytics.goatcounter` is set in site.ts.
+ *
+ * ClientRouter swaps pages without a full reload, so automatic counting is turned off
+ * (no_onload) and every page view is counted on `astro:page-load`. Clicks that matter for
+ * PRD G1 (CV download, contact, GitHub) are counted as events by one delegated listener
+ * that recognizes the link by its href, so no markup needs tracking attributes.
+ */
+import { analytics, contactHref, profile } from "../lib/site";
+
+const code = import.meta.env.PROD ? analytics.goatcounter : null;
+const config = { cv: profile.cv.href, contact: contactHref, github: profile.github.href };
+---
+
+{code && (
+  <>
+    <script is:inline set:html="window.goatcounter = { no_onload: true };" />
+    <script
+      is:inline
+      data-goatcounter={`https://${code}.goatcounter.com/count`}
+      async
+      src="//gc.zgo.at/count.js"
+    />
+    <script is:inline type="application/json" id="analytics-config" set:html={JSON.stringify(config)} />
+  </>
+)}
+
+<script>
+  type GoatCounter = { count?: (vars: { path: string; title?: string; event?: boolean }) => void };
+  const gc = () => (window as unknown as { goatcounter?: GoatCounter }).goatcounter;
+
+  /** Runs `fn` now if count.js is ready, otherwise once it has loaded. */
+  function whenReady(fn: () => void) {
+    if (gc()?.count) return fn();
+    const script = document.querySelector<HTMLScriptElement>("script[data-goatcounter]");
+    script?.addEventListener("load", fn, { once: true });
+  }
+
+  function init() {
+    const configEl = document.getElementById("analytics-config");
+    if (!configEl?.textContent || (window as unknown as { __analyticsBound?: boolean }).__analyticsBound)
+      return;
+    (window as unknown as { __analyticsBound?: boolean }).__analyticsBound = true;
+    const links: { cv: string; contact: string; github: string } = JSON.parse(configEl.textContent);
+
+    document.addEventListener("astro:page-load", () =>
+      whenReady(() => gc()?.count?.({ path: location.pathname + location.search })),
+    );
+
+    document.addEventListener("click", (event) => {
+      const link = (event.target as Element | null)?.closest?.("a[href]");
+      if (!(link instanceof HTMLAnchorElement)) return;
+      const href = link.getAttribute("href") ?? "";
+      const name =
+        href === links.cv
+          ? "cv-download"
+          : href === links.contact
+            ? "contact"
+            : href.startsWith(links.github)
+              ? "github"
+              : null;
+      if (name)
+        whenReady(() => gc()?.count?.({ path: name, title: `from ${location.pathname}`, event: true }));
+    });
+  }
+  init();
+</script>
