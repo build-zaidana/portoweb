@@ -1,0 +1,462 @@
+---
+/**
+ * The inside of one hero card, "notebook" style (Gate 2 decision, option 1):
+ * washi tape on top, light paper grain, content that is specific to the entry
+ * (a mini quiz, real code, the article's first lines with a highlighter mark,
+ * a tiny copy of this site) and a handwritten margin note.
+ *
+ * HeroStack owns position, motion and accessibility; this component only draws the face.
+ */
+import type { HeroCard } from "../../lib/hero";
+import ProjectArt from "../cards/ProjectArt.astro";
+import SampleBadge from "../ui/SampleBadge.astro";
+import SketchIcon, { type IconName } from "../ui/SketchIcon.astro";
+
+interface Props {
+  card: HeroCard;
+  /** Position in the deck, used to vary tape color and angle. */
+  index: number;
+}
+
+const { card, index } = Astro.props;
+
+const kindLabel: Record<HeroCard["kind"], { text: string; icon: IconName }> = {
+  project: { text: "Building", icon: "build" },
+  learning: { text: "Learning", icon: "book" },
+  writing: { text: "Writing", icon: "spark" },
+  site: { text: "This site", icon: "cloud" },
+};
+
+/** Tape contrasts with the card: tan on sky, sky on sage, sage on tan. */
+const tapeFor = { sky: "tan", sage: "sky", tan: "sage" } as const;
+const tapeAngle = [-5, 4, -3, 6][index % 4];
+
+/** Tiny, dependency-free TypeScript highlighter for a few lines of code. */
+function highlight(code: string): string {
+  const escape = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return escape(code)
+    .replace(
+      /\b(function|return|const|let|type|interface|export|import|from|new)\b/g,
+      '<span class="k">$1</span>',
+    )
+    .replace(/\b([A-Z]\w*)\b/g, '<span class="t">$1</span>')
+    .replace(/\b(-?\d+)\b/g, '<span class="n">$1</span>')
+    .replace(/\b([a-z_]\w*)(?=\()/g, '<span class="f">$1</span>');
+}
+---
+
+<span
+  class="tape"
+  style={`--tape: var(--${tapeFor[card.tint]}); --tape-r: ${tapeAngle}deg`}
+  aria-hidden="true"
+></span>
+
+<div class="top">
+  <span class="kind">
+    <SketchIcon name={kindLabel[card.kind].icon} size={16} />
+    {kindLabel[card.kind].text}
+  </span>
+  {card.sample && <SampleBadge />}
+</div>
+
+<h3 class="title">
+  <a
+    href={card.href}
+    class="card-link"
+    draggable="false"
+    {...(card.external ? { target: "_blank", rel: "noopener" } : {})}
+  >
+    {card.title}
+  </a>
+</h3>
+
+<div class="preview" aria-hidden="true">
+  {card.kind === "project" && card.art === "form" && (
+    <div class="quiz">
+      <p class="q-meta">Question 2 of 5</p>
+      <p class="q">What does an API describe?</p>
+      <ul>
+        <li class="on">
+          <i />
+          What a program can ask for
+        </li>
+        <li>
+          <i />
+          Where the database lives
+        </li>
+      </ul>
+      <p class="src">
+        Source: “A menu lists <mark>what the kitchen can make</mark>.”
+      </p>
+    </div>
+  )}
+  {card.kind === "project" && card.art !== "form" && card.art && (
+    <div class="art-box">
+      <ProjectArt variant={card.art} />
+    </div>
+  )}
+  {card.kind === "learning" &&
+    (card.snippet ? (
+      <pre class="code" set:html={highlight(card.snippet)} />
+    ) : (
+      <p class="plain">{card.body}</p>
+    ))}
+  {card.kind === "writing" && card.page && (
+    <div class="page">
+      <p>
+        {card.page.before}
+        {card.page.mark && <mark>{card.page.mark}</mark>}
+        {card.page.after}
+      </p>
+    </div>
+  )}
+  {card.kind === "site" && (
+    <div class="mini-site">
+      <div class="ms-sky">
+        <span />
+        <span />
+        <span />
+      </div>
+      <p class="ms-line">Learning to build software…</p>
+    </div>
+  )}
+</div>
+
+{card.note && (
+  <p class:list={["note", `note--${card.kind}`]}>
+    {card.kind === "learning" && (
+      <svg class="note-arrow" viewBox="0 0 60 40" aria-hidden="true">
+        <path d="M56 36 C 44 32, 28 22, 12 8" />
+        <path d="M12 8 l 8 1 M12 8 l 1 8" />
+      </svg>
+    )}
+    {card.note}
+    {card.kind === "site" && " ↑"}
+  </p>
+)}
+
+<p class="meta">{card.meta}</p>
+
+<style>
+  /* ── Tape + paper ─────────────────────────────────────────── */
+  .tape {
+    position: absolute;
+    inset-block-start: -0.8rem;
+    inset-inline-start: 50%;
+    z-index: 2;
+    inline-size: 5.75rem;
+    block-size: 1.5rem;
+    translate: -50% 0;
+    rotate: var(--tape-r);
+    background:
+      repeating-linear-gradient(90deg, transparent 0 6px, rgb(255 255 255 / 0.18) 6px 7px),
+      color-mix(in oklab, var(--tape) 72%, transparent);
+    /* Torn ends */
+    clip-path: polygon(
+      0 8%,
+      4% 0,
+      8% 10%,
+      12% 0,
+      100% 0,
+      96% 12%,
+      100% 25%,
+      96% 40%,
+      100% 55%,
+      96% 70%,
+      100% 85%,
+      96% 100%,
+      0 100%,
+      4% 88%,
+      0 75%,
+      4% 60%,
+      0 45%,
+      4% 30%,
+      0 18%
+    );
+  }
+
+  /* ── Header ───────────────────────────────────────────────── */
+  .top {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+  .kind {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.6rem 0.25rem 0.45rem;
+    border-radius: 999px;
+    background-color: color-mix(in oklab, var(--surface-raised) 80%, transparent);
+    font-size: var(--text-step--1);
+    font-weight: 500;
+  }
+  .title {
+    flex-shrink: 0;
+    margin-block-start: 0.2rem;
+    font-size: 1.75rem;
+    line-height: 1.05;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  @media (max-width: 29.99rem) {
+    .title {
+      font-size: 1.5rem;
+    }
+  }
+  .card-link {
+    color: inherit;
+    text-decoration: none;
+    -webkit-user-drag: none;
+  }
+  .card-link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+  .card-link:focus-visible {
+    outline: none;
+  }
+
+  /* ── Specific content ─────────────────────────────────────── */
+  /* The preview gives way (and clips) when the card is short, so nothing spills over the controls. */
+  .preview {
+    position: relative;
+    flex-shrink: 1;
+    min-block-size: 0;
+    overflow: hidden;
+    padding: 0.35rem; /* room for the rotated page + shadows inside the clip */
+    margin: -0.35rem;
+    font-size: 0.8125rem;
+  }
+  /* Small cards: keep the quiz to one question + the checked answer, and fit the code line. */
+  @media (max-width: 29.99rem) {
+    .q-meta,
+    .src,
+    .quiz li:not(.on) {
+      display: none;
+    }
+    .code {
+      font-size: 0.7rem;
+    }
+  }
+  /* The smallest phones (≤ 380px): a notch tighter so every card fits without clipping. */
+  @media (max-width: 23.75rem) {
+    .preview {
+      font-size: 0.75rem;
+    }
+    .quiz {
+      padding: 0.65rem 0.75rem;
+    }
+    .ms-sky {
+      block-size: 4.5rem;
+    }
+    .note {
+      font-size: 1.15rem;
+    }
+    /* The meta line (stack, date) is on the detail page; give its space to the content. */
+    .meta {
+      display: none;
+    }
+  }
+  .quiz,
+  .code,
+  .mini-site,
+  .plain {
+    border-radius: var(--radius-md);
+    background-color: var(--surface-raised);
+    border: 1px solid var(--line);
+  }
+  .quiz {
+    display: grid;
+    gap: 0.45rem;
+    padding: 0.85rem 0.95rem;
+  }
+  .q-meta {
+    color: var(--ink-soft);
+    font-size: 0.75rem;
+  }
+  .q {
+    font-weight: 600;
+  }
+  .quiz ul {
+    display: grid;
+    gap: 0.3rem;
+  }
+  .quiz li {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.3rem 0.45rem;
+    border-radius: 0.45rem;
+    border: 1px solid var(--line);
+  }
+  .quiz li i {
+    flex: none;
+    inline-size: 0.7rem;
+    block-size: 0.7rem;
+    border-radius: 999px;
+    border: 1.5px solid var(--line-strong);
+  }
+  .quiz li.on {
+    border-color: var(--sage);
+    background-color: color-mix(in oklab, var(--sage) 14%, transparent);
+  }
+  .quiz li.on i {
+    border-color: var(--accent);
+    background: radial-gradient(circle, var(--accent) 40%, transparent 46%);
+  }
+  .src {
+    color: var(--ink-soft);
+    font-size: 0.75rem;
+  }
+  mark {
+    color: inherit;
+    padding-inline: 0.1em;
+    background: linear-gradient(transparent 55%, color-mix(in oklab, var(--tan) 70%, transparent) 55%);
+  }
+
+  .art-box {
+    position: relative;
+    block-size: 11rem;
+    margin-inline: -1.25rem;
+    overflow: hidden;
+  }
+  .art-box :global(.art) {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+  }
+
+  .code {
+    margin: 0;
+    padding: 0.85rem 0.95rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    line-height: 1.65;
+    white-space: pre;
+    overflow: hidden;
+  }
+  .code :global(.k) {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .code :global(.t),
+  .code :global(.n) {
+    color: var(--code-type);
+    font-weight: 600;
+  }
+  .code :global(.f) {
+    font-weight: 600;
+  }
+  .plain {
+    padding: 0.85rem 0.95rem;
+    color: var(--ink-soft);
+  }
+
+  /* A page from a lined notebook, slightly off-straight. */
+  .page {
+    padding: 0.9rem 1rem;
+    border-radius: 0.4rem;
+    background:
+      repeating-linear-gradient(
+        transparent 0 1.35rem,
+        color-mix(in oklab, var(--sky) 45%, transparent) 1.35rem calc(1.35rem + 1px)
+      ),
+      var(--surface-raised);
+    box-shadow: 0 8px 16px -10px var(--shadow-tint);
+    rotate: 1.5deg;
+    font-size: 0.875rem;
+    line-height: 1.35rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .mini-site {
+    display: grid;
+    gap: 0.45rem;
+    padding: 0.6rem;
+    background-color: var(--paper);
+  }
+  .ms-sky {
+    position: relative;
+    block-size: 6.25rem;
+    border-radius: 0.6rem;
+    background: linear-gradient(var(--sky-top), var(--sky-bottom));
+    overflow: hidden;
+  }
+  .ms-sky span {
+    position: absolute;
+    inset-block-start: 1.3rem;
+    inset-inline-start: 42%;
+    inline-size: 3rem;
+    block-size: 4rem;
+    border-radius: 0.55rem;
+    background-color: var(--surface-raised);
+    border: 1px solid var(--line);
+  }
+  .ms-sky span:nth-child(1) {
+    rotate: 10deg;
+    translate: 1rem 0;
+    opacity: 0.6;
+  }
+  .ms-sky span:nth-child(2) {
+    rotate: 4deg;
+    translate: 0.5rem 0;
+    opacity: 0.8;
+  }
+  .ms-sky span:nth-child(3) {
+    rotate: -4deg;
+  }
+  .ms-line {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    line-height: 1;
+  }
+
+  /* ── Handwritten margin note ──────────────────────────────── */
+  .note {
+    position: relative;
+    flex-shrink: 0;
+    font-family: var(--font-hand);
+    font-size: 1.3rem;
+    line-height: 1.05;
+    color: var(--accent);
+    rotate: -2.5deg;
+    text-wrap: balance;
+  }
+  .note--learning {
+    align-self: flex-end;
+    max-inline-size: 10rem;
+    margin-block-start: 1.25rem;
+    text-align: end;
+  }
+  .note--site {
+    align-self: center;
+    rotate: 3deg;
+  }
+  .note-arrow {
+    position: absolute;
+    inset-inline-start: -3.25rem;
+    inset-block-start: -1.4rem;
+    inline-size: 3rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .meta {
+    margin-block-start: auto;
+    flex-shrink: 0;
+    font-size: var(--text-step--1);
+    color: var(--ink-soft);
+  }
+</style>

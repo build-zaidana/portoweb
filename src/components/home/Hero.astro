@@ -219,6 +219,12 @@ const first = cards[0];
     position: relative;
     z-index: 1;
   }
+  /* Phones: keep swiped/back cards inside the frame so the page never scrolls sideways. */
+  @media (max-width: 47.99rem) {
+    .sky-frame {
+      overflow: clip;
+    }
+  }
   .visual :global(.hero-sticker) {
     position: absolute;
     inset-block-start: -1.25rem;
