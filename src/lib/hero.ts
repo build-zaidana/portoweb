@@ -47,7 +47,11 @@ export function excerpt(
     .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
     .replace(/\s+/g, " ");
   // Cut at a word boundary and drop trailing punctuation so we never print "word.…".
-  if (text.length > max) text = `${text.slice(0, max).replace(/\s+\S*$/, "").replace(/[\s.,;:!?]+$/, "")}…`;
+  if (text.length > max)
+    text = `${text
+      .slice(0, max)
+      .replace(/\s+\S*$/, "")
+      .replace(/[\s.,;:!?]+$/, "")}…`;
   const at = highlight ? text.indexOf(highlight) : -1;
   if (!highlight || at < 0) return { before: text, mark: "", after: "" };
   return { before: text.slice(0, at), mark: highlight, after: text.slice(at + highlight.length) };
