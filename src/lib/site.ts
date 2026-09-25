@@ -52,7 +52,7 @@ export const newsletter: { username: string | null } = {
  * null = no analytics script at all. Only production builds load it.
  */
 export const analytics: { goatcounter: string | null } = {
-  goatcounter: null,
+  goatcounter: "buildzaidana",
 };
 
 /** Real progress of this website, phase by phase (update at every gate). Shown on Home. */
