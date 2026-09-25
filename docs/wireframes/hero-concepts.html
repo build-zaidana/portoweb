@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hero concepts — wireframes</title>
+<style>
+  /* Grayscale wireframes. Not part of the site build (lives in docs/). */
+  :root { --bg:#f2f2f2; --ink:#222; --mid:#8a8a8a; --soft:#bdbdbd; --box:#e2e2e2; --box2:#d4d4d4; --note:#555; }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #fff; font: 14px/1.4 system-ui, sans-serif; color: var(--ink); padding: 40px; }
+  .concept { margin-bottom: 72px; }
+  .concept > header { display: flex; align-items: baseline; gap: 16px; margin-bottom: 16px; }
+  .concept > header h2 { font: 400 32px/1 Georgia, serif; }
+  .concept > header p { color: var(--mid); max-width: 70ch; }
+  .frames { display: flex; gap: 32px; align-items: flex-start; }
+  .frame { position: relative; background: var(--bg); border: 1px solid var(--soft); overflow: hidden; }
+  .desk { width: 1200px; height: 720px; }
+  .mob { width: 360px; height: 720px; }
+  .label { position: absolute; top: -22px; left: 0; font-size: 12px; color: var(--mid); }
+  .nav { position: absolute; top: 18px; left: 50%; translate: -50% 0; width: 300px; height: 40px; border-radius: 99px; background: #fafafa; border: 1px solid var(--soft); }
+  .logo { position: absolute; top: 26px; left: 40px; width: 90px; height: 22px; background: var(--ink); border-radius: 4px; }
+  .navr { position: absolute; top: 20px; right: 40px; width: 120px; height: 36px; border-radius: 99px; border: 1px solid var(--soft); background:#fafafa; }
+  .serif { font-family: Georgia, serif; }
+  .line { height: 10px; background: var(--soft); border-radius: 6px; margin: 8px 0; }
+  .btn { display: inline-block; height: 40px; border-radius: 99px; background: var(--ink); width: 150px; margin-right: 8px; }
+  .btn.o { background: none; border: 1.5px solid var(--mid); }
+  .btn.g { background: #fafafa; border: 1px solid var(--soft); box-shadow: 0 6px 16px -8px #0004; }
+  .chip { display: inline-block; height: 26px; border-radius: 99px; border: 1px dashed var(--mid); width: 190px; }
+  .tag { position: absolute; background: var(--ink); color: #fff; font-size: 11px; font-weight: 600; width: 22px; height: 22px; border-radius: 99px; display: grid; place-items: center; }
+  .note { position: absolute; font-size: 12px; color: var(--note); max-width: 220px; }
+  .sticker { position: absolute; width: 96px; height: 96px; border-radius: 50%; border: 2px dashed var(--mid); rotate: -12deg; display: grid; place-items: center; font-size: 11px; text-align: center; color: var(--note); padding: 10px; background:#fff; }
+  .card { position: absolute; background: #fff; border: 1px solid var(--soft); border-radius: 18px; box-shadow: 0 20px 40px -24px #0005; padding: 18px; }
+  .sky { position: absolute; border-radius: 28px; background: repeating-radial-gradient(circle at 30% 40%, #ddd 0 2px, #e9e9e9 2px 7px); }
+  .legend { margin-top: 14px; display: grid; grid-template-columns: repeat(4, max-content); gap: 6px 20px; font-size: 12px; color: var(--note); }
+  .legend b { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 99px; background: var(--ink); color: #fff; font-size: 10px; margin-right: 6px; }
+  .strip { position: absolute; left: 0; right: 0; bottom: 0; height: 120px; border-top: 1px solid var(--soft); }
+</style>
+</head>
+<body>
+
+<!-- ───────────────────────── A: Card stack ───────────────────────── -->
+<section class="concept" id="a">
+  <header><h2>A · Card stack</h2><p>Proof you can hold. Headline on the left; on the right, a tilted 3D stack of real things (a project, a learning note, an article) that you swipe or step through. The phrase in the subline changes with the front card.</p></header>
+  <div class="frames">
+    <div class="frame desk"><span class="label">Desktop 1440</span>
+      <div class="logo"></div><div class="nav"></div><div class="navr"></div>
+      <div style="position:absolute;left:80px;top:170px;width:470px">
+        <div style="font-size:13px;color:var(--mid)">Zaidana · Software Engineering student, Indonesia</div>
+        <div class="serif" style="font-size:64px;line-height:1;margin-top:14px">Learning to build software that helps people</div>
+        <div style="margin-top:22px;font-size:20px;color:var(--note)">Right now I'm <u>building a quiz app</u> ⟳</div>
+        <div style="margin-top:30px"><span class="btn g"></span><span class="btn o"></span></div>
+        <div style="margin-top:18px;font-size:12px;color:var(--mid)">github.com/zaidana ↗ (real proof link)</div>
+      </div>
+      <div class="sky" style="left:640px;top:110px;width:500px;height:520px"></div>
+      <div class="card" style="left:760px;top:190px;width:250px;height:330px;rotate:6deg;opacity:.6"></div>
+      <div class="card" style="left:740px;top:175px;width:250px;height:330px;rotate:2deg;opacity:.8"></div>
+      <div class="card" style="left:720px;top:160px;width:250px;height:330px;rotate:-4deg"><div class="line" style="width:40%"></div><div class="serif" style="font-size:22px;margin:10px 0">Quiz from my notes</div><div class="line"></div><div class="line" style="width:70%"></div><div style="height:120px;background:var(--box);border-radius:10px;margin-top:14px"></div></div>
+      <div style="position:absolute;left:760px;top:560px;display:flex;gap:10px;align-items:center"><span style="width:36px;height:36px;border-radius:99px;border:1px solid var(--mid)"></span><span style="width:140px;height:2px;background:var(--mid)"></span><span style="width:36px;height:36px;border-radius:99px;border:1px solid var(--mid)"></span></div>
+      <div class="sticker" style="left:540px;top:120px">Open to remote internships</div>
+      <span class="tag" style="left:52px;top:168px">1</span><span class="tag" style="left:52px;top:215px">2</span><span class="tag" style="left:52px;top:350px">3</span><span class="tag" style="left:690px;top:150px">4</span>
+      <div class="note" style="left:980px;top:560px">Drag, arrows, or keys ← →. No autoplay.</div>
+    </div>
+    <div class="frame mob"><span class="label">Mobile 390</span>
+      <div class="logo" style="left:20px;width:70px"></div><div class="navr" style="right:20px;width:80px"></div>
+      <div style="position:absolute;left:20px;right:20px;top:90px">
+        <div class="serif" style="font-size:40px;line-height:1">Learning to build software that helps people</div>
+        <div style="margin-top:12px;color:var(--note)">Right now I'm <u>building…</u></div>
+        <div style="margin-top:14px"><span class="btn g" style="width:130px"></span></div>
+      </div>
+      <div class="sky" style="left:20px;right:20px;top:360px;height:320px"></div>
+      <div class="card" style="left:60px;top:390px;width:220px;height:250px;rotate:-4deg"></div>
+      <div class="sticker" style="right:14px;top:330px;width:78px;height:78px">Open to internships</div>
+    </div>
+  </div>
+  <div class="legend"><span><b>1</b>Who</span><span><b>2</b>Focus</span><span><b>3</b>Seeking + CTA</span><span><b>4</b>Proof (cards)</span></div>
+</section>
+
+<!-- ───────────────────────── B: Annotated sentence ───────────────────────── -->
+<section class="concept" id="b">
+  <header><h2>B · Annotated sentence</h2><p>A notebook page. One very large serif sentence fills the screen; hand-drawn lines connect key words to small margin notes with real, dated specifics (what I'm building, learning, looking for). Type is the visual; no mockups.</p></header>
+  <div class="frames">
+    <div class="frame desk"><span class="label">Desktop 1440</span>
+      <div class="logo"></div><div class="nav"></div><div class="navr"></div>
+      <div class="serif" style="position:absolute;left:80px;top:150px;width:900px;font-size:92px;line-height:.98">I'm <u>learning</u> to build software that <u>helps people</u>, and <u>writing down</u> what I find.</div>
+      <svg style="position:absolute;left:0;top:0" width="1200" height="720" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="4 4"><path d="M300 245 C 320 120, 900 80, 990 120"/><path d="M820 350 C 900 380, 960 380, 1000 330"/><path d="M430 440 C 420 520, 300 560, 250 580"/></svg>
+      <div class="note" style="left:990px;top:100px;width:180px;border:1px solid var(--soft);background:#fff;padding:10px;border-radius:10px">Currently learning<br><b>TypeScript generics</b><br><span style="color:var(--mid)">Sep 2026</span></div>
+      <div class="note" style="left:1000px;top:300px;width:170px;border:1px solid var(--soft);background:#fff;padding:10px;border-radius:10px">Building<br><b>Quiz from my notes</b> →</div>
+      <div class="note" style="left:90px;top:580px;width:200px;border:1px solid var(--soft);background:#fff;padding:10px;border-radius:10px">Latest note<br><b>How I read an error message</b> →</div>
+      <div style="position:absolute;right:40px;bottom:40px;text-align:right"><span class="chip"></span><div style="margin-top:10px"><span class="btn g"></span><span class="btn o"></span></div></div>
+      <span class="tag" style="left:52px;top:150px">1</span><span class="tag" style="left:960px;top:95px">2</span><span class="tag" style="left:780px;top:640px">3</span><span class="tag" style="left:62px;top:575px">4</span>
+      <div class="note" style="left:360px;top:650px">Lines draw in once on load (the single orchestrated moment).</div>
+    </div>
+    <div class="frame mob"><span class="label">Mobile 390</span>
+      <div class="logo" style="left:20px;width:70px"></div><div class="navr" style="right:20px;width:80px"></div>
+      <div class="serif" style="position:absolute;left:20px;right:20px;top:90px;font-size:44px;line-height:1">I'm <u>learning</u> to build software that <u>helps people</u>…</div>
+      <div style="position:absolute;left:20px;right:20px;top:420px;display:grid;gap:10px">
+        <div class="note" style="position:static;border:1px solid var(--soft);background:#fff;padding:10px;border-radius:10px;max-width:none">Currently learning · TypeScript generics</div>
+        <div class="note" style="position:static;border:1px solid var(--soft);background:#fff;padding:10px;border-radius:10px;max-width:none">Building · Quiz from my notes →</div>
+        <span class="btn g" style="width:150px"></span>
+      </div>
+    </div>
+  </div>
+  <div class="legend"><span><b>1</b>Who + focus (sentence)</span><span><b>2</b>Specifics (notes)</span><span><b>3</b>Seeking + CTA</span><span><b>4</b>Proof (latest note)</span></div>
+</section>
+
+<!-- ───────────────────────── C: Public log ───────────────────────── -->
+<section class="concept" id="c">
+  <header><h2>C · Public log</h2><p>A changelog of a person. Left: identity and an availability card (role, UTC+7 overlap hours, hours per week, start date). Right: a dated "what happened this month" log pulled from projects, writing, and /now. Proof of consistency first.</p></header>
+  <div class="frames">
+    <div class="frame desk"><span class="label">Desktop 1440</span>
+      <div class="logo"></div><div class="nav"></div><div class="navr"></div>
+      <div style="position:absolute;left:80px;top:150px;width:460px">
+        <div class="serif" style="font-size:72px;line-height:.98">Zaidana</div>
+        <div style="font-size:20px;color:var(--note);margin-top:12px">Software Engineering student. Fullstack + AI, learning in public.</div>
+        <div style="margin-top:28px;border:1px solid var(--soft);background:#fff;border-radius:16px;padding:18px">
+          <div style="font-weight:600">Open to remote internships</div>
+          <div class="line" style="width:80%"></div><div class="line" style="width:60%"></div><div class="line" style="width:70%"></div>
+          <div style="margin-top:12px"><span class="btn" style="width:130px"></span><span class="btn o" style="width:110px"></span></div>
+        </div>
+      </div>
+      <div style="position:absolute;left:640px;top:150px;width:480px">
+        <div style="font-size:13px;color:var(--mid)">September 2026</div>
+        <div style="border-left:2px solid var(--soft);margin-top:12px;padding-left:22px;display:grid;gap:22px">
+          <div><div style="font-size:12px;color:var(--mid)">Sep 18 · Shipped</div><div class="serif" style="font-size:24px">Quiz from my notes v0.1</div><div class="line" style="width:70%"></div></div>
+          <div><div style="font-size:12px;color:var(--mid)">Sep 12 · Wrote</div><div class="serif" style="font-size:24px">How I read an error message</div><div class="line" style="width:60%"></div></div>
+          <div><div style="font-size:12px;color:var(--mid)">Sep 05 · Learning</div><div class="serif" style="font-size:24px">TypeScript generics</div><div class="line" style="width:50%"></div></div>
+          <div style="color:var(--mid)">See the full log →</div>
+        </div>
+      </div>
+      <span class="tag" style="left:52px;top:150px">1</span><span class="tag" style="left:52px;top:235px">2</span><span class="tag" style="left:52px;top:310px">3</span><span class="tag" style="left:612px;top:180px">4</span>
+      <div class="note" style="left:640px;top:640px">Mostly still; the newest entry slides in on load.</div>
+    </div>
+    <div class="frame mob"><span class="label">Mobile 390</span>
+      <div class="logo" style="left:20px;width:70px"></div><div class="navr" style="right:20px;width:80px"></div>
+      <div style="position:absolute;left:20px;right:20px;top:90px">
+        <div class="serif" style="font-size:48px;line-height:1">Zaidana</div>
+        <div style="color:var(--note);margin-top:8px">Fullstack + AI, learning in public.</div>
+        <div style="margin-top:16px;border:1px solid var(--soft);background:#fff;border-radius:14px;padding:14px"><b>Open to remote internships</b><div class="line"></div><div class="line" style="width:60%"></div></div>
+        <div style="margin-top:24px;border-left:2px solid var(--soft);padding-left:14px;display:grid;gap:14px">
+          <div class="serif" style="font-size:20px">Shipped: Quiz v0.1</div><div class="serif" style="font-size:20px">Wrote: Reading errors</div><div class="serif" style="font-size:20px">Learning: TS generics</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="legend"><span><b>1</b>Who</span><span><b>2</b>Focus</span><span><b>3</b>Seeking + logistics</span><span><b>4</b>Proof (dated log)</span></div>
+</section>
+
+</body>
+</html>

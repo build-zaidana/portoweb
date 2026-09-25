@@ -7,8 +7,8 @@
 | Fase | Nama | Status |
 |---|---|---|
 | 0 | Review & rencana | ✅ Selesai (Gate 0, 2026-09-25) |
-| 1 | Fondasi | 🟡 Selesai, menunggu "lanjut" (Gate 1) |
-| 2 | Home + About | ⏳ |
+| 1 | Fondasi | ✅ Selesai (Gate 1, 2026-09-25) |
+| 2 | Home + About | 🔄 Berjalan |
 | 3 | Halaman lain | ⏳ |
 | 4 | Copywriting | ⏳ |
 | 5 | 3 proyek pertama | ⏳ |
