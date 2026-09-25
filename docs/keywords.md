@@ -33,6 +33,11 @@
 | `set:text` | Astro | HeroStack (mini code) | 2 |
 | `Astro.slots.has` | Astro | ProgressiveFade, CalmCard | 2 |
 | `set:html` | Astro | HeroCardFace (kode ter-highlight) | 2 |
+| `@astrojs/rss` | Astro | src/pages/rss.xml.ts | 3 |
+| `astro render() headings` | Astro | Outline di detail proyek | 3 |
+| `astro <Code /> component` | Astro | /now (potongan kode) | 3 |
+| `shiki css-variables theme` | Astro | Blok kode Markdown (tokens.css) | 3 |
+| `getStaticPaths props` | Astro | Detail proyek & artikel (next/older/newer) | 3 |
 
 ## Tailwind / CSS
 
@@ -69,6 +74,11 @@
 | `css cascade source order` | CSS | HeroCardFace, about (bug urutan @media) | 2 |
 | `text-shadow emboss` | CSS | LabelStrip | 2 |
 | `tailwind grid-column col-*` | Tailwind | Konvensi nama kelas (bentrok) | 2 |
+| `input type=radio segmented control` | CSS | Filter status /projects | 3 |
+| `::details-content` | CSS | Arsip /now | 3 |
+| `interpolate-size allow-keywords` | CSS | Arsip /now | 3 |
+| `css zoom property` | CSS | ProjectFigure (ilustrasi diperbesar) | 3 |
+| `tailwind outline utility collision` | Tailwind | Konvensi nama kelas (.outline → .toc) | 3 |
 
 ## Design / Typography
 
@@ -111,6 +121,10 @@
 | `sr-only opens in a new tab` | A11y | Hero proof link | 2 |
 | `wcag 1.4.1 use of color` | A11y | StatusChip (status tertulis, titik warna hanya pendukung) | 2 |
 | `aria-hidden per-character span` | A11y | LabelStrip (teks dibaca sekali lewat sr-only) | 2 |
+| `aria-invalid` | A11y | Form Contact | 3 |
+| `aria-describedby error message` | A11y | Form Contact | 3 |
+| `:user-invalid` | A11y | global.css (field form) | 3 |
+| `aria-current` | A11y | Outline detail proyek | 3 |
 
 ## Animation
 
@@ -144,6 +158,8 @@
 | `render-blocking resources` | Performance | catatan Fase 6 | 1 |
 | `meta robots noindex` | SEO | /styleguide | 1 |
 | `open graph meta tags` | SEO | BaseLayout.astro | 1 |
+| `rel=alternate application/rss+xml` | SEO | BaseLayout | 3 |
+| `og:type article` | SEO | Detail proyek & artikel | 3 |
 
 ## Deploy / Tooling
 
@@ -158,4 +174,6 @@
 | `conventional commits` | Git | riwayat commit | 1 |
 | `node type stripping` | Tooling | scripts/contrast.ts | 1 |
 | `typescript types compiler option` | Tooling | tsconfig.json (TS 6) | 1 |
+| `netlify-honeypot` | Deploy | /contact (anti spam) | 3 |
+| `progressive enhancement form fetch` | Deploy | /contact | 3 |
 

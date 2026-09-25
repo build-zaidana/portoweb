@@ -50,13 +50,21 @@
 │   │   ├── ThemeToggle.astro
 │   │   ├── SiteHeader.astro  # nav pil + menu mobile
 │   │   ├── SiteFooter.astro
-│   │   ├── WhereNext.astro   # 4 pintu navigasi (daylight)
-│   │   ├── ui/               # Button, StatusChip, SampleBadge, SketchIcon, SketchFilter, LabelStrip, ProgressiveFade
+│   │   ├── WhereNext.astro   # 4 pintu navigasi (daylight), dipakai di About
+│   │   ├── Newsletter.astro  # akhir Home + setiap artikel; status jujur sampai Buttondown ada
+│   │   ├── ProjectFigure.astro # gambar proyek + callout beranotasi (lovi)
+│   │   ├── ui/               # Button, BackLink, StatusChip, SampleBadge, SketchIcon, SketchFilter, LabelStrip, ProgressiveFade
 │   │   ├── cards/            # ProjectCard + ProjectArt (craft), WritingCard (notch), CalmCard (letters)
 │   │   └── home/             # Hero, HeroStack (perilaku), HeroCardFace (isi card notebook), SkyBackdrop, StoryReveal
 │   └── pages/              # routing berbasis file
 │       ├── index.astro     # Home
 │       ├── about.astro
+│       ├── projects/       # index (daftar + filter status), [slug] (write-up + callout + outline)
+│       ├── writing/        # index (per tahun), [slug] (artikel)
+│       ├── now.astro       # surat bulanan + arsip
+│       ├── contact.astro   # Netlify Forms; contact/thanks.astro untuk POST tanpa JS
+│       ├── 404.astro
+│       ├── rss.xml.ts      # @astrojs/rss dari lib/content (guard sample ikut berlaku)
 │       └── styleguide.astro
 ├── public/cv-placeholder.pdf  # PRD F7, diganti CV asli
 └── docs/                   # progress, keywords, referensi, screenshots per fase
@@ -210,7 +218,7 @@ draft: false # true = tidak tampil di production
 Isi artikel…
 ```
 
-**Proyek baru:** buat `src/content/projects/<slug>.md` dengan field `title`, `summary`, `status` (`idea | building | shipped`), `stack`, `startedAt`, `tint` (`sage | sky | tan`, hanya untuk chip card hero; card proyek selalu `--surface`), dan opsional `updatedAt`, `repo`, `demo`, `featured`. Body memakai heading **Problem → Approach → Result → Learnings**.
+**Proyek baru:** buat `src/content/projects/<slug>.md` dengan field `title`, `summary`, `status` (`idea | building | shipped`), `stack`, `startedAt`, `tint` (`sage | sky | tan`, hanya untuk chip card hero; card proyek selalu `--surface`), dan opsional `updatedAt`, `repo`, `demo`, `featured`, `callouts` (2–4 anotasi: `label`, `note`, `x`/`y` = persen dari kotak ilustrasi, `side: left|right`). Body memakai heading **Problem → Approach → Result → Learnings** (heading `##` otomatis menjadi outline "On this page").
 
 **Update /now:** buat file baru per bulan `src/content/now/YYYY-MM.md` (field `month`, `learning`, `building`, `reading`). Entri terbaru otomatis menjadi /now.
 
@@ -261,7 +269,7 @@ Card stack **tidak pernah autoplay**. Durasi 150–400ms. `prefers-reduced-motio
 
 - **Penamaan:** komponen `PascalCase.astro`; modul `lib/` `camelCase.ts`; token CSS `kebab-case`; slug konten `kebab-case` (menjadi URL).
 - **Urutan @media:** aturan `@media` yang menimpa harus ditulis **setelah** aturan dasarnya (specificity sama → yang terakhir menang). Bug ini sudah terjadi dua kali (foto About, checklist hero).
-- **Styling:** Tailwind untuk layout/spacing sederhana di halaman. Efek kompleks (notch, glass, card) memakai `<style>` scoped di komponen dengan `var(--token)`. Hindari nama kelas yang bentrok dengan utility Tailwind (kasus nyata: `.underline`, `.col-1`/`.col-2`, yang di Tailwind 4 menjadi `grid-column`).
+- **Styling:** Tailwind untuk layout/spacing sederhana di halaman. Efek kompleks (notch, glass, card) memakai `<style>` scoped di komponen dengan `var(--token)`. Hindari nama kelas yang bentrok dengan utility Tailwind (kasus nyata: `.underline`, `.col-1`/`.col-2` yang di Tailwind 4 menjadi `grid-column`, dan `.outline`).
 - **Scan Tailwind:** Tailwind hanya memindai kode. `docs/`, `.claude/`, dan `*.md` di root dikecualikan dengan `@source not` di `global.css`, karena teks dokumentasi sempat menghasilkan ±2 KB kelas CSS yang tidak terpakai.
 - **Scoped CSS + komponen anak:** selector yang menargetkan root komponen anak butuh `:global()`. Untuk mengubah warna di dalam komponen anak, gunakan custom property (contoh: `--badge-fg` di `SampleBadge`), bukan selector dari luar.
 - **A11y:** satu gaya focus global (`:focus-visible`, outline `--focus`). Target sentuh ≥ 44px. Card yang bisa diklik memakai pola *stretched link* (satu `<a>` di judul, `::after` menutupi card). Skip link memakai pola *visually hidden* (clip).
@@ -301,3 +309,8 @@ Card stack **tidak pernah autoplay**. Durasi 150–400ms. `prefers-reduced-motio
 | 017 | Card hero bergaya notebook dengan isi dari field konten | Personal dan spesifik, tapi tetap data-driven (tidak ada klaim hardcoded) | Skeleton generik (terlalu polos), kolase (bertabrakan dengan tumpukan) |
 | 018 | Semua card proyek memakai batu hangat (`--surface`) | Pilihan user setelah mockup: tenang dan disiplin, warna datang dari ilustrasi dan chip status | Tiga pastel per proyek (kusam, acak), warna = status (sempat diterapkan, lalu diganti), kertas notebook (mengulang motif hero), pastel lebih jenuh |
 | 019 | Strip label ketikan menggantikan stiker bundar di hero | Lebih khas dan terbaca; diambil dari referensi journaling tanpa membawa gaya scrapbook | Stiker bundar, /now bergaya jurnal (ditolak user: terlalu ramai) |
+| 020 | Filter status proyek = radio native + CSS `:has()`; JS hanya untuk pil bergeser & pengumuman | Berfungsi tanpa JS, aksesibel sebagai radio group | Tabs ARIA dengan JS penuh, library filter |
+| 021 | Form kontak Netlify Forms dengan progressive enhancement (POST biasa → /contact/thanks; fetch di tempat bila ada JS) | Rp 0, tanpa backend, tetap jalan tanpa JS | Formspree (batas bulanan), serverless function |
+| 022 | Blok kode Markdown memakai tema Shiki `css-variables` yang dipetakan ke token | Warna kode ikut light/dark dan kontrasnya terverifikasi skrip | Dua tema Shiki bawaan (warna di luar palet, kontras tidak terkontrol) |
+| 023 | /now ditulis seperti surat (kolom sempit, bulan sebagai headline) | Membedakan halaman dari Projects/Writing yang berkerangka sama (review design-critic) | Baris label + ikon seperti Projects, gaya jurnal/scrapbook (ditolak user) |
+| 024 | Newsletter & kontak tidak menampilkan yang belum ada (email, sosial, form Buttondown) | Jujur: tidak ada form yang tidak mengirim ke mana-mana | Form placeholder "coming soon" |

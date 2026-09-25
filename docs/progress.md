@@ -8,8 +8,8 @@
 |---|---|---|
 | 0 | Review & rencana | ✅ Selesai (Gate 0, 2026-09-25) |
 | 1 | Fondasi | ✅ Selesai (Gate 1, 2026-09-25) |
-| 2 | Home + About | 🟡 Selesai, menunggu "lanjut" (Gate 2) |
-| 3 | Halaman lain | ⏳ |
+| 2 | Home + About | ✅ Selesai (Gate 2, 2026-09-25) |
+| 3 | Halaman lain | 🟡 Selesai, menunggu "lanjut" (Gate 3) |
 | 4 | Copywriting | ⏳ |
 | 5 | 3 proyek pertama | ⏳ |
 | 6 | Launch | ⏳ |
@@ -31,6 +31,8 @@
 - 2026-09-25 — Font tulisan tangan **Caveat** (self-host, 1 bobot), hanya untuk catatan margin.
 - 2026-09-25 — Ikon "build" diganti **palu** (wrench terbaca seperti bulan sabit).
 - 2026-09-25 — Nav memakai "Projects" (bukan "Work") supaya konsisten dengan URL & tombol.
+- 2026-09-25 — Card proyek: **batu hangat** (`--surface`) untuk semua card. Hero: **strip label ketikan** menggantikan stiker. /now **tidak** bergaya jurnal.
+- 2026-09-25 — Contact: **tanpa email & sosial** (belum ada; muncul otomatis saat diisi di `site.ts`). Newsletter: **belum ada akun Buttondown**, tampil status jujur + RSS.
 - 2026-09-25 — 5 usulan review PRD disetujui: sample dikecualikan dari production (flag `SHOW_SAMPLES`), bukti non-sample di layar pertama, logistik remote, analytics gratis tanpa cookie (F8), target 2 tulisan/bulan.
 
 ## Log
@@ -189,3 +191,35 @@ User: garis margin di card hero dihapus; warna card proyek "kurang pas"; minta m
 - 🔑 Satu permukaan untuk semua card, warna dari konten — design tokens surface · wcag 1.4.1 use of color
 - 🔑 Huruf timbul yang tidak sejajar — per-character span · text-shadow emboss · seeded PRNG mulberry32
 - 🔑 Nama kelas bentrok dengan utility Tailwind — tailwind grid-column col-* · tailwind utility collision
+
+### Fase 3 — Halaman lain (2026-09-25)
+
+**Selesai:**
+- `/projects`: daftar editorial (satu baris lebar per proyek, beda dari grid di Home) + filter status berupa segmented control (radio native, filter murni CSS `:has()`, pil bergeser + pengumuman jumlah lewat JS kecil). Empty state jujur per filter dan saat belum ada proyek.
+- `/projects/[slug]`: header + fakta (Started/Updated/Stack/Code/Demo), gambar beranotasi ala lovi (`ProjectFigure`, field `callouts` di schema; di HP jadi daftar bernomor), outline "On this page" yang menandai section aktif (IntersectionObserver), lalu link proyek berikutnya.
+- `/writing`: dikelompokkan per tahun dengan angka tahun sticky, waktu baca, tag, RSS. `/writing/[slug]`: satu kolom baca, older/newer, lalu newsletter.
+- `/rss.xml` (`@astrojs/rss`) + `<link rel="alternate">` di semua halaman.
+- `/now`: ditulis seperti surat bulanan (kolom sempit, bulan sebagai headline), potongan kode, arsip bulan sebelumnya (`<details>` beranimasi).
+- `/contact`: Netlify Forms (honeypot), berfungsi tanpa JS (POST → `/contact/thanks`); dengan JS terkirim di tempat, validasi inline dengan `aria-invalid` + `aria-describedby`, fokus pindah ke konfirmasi. Logistik di kiri: peran, zona waktu, GitHub, CV.
+- `Newsletter` di akhir Home dan setiap artikel: "No newsletter yet" + RSS/GitHub sampai `newsletter.username` diisi.
+- `404` ramah + `BackLink`. Style Markdown global (`.markdown`), style field form global, token `--danger`, blok kode memakai tema Shiki `css-variables` yang dipetakan ke token.
+- Review `design-critic` + `copy-reviewer` diterapkan: /now dibedakan dari Projects/Writing, pintu WhereNext yang menunjuk halaman sendiri dihapus (tinggal di About), janji tanpa tanggal ("on its way", "starts soon") diganti fakta + langkah nyata, istilah "notes" dirapikan, target sentuh 44px.
+- Verifikasi: build 0 error (production & `SHOW_SAMPLES=true`), 58/58 pasangan kontras lolos, tanpa scroll horizontal di 360/390/1440, Lighthouse mobile 100 (A11y/BP/SEO/Agentic) di /projects, detail proyek, /contact. Screenshot: `docs/screenshots/fase-3/`.
+- 🔑 Filter tanpa JS — css :has() · input type=radio · segmented control
+- 🔑 Anotasi di atas gambar — css custom properties · css calc() · absolute positioning hotspot
+- 🔑 Section aktif di outline — IntersectionObserver rootMargin · aria-current
+- 🔑 Form kontak tanpa backend — netlify forms · honeypot field · progressive enhancement
+- 🔑 Error form yang terbaca screen reader — aria-invalid · aria-describedby · :user-invalid
+- 🔑 Warna kode dari token — shiki css-variables theme · astro-code
+- 🔑 Buka-tutup arsip yang halus — ::details-content · interpolate-size
+- 🔑 RSS — @astrojs/rss · rel=alternate
+
+**Tertunda / untuk user:**
+- Logistik PRD §3 (jam overlap, mulai kapan, jam/minggu) belum tampil di Contact/About: menunggu jawaban user (Fase 4).
+- Email kerja, akun X/Instagram, akun Buttondown: isi di `src/lib/site.ts` (`contact`, `newsletter`) saat sudah ada.
+- Card hero "This site": keputusan menyebut AI coding assistant (Fase 4).
+
+**Catatan kerja:**
+- Nama kelas yang bentrok dengan Tailwind lagi: `.outline` (menjadi `outline: 1px solid`). Sekarang `.toc`.
+- Content store dev server bisa basi setelah file konten diedit lewat skrip; restart `astro dev --force` bila nilai tidak berubah.
+- Python di Windows menulis CRLF dalam mode teks; pakai `newline=""` saat menulis file proyek.
