@@ -27,6 +27,9 @@
 - 2026-09-25 — Hero: konsep **A (card stack) + baris logistik** dari C.
 - 2026-09-25 — Zona waktu **WIB (UTC+7)**. Jam/minggu & tanggal mulai **tidak ditampilkan** (belum pasti).
 - 2026-09-25 — Bukti non-sample di layar pertama: **github.com/build-zaidana**.
+- 2026-09-25 — Card hero bergaya **Notebook** (option 1 dari 2 mockup): isi spesifik per entri, catatan tangan, stabilo, selotip washi, tekstur kertas.
+- 2026-09-25 — Font tulisan tangan **Caveat** (self-host, 1 bobot), hanya untuk catatan margin.
+- 2026-09-25 — Ikon "build" diganti **palu** (wrench terbaca seperti bulan sabit).
 - 2026-09-25 — Nav memakai "Projects" (bukan "Work") supaya konsisten dengan URL & tombol.
 - 2026-09-25 — 5 usulan review PRD disetujui: sample dikecualikan dari production (flag `SHOW_SAMPLES`), bukti non-sample di layar pertama, logistik remote, analytics gratis tanpa cookie (F8), target 2 tulisan/bulan.
 
@@ -151,4 +154,16 @@ User: animasi terasa kaku di semua bagian (tombol, card, ganti tema, pindah hala
 - Halaman detail proyek: callout beranotasi (lovi) + format Problem → Approach → Result → Learnings.
 - Pil nav aktif sudah siap bergeser saat halaman Projects/Writing/Now ada.
 - Tambahkan field `phrase` di proyek/tulisan asli supaya kalimat hero tetap enak dibaca.
+
+#### Revisi setelah review user (2026-09-25)
+User: ikon wrench terlihat seperti bulan sabit bertangkai; card stack terlalu polos.
+- Ikon `build` digambar ulang sebagai palu (dicek di 16/24/64px).
+- 2 mockup hi-fi (Notebook vs Collage, `docs/screenshots/fase-2/card-options-*.png`) → user memilih Notebook.
+- `HeroCardFace.astro` baru: mini-kuis, kode dengan syntax highlight, paragraf pembuka artikel asli + stabilo, miniatur situs ini, catatan tangan (Caveat), selotip washi, tekstur kertas. Isi berasal dari field opsional baru: `heroNote` (proyek/tulisan/now), `highlight` (tulisan), `snippet` (now).
+- Card muat di 360–1440px tanpa terpotong dan tanpa scroll horizontal (dicek per card, termasuk saat card dilempar).
+- 🔑 Font tulisan tangan hanya untuk catatan — astro fonts api · fontsource caveat
+- 🔑 Highlighter kode tanpa library — regex tokenizer · set:html · html escaping
+- 🔑 Tekstur kertas tanpa gambar — svg feTurbulence data uri · mix-blend-mode multiply
+- 🔑 Selotip dengan ujung sobek — css clip-path polygon · repeating-linear-gradient
+- Catatan kerja: dev server kadang menahan CSS lama setelah file diedit lewat skrip; `touch <file>` memaksa watcher memuat ulang.
 

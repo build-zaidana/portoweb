@@ -11,7 +11,7 @@
 | Styling | Tailwind CSS 4 lewat `@tailwindcss/vite` + CSS scoped per komponen | 4.3 |
 | Bahasa | TypeScript `astro/tsconfigs/strict` (TS 6) | 6.0 |
 | Konten | Markdown + Content Collections (`glob()` loader, Zod 4 dari `astro/zod`) | — |
-| Font | Astro Fonts API (diunduh saat build, di-self-host) | — |
+| Font | Astro Fonts API (diunduh saat build, di-self-host): Instrument Serif, General Sans, JetBrains Mono, Caveat | — |
 | Format | Prettier + `prettier-plugin-astro` + `prettier-plugin-tailwindcss` | 3.9 |
 | Host | Netlify (Fase 6) | — |
 | Node | ≥ 22.12 (dev: 24) | — |
@@ -53,7 +53,7 @@
 │   │   ├── WhereNext.astro   # 4 pintu navigasi (daylight)
 │   │   ├── ui/               # Button, StatusChip, SampleBadge, SketchIcon, SketchFilter, Sticker, ProgressiveFade
 │   │   ├── cards/            # ProjectCard + ProjectArt (craft), WritingCard (notch), CalmCard (letters)
-│   │   └── home/             # Hero, HeroStack, SkyBackdrop, StoryReveal
+│   │   └── home/             # Hero, HeroStack (perilaku), HeroCardFace (isi card notebook), SkyBackdrop, StoryReveal
 │   └── pages/              # routing berbasis file
 │       ├── index.astro     # Home
 │       ├── about.astro
@@ -88,6 +88,8 @@ Paralel dengan itu, `integrations/sample-report.ts` membaca frontmatter langsung
 **Fakta tentang Zaidana** (peran, negara, zona waktu, GitHub, CV) hanya diambil dari `profile` di `src/lib/site.ts`. Klaim baru harus ditambahkan di sana dulu (sumber: PRD §1/§4 atau jawaban user).
 
 **Hero stack:** `getHeroCards()` mengambil proyek teratas, entri /now terbaru, dan tulisan terbaru, lalu selalu menambahkan card asli "This site". Kata kerja kalimat hero mengikuti status proyek (idea → planning, building → building, shipped → improving). Field opsional `phrase` di proyek/tulisan dipakai untuk kalimat, dengan fallback judul berkutip. Kalau card depan adalah sample, kalimatnya ikut berlabel Sample.
+
+**Isi card (notebook):** `HeroCardFace` menggambar isi spesifik per jenis card. Field opsional di konten: `heroNote` (catatan tangan, proyek/tulisan/now), `highlight` (frasa yang distabilo di paragraf pembuka artikel, diambil otomatis dari body), `snippet` (kode di entri /now). Tanpa field itu, card tetap tampil tanpa elemen tersebut.
 
 ## 4. Design tokens
 
@@ -175,7 +177,7 @@ Pasangan baru **wajib** ditambahkan ke `TEXT_PAIRS` di `src/lib/contrast.ts` seb
 | `text-step-0` | 17px / 1.6 | General Sans | Body |
 | `text-step--1` | 14px | General Sans | Meta, tombol, chip |
 
-Instrument Serif hanya punya satu bobot yang tipis, jadi **tidak dipakai di bawah 30px**. JetBrains Mono **hanya untuk kode**, tidak untuk label (anti-slop).
+Instrument Serif hanya punya satu bobot yang tipis, jadi **tidak dipakai di bawah 30px** (pengecualian: judul card hero 24–28px). **Caveat** (`--font-hand`) hanya untuk catatan tangan di card hero, tidak untuk teks lain. JetBrains Mono **hanya untuk kode**, tidak untuk label (anti-slop).
 
 ### Radius, elevasi, motion
 
@@ -287,3 +289,4 @@ Card stack **tidak pernah autoplay**. Durasi 150–400ms. `prefers-reduced-motio
 | 014 | Langit dari SVG filter (bukan gambar) | Orisinal, ringan, otomatis ikut tema lewat token | Foto/ilustrasi awan (aset berlisensi, berat) |
 | 015 | Scroll reveal dengan CSS scroll-driven animations | Nol JS, mudah dimatikan, fallback teks penuh | GSAP ScrollTrigger |
 | 016 | Timeline sebagai collection `file()` YAML | Satu file mudah diedit, ikut guard sample | Array di halaman (lolos dari guard) |
+| 017 | Card hero bergaya notebook dengan isi dari field konten | Personal dan spesifik, tapi tetap data-driven (tidak ada klaim hardcoded) | Skeleton generik (terlalu polos), kolase (bertabrakan dengan tumpukan) |

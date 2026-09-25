@@ -32,6 +32,7 @@
 | `astro file() loader` | Astro | src/content.config.ts (timeline) | 2 |
 | `set:text` | Astro | HeroStack (mini code) | 2 |
 | `Astro.slots.has` | Astro | ProgressiveFade, CalmCard | 2 |
+| `set:html` | Astro | HeroCardFace (kode ter-highlight) | 2 |
 
 ## Tailwind / CSS
 
@@ -60,6 +61,9 @@
 | `transform-style preserve-3d` | CSS | HeroStack deck | 2 |
 | `touch-action pan-y` | CSS | HeroStack (swipe vs scroll) | 2 |
 | `mask-image linear-gradient` | CSS | ProgressiveFade | 2 |
+| `css clip-path polygon` | CSS | HeroCardFace (selotip sobek) | 2 |
+| `repeating-linear-gradient` | CSS | HeroCardFace (selotip, kertas bergaris) | 2 |
+| `overflow: clip` | CSS | Hero (frame di mobile) | 2 |
 
 ## Design / Typography
 
@@ -76,6 +80,9 @@
 | `svg feColorMatrix` | Illustration | SkyBackdrop (clouds) | 2 |
 | `svg mask halftone` | Illustration | SkyBackdrop | 2 |
 | `seeded PRNG mulberry32` | Illustration | SkyBackdrop (stars) | 2 |
+| `fontsource caveat` | Typography | Catatan tangan di card hero | 2 |
+| `svg feTurbulence data uri` | Illustration | HeroStack (tekstur kertas) | 2 |
+| `mix-blend-mode multiply` | Illustration | HeroStack (tekstur kertas) | 2 |
 
 ## Accessibility
 
