@@ -23,11 +23,12 @@
 
 :root {
   /* ── Base surfaces ────────────────────────────────────────────
-     Light: warm-neutral paper (greyer than the "AI cream" #F4F1EA).
+     Light: warm-neutral paper, still greyer than the "AI cream" #F4F1EA. The warmth
+     lives in the surfaces (warm stone), which sit a clear step away from the page.
      Dark: green-tinted night, lifted in steps instead of shadows. */
-  --paper: light-dark(#f3f2ee, #161915);
-  --surface: light-dark(#e9e7e1, #1f231e);
-  --surface-raised: light-dark(#fbfaf7, #292e28);
+  --paper: light-dark(#f3f1ec, #161915);
+  --surface: light-dark(#e6e1d7, #1f231e);
+  --surface-raised: light-dark(#fdfcf9, #292e28);
 
   /* ── Ink ─────────────────────────────────────────────────── */
   --ink: light-dark(#2a2a2a, #eceae4);
@@ -77,10 +78,10 @@
   --gutter: clamp(1.25rem, 0.8rem + 2.2vw, 2.5rem);
 
   /* ── Motion durations (zeroed for reduced motion below) ───── */
-  --dur-1: 150ms; /* press, color */
-  --dur-2: 220ms; /* hover */
-  --dur-3: 320ms; /* open/close, lift */
-  --dur-4: 400ms; /* card travel, sheen */
+  --dur-1: 150ms; /* press down, color */
+  --dur-2: 240ms; /* hover in/out of color and shadow */
+  --dur-3: 320ms; /* open/close, page content */
+  --dur-4: 400ms; /* lift (spring), card travel, theme reveal */
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -112,8 +113,8 @@
   --text-step-0--line-height: 1.6;
   --text-step-1: 1.25rem; /* 20px — lead */
   --text-step-1--line-height: 1.5;
-  --text-step-2: 1.625rem; /* 26px — card titles (serif) */
-  --text-step-2--line-height: 1.15;
+  --text-step-2: 1.875rem; /* 30px — card titles. Instrument Serif has one thin weight, so not smaller */
+  --text-step-2--line-height: 1.1;
   --text-step-3: clamp(2rem, 1.5rem + 1.8vw, 2.75rem); /* section titles */
   --text-step-3--line-height: 1.04;
   --text-step-4: clamp(2.75rem, 1.7rem + 4vw, 4.75rem); /* page titles */
@@ -131,6 +132,30 @@
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1); /* measured on wabi.ai */
   --ease-soft: cubic-bezier(0.25, 1, 0.5, 1); /* measured on integratedbio */
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  /* Gentle damped spring (≈4% overshoot, settles by the end). For lift, press release,
+     and anything that should feel physical. Generated from a spring equation (zeta 0.72). */
+  --ease-spring: linear(
+    0,
+    0.084,
+    0.266,
+    0.471,
+    0.657,
+    0.805,
+    0.911,
+    0.979,
+    1.017,
+    1.035,
+    1.038,
+    1.034,
+    1.027,
+    1.019,
+    1.012,
+    1.007,
+    1.003,
+    1.001,
+    0.999,
+    1
+  );
 
   /* ── Elevation (warm; transparent in dark mode via --shadow-tint) ── */
   --shadow-lift: 0 1px 1px var(--shadow-tint), 0 10px 28px -12px var(--shadow-tint);
