@@ -68,19 +68,20 @@ const typeScale = [
   { token: "step-5", size: "56 → 128px", use: "Hero, footer wordmark", serif: true },
   { token: "step-4", size: "44 → 76px", use: "Page titles", serif: true },
   { token: "step-3", size: "32 → 44px", use: "Section titles", serif: true },
-  { token: "step-2", size: "26px", use: "Card titles", serif: true },
+  { token: "step-2", size: "30px", use: "Card titles", serif: true },
   { token: "step-1", size: "20px", use: "Lead paragraphs", serif: false },
   { token: "step-0", size: "17px", use: "Body", serif: false },
   { token: "step--1", size: "14px", use: "Meta, captions, buttons", serif: false },
 ];
 
 const motion = [
-  { token: "--dur-1", value: "150ms", use: "Press, color change" },
-  { token: "--dur-2", value: "220ms", use: "Hover" },
-  { token: "--dur-3", value: "320ms", use: "Open, close, lift" },
-  { token: "--dur-4", value: "400ms", use: "Card travel, glass sheen" },
-  { token: "--ease-out", value: "cubic-bezier(.22, 1, .36, 1)", use: "Default. Fast start, long settle" },
-  { token: "--ease-soft", value: "cubic-bezier(.25, 1, .5, 1)", use: "Notched card tile" },
+  { token: "--dur-1", value: "150ms", use: "Press down, color change" },
+  { token: "--dur-2", value: "240ms", use: "Hover color and shadow" },
+  { token: "--dur-3", value: "320ms", use: "Open, close, underline, button fill" },
+  { token: "--dur-4", value: "400ms", use: "Lift, card travel, theme reveal, page enter" },
+  { token: "--ease-spring", value: "linear(…) spring, 4% overshoot", use: "Lift, press release, nav pill" },
+  { token: "--ease-out", value: "cubic-bezier(.22, 1, .36, 1)", use: "Color, fades, page enter" },
+  { token: "--ease-in-out", value: "cubic-bezier(.65, 0, .35, 1)", use: "Theme reveal, glass sheen" },
 ];
 
 const icons: IconName[] = ["arrow", "build", "spark", "book", "cloud"];
@@ -406,8 +407,9 @@ const sections = [
           Motion
         </h2>
         <p class="section-note">
-          Motion answers what you do (hover, press, open, switch theme). Only one moment on the site moves by
-          itself. With reduced motion turned on, every duration becomes 0.
+          Motion answers what you do: hover lifts on a spring, press settles, the new theme spreads from the
+          switch, and pages glide in while the header stays still. Only two moments move by themselves (the
+          hero card stack and the footer). With reduced motion on, every duration becomes 0.
         </p>
         <dl class="motion-list">
           {motion.map((m) => (

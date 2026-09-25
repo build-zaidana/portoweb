@@ -98,3 +98,17 @@
 - Pakai `getProjects()/getWriting()` dari `src/lib/content.ts`, jangan `getCollection()` langsung.
 - Pasangan warna teks baru → tambahkan ke `TEXT_PAIRS` dulu.
 - Label monospace hanya boleh di /styleguide.
+
+#### Revisi setelah review user (2026-09-25)
+User: animasi terasa kaku di semua bagian (tombol, card, ganti tema, pindah halaman) + setuju memperbaiki light mode dan ukuran judul card.
+- Sistem motion baru: easing spring `linear()`, model hover-lift / press / release yang sama di semua komponen, hover hanya di perangkat pointer.
+- Tombol: lift + press spring; secondary terisi tinta dari bawah; primary dapat bayangan.
+- Card proyek naik 6px + panel ilustrasi bergerak bertahap; card tulisan naik 4px + tile masuk ke coakan.
+- Ganti tema: tema baru menyebar melingkar dari tombol (View Transition), transisi lain dibekukan selama pergantian.
+- Pindah halaman: header diam, pil halaman aktif bergeser ke link baru, konten keluar/masuk dengan arah.
+- Light mode lebih hangat: `--surface` batu hangat `#e6e1d7` (jarak jelas dari halaman), `--paper` `#f3f1ec`. Judul card 26 → 30px.
+- 🔑 Easing pegas tanpa library — css linear() easing · spring animation damping ratio
+- 🔑 Tema menyebar dari tombol — ::view-transition-new(root) · element.animate() pseudoElement · view-transition-name
+- 🔑 Header diam, pil aktif bergeser — astro transition:name · astro transition:animate · ::view-transition-group()
+- 🔑 Hover tidak nyangkut di HP — @media (hover: hover) · clip-path inset() transition
+

@@ -86,6 +86,19 @@
 |---|---|---|---|
 | `View Transition API startViewTransition` | Animation | ThemeToggle.astro | 1 |
 | `prefers-reduced-motion` | Animation | tokens.css (--dur-* = 0ms) | 1 |
+| `css linear() easing` | Animation | tokens.css (--ease-spring) | 1 |
+| `spring animation damping ratio` | Animation | --ease-spring (zeta 0.72) | 1 |
+| `@media (hover: hover)` | Animation / CSS | Button, ProjectCard, WritingCard | 1 |
+| `clip-path inset() transition` | Animation | Button secondary fill | 1 |
+| `text-underline-offset transition` | Animation | global.css (.link) | 1 |
+| `transition-delay stagger` | Animation | SiteHeader menu, ProjectArt | 1 |
+| `::view-transition-new(root)` | Animation | ThemeToggle (circle reveal) | 1 |
+| `element.animate() pseudoElement` | Animation | ThemeToggle | 1 |
+| `view-transition-name` | Animation | global.css (theme switching) | 1 |
+| `astro transition:name` | Astro | SiteHeader (nav-indicator), BaseLayout (page-main) | 1 |
+| `astro transition:animate` | Astro | SiteHeader (none), BaseLayout (custom) | 1 |
+| `TransitionDirectionalAnimations` | Astro | src/lib/motion.ts | 1 |
+| `::view-transition-group()` | Animation | global.css (nav-indicator) | 1 |
 
 ## Performance / SEO
 

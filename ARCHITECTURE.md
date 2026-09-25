@@ -1,7 +1,7 @@
 # ARCHITECTURE — Zaidana Studio
 
 > **Bagaimana** situs ini dibangun. *Apa* dan *kenapa* ada di `PRD.md`. Dokumen ini dirawat Claude Code dan diperbarui di akhir setiap fase.
-> Terakhir diperbarui: Fase 1 (2026-09-25).
+> Terakhir diperbarui: Fase 1 + revisi motion & palet (2026-09-25).
 
 ## 1. Stack
 
@@ -93,9 +93,9 @@ Warna dipetakan ke utility Tailwind di `global.css` lewat `@theme inline` (`bg-p
 
 | Peran | Token | Light | Dark |
 |---|---|---|---|
-| Halaman | `--paper` | `#f3f2ee` warm-neutral (bukan krem AI `#F4F1EA`) | `#161915` malam kehijauan |
-| Card calm | `--surface` | `#e9e7e1` | `#1f231e` |
-| Panel, nav | `--surface-raised` | `#fbfaf7` | `#292e28` |
+| Halaman | `--paper` | `#f3f1ec` warm-neutral (lebih abu dari krem AI `#F4F1EA`) | `#161915` malam kehijauan |
+| Card calm | `--surface` | `#e6e1d7` batu hangat, satu langkah jelas dari halaman | `#1f231e` |
+| Panel, nav | `--surface-raised` | `#fdfcf9` | `#292e28` |
 | Teks | `--ink` / `--ink-soft` | `#2a2a2a` / `#5c5a55` | `#eceae4` / `#a8a79e` |
 | Aksen teks (link, focus) | `--accent` | `#4a5d44` sage tua | `#aec2a5` sage muda |
 | Aksen permukaan | `--sage` `--sky` `--tan` | `#8b9d83` `#a8c5d6` `#c9a88c` | sama / sedikit lebih terang |
@@ -109,12 +109,12 @@ Sage = aksen utama, sky = pendukung, tan = isian hover yang hangat. **Tidak ada 
 
 | Mode | Text | Background | Ratio | AA | Usage |
 |---|---|---|---|---|---|
-| light | `--ink` | `--paper` | 12.81:1 | ✅ | Body text, headings |
-| light | `--ink-soft` | `--paper` | 6.15:1 | ✅ | Secondary text, meta |
-| light | `--accent` | `--paper` | 6.38:1 | ✅ | Links, focus ring |
-| light | `--ink` | `--surface` | 11.61:1 | ✅ | Text on calm cards |
-| light | `--ink-soft` | `--surface` | 5.57:1 | ✅ | Secondary text on calm cards |
-| light | `--ink` | `--surface-raised` | 13.75:1 | ✅ | Nav, raised panels |
+| light | `--ink` | `--paper` | 12.72:1 | ✅ | Body text, headings |
+| light | `--ink-soft` | `--paper` | 6.10:1 | ✅ | Secondary text, meta |
+| light | `--accent` | `--paper` | 6.33:1 | ✅ | Links, focus ring |
+| light | `--ink` | `--surface` | 11.02:1 | ✅ | Text on calm cards |
+| light | `--ink-soft` | `--surface` | 5.29:1 | ✅ | Secondary text on calm cards |
+| light | `--ink` | `--surface-raised` | 13.99:1 | ✅ | Nav, raised panels |
 | light | `--ink` | `--tint-sage` | 11.39:1 | ✅ | Project card (sage) |
 | light | `--ink-soft` | `--tint-sage` | 5.47:1 | ✅ | Project card meta (sage) |
 | light | `--ink` | `--tint-sky` | 11.73:1 | ✅ | Project card (sky) |
@@ -125,7 +125,7 @@ Sage = aksen utama, sky = pendukung, tan = isian hover yang hangat. **Tidak ada 
 | light | `--on-deep` | `--deep-ink` | 12.81:1 | ✅ | Writing card (charcoal) |
 | light | `--on-deep-soft` | `--deep-sage` | 5.40:1 | ✅ | Writing card meta (deep sage) |
 | light | `--on-deep-soft` | `--deep-ink` | 8.37:1 | ✅ | Writing card meta (charcoal) |
-| light | `--paper` | `--ink` | 12.81:1 | ✅ | Primary button label |
+| light | `--paper` | `--ink` | 12.72:1 | ✅ | Primary button label |
 | light | `--on-fill` | `--sage` | 4.95:1 | ✅ | Text on sage fill (hover states) |
 | light | `--on-fill` | `--sky` | 7.94:1 | ✅ | Arrow button on sky |
 | light | `--on-fill` | `--tan` | 6.47:1 | ✅ | Hover fill on tan |
@@ -137,8 +137,8 @@ Sage = aksen utama, sky = pendukung, tan = isian hover yang hangat. **Tidak ada 
 | dark | `--ink` | `--surface-raised` | 11.52:1 | ✅ | Nav, raised panels |
 | dark | `--ink` | `--tint-sage` | 12.29:1 | ✅ | Project card (sage) |
 | dark | `--ink-soft` | `--tint-sage` | 6.12:1 | ✅ | Project card meta (sage) |
-| dark | `--ink` | `--tint-sky` | 12.79:1 | ✅ | Project card (sky) |
-| dark | `--ink-soft` | `--tint-sky` | 6.37:1 | ✅ | Project card meta (sky) |
+| dark | `--ink` | `--tint-sky` | 12.83:1 | ✅ | Project card (sky) |
+| dark | `--ink-soft` | `--tint-sky` | 6.38:1 | ✅ | Project card meta (sky) |
 | dark | `--ink` | `--tint-tan` | 12.71:1 | ✅ | Project card (tan) |
 | dark | `--ink-soft` | `--tint-tan` | 6.32:1 | ✅ | Project card meta (tan) |
 | dark | `--on-deep` | `--deep-sage` | 9.11:1 | ✅ | Writing card (deep sage) |
@@ -159,18 +159,18 @@ Pasangan baru **wajib** ditambahkan ke `TEXT_PAIRS` di `src/lib/contrast.ts` seb
 | `text-step-5` | 56 → 128px (fluid) | Instrument Serif | Hero, wordmark footer |
 | `text-step-4` | 44 → 76px | Instrument Serif | Judul halaman |
 | `text-step-3` | 32 → 44px | Instrument Serif | Judul section |
-| `text-step-2` | 26px | Instrument Serif | Judul card |
+| `text-step-2` | 30px | Instrument Serif | Judul card |
 | `text-step-1` | 20px | General Sans | Lead |
 | `text-step-0` | 17px / 1.6 | General Sans | Body |
 | `text-step--1` | 14px | General Sans | Meta, tombol, chip |
 
-Instrument Serif hanya punya satu bobot, jadi **tidak dipakai di bawah 26px**. JetBrains Mono **hanya untuk kode**, tidak untuk label (anti-slop).
+Instrument Serif hanya punya satu bobot yang tipis, jadi **tidak dipakai di bawah 30px**. JetBrains Mono **hanya untuk kode**, tidak untuk label (anti-slop).
 
 ### Radius, elevasi, motion
 
 - Radius mengikuti hierarki: `sm` 8px (chip) · `md` 14px (mini-UI, tile) · `lg` 22px (card) · `xl` 32px (card calm/proyek) · pill (tombol, nav).
 - Elevasi: light mode memakai `--shadow-lift` (bayangan hangat, hanya untuk yang "terangkat"). Dark mode memakai kecerahan permukaan, dan `--shadow-tint` bernilai transparan.
-- Motion: `--ease-out` `cubic-bezier(.22,1,.36,1)` (diukur dari wabi.ai), `--ease-soft` (integratedbio). Durasi 150/220/320/400ms.
+- Motion: lihat §6b.
 - Efek kaca (`.glass`) **hanya** untuk nav pil dan CTA utama.
 
 ## 5. Cara menambah konten
@@ -201,6 +201,35 @@ Isi artikel…
 2. Saat navigasi ClientRouter, event `astro:before-swap` mengisi tema ke dokumen baru sebelum ditukar.
 3. `ThemeToggle.astro` menyimpan pilihan dan memakai `document.startViewTransition` untuk crossfade (dilewati saat reduced motion).
 4. Tanpa JS, `color-scheme: light dark` membuat `light-dark()` mengikuti OS.
+
+## 6b. Motion
+
+Semua gerakan dipicu user, kecuali dua momen yang diorkestrasi (hero card stack dan footer, dibuat di Fase 2). Durasi 150–400ms. `prefers-reduced-motion` membuat semua `--dur-*` bernilai 0ms, transform hover/press dimatikan, dan ClientRouter menonaktifkan transisi halaman.
+
+| Token | Nilai | Dipakai untuk |
+|---|---|---|
+| `--dur-1` | 150ms | Tekan (press down), perubahan warna cepat |
+| `--dur-2` | 240ms | Warna & bayangan saat hover |
+| `--dur-3` | 320ms | Buka/tutup, underline, isian tombol |
+| `--dur-4` | 400ms | Lift, perjalanan card, reveal tema, konten halaman masuk |
+| `--ease-spring` | `linear()` pegas teredam (ζ 0.72, overshoot ±4%) | Lift, lepas tekan, pil nav |
+| `--ease-out` | `cubic-bezier(.22,1,.36,1)` (diukur dari wabi.ai) | Warna, fade, konten masuk |
+| `--ease-soft` | `cubic-bezier(.25,1,.5,1)` (integratedbio) | Warna tile di card tulisan |
+| `--ease-in-out` | `cubic-bezier(.65,0,.35,1)` | Reveal tema, kilau kaca |
+
+**Model interaksi (sama di semua komponen):** hover → naik 2–6px dengan spring (hanya `@media (hover: hover)`, supaya hover tidak "nyangkut" di layar sentuh). Press → turun dan mengecil ke 97–99% dalam 150ms. Lepas → spring kembali ke posisi awal.
+
+| Interaksi | Implementasi |
+|---|---|
+| Tombol primary | Lift + bayangan hangat + warna sedikit ke arah sage |
+| Tombol secondary | Lift + isian tinta naik dari bawah (`clip-path: inset()`), teks berubah ke `--paper` |
+| Tombol glass | Lift + kilau bergerak + bayangan |
+| Card proyek | Card naik 6px + bayangan. Panel ilustrasi naik dan meluruskan diri, lapisan belakang menyusul 60ms kemudian |
+| Card tulisan | Card naik 4px, underline judul tumbuh (400ms), tile panah masuk ke coakan, panah maju 4px |
+| Link teks | Underline naik mendekat ke teks (`text-underline-offset`) + menebal warnanya |
+| Ganti tema | View Transition: tema baru menyebar sebagai lingkaran dari tombol (400ms). Selama transisi, transisi CSS lain dibekukan dan semua elemen jadi satu snapshot (`data-theme-switching`) |
+| Pindah halaman | Header diam (`transition:animate="none"`). Pil halaman aktif bergeser ke link baru (`transition:name="nav-indicator"`, spring 400ms). `<main>` keluar 160ms naik, masuk 400ms dari bawah (`src/lib/motion.ts`), arah dibalik saat back |
+| Menu mobile | Panel tumbuh (`grid-template-rows`), item muncul berurutan 30ms |
 
 ## 7. Konvensi
 
@@ -235,3 +264,5 @@ Isi artikel…
 | 007 | Notch card memakai `clip-path: shape()` + `@supports` | Bentuk responsif tanpa SVG/ukuran tetap; browser lama mendapat card biasa | `clip-path: path()` (ukuran piksel tetap), mask berlapis (rumit) |
 | 008 | Dark `--deep-ink` coklat hangat, bukan hitam | Di dark mode, yang terangkat harus lebih terang dari halaman (prinsip origin) | Hitam pekat (terlihat seperti lubang) |
 | 009 | TS 6: `"types": ["node"]` di tsconfig | TS 6 tidak lagi memuat `@types/*` otomatis; dibutuhkan untuk `integrations/` dan `scripts/` | — |
+| 010 | Easing spring via CSS `linear()` | Terasa fisik dan halus tanpa library JS; tetap CSS murni dan ikut reduced motion | Library animasi (Motion/GSAP), menambah JS |
+| 011 | Pil nav aktif transparan + View Transition bernama | Pil bisa bergeser antar halaman tanpa menutupi label | Pil hitam solid (label tertutup saat bergeser) |
