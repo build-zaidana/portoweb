@@ -21,6 +21,8 @@ const projects = defineCollection({
     title: z.string().max(60),
     /** One sentence shown on cards: what it does and for whom. */
     summary: z.string().max(160),
+    /** Short lowercase phrase for the hero sentence ("Right now I'm building …"). Falls back to the quoted title. */
+    phrase: z.string().max(60).optional(),
     status: z.enum(["idea", "building", "shipped"]),
     stack: z.array(z.string()).min(1),
     startedAt: z.coerce.date(),
@@ -40,6 +42,8 @@ const writing = defineCollection({
   schema: z.object({
     title: z.string().max(90),
     description: z.string().max(180),
+    /** Short lowercase phrase for the hero sentence ("Right now I'm building …"). Falls back to the quoted title. */
+    phrase: z.string().max(60).optional(),
     publishedAt: z.coerce.date(),
     updatedAt: z.coerce.date().optional(),
     tags: z.array(z.string()).default([]),

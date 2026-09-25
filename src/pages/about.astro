@@ -9,11 +9,25 @@ import Button from "../components/ui/Button.astro";
 import SampleBadge from "../components/ui/SampleBadge.astro";
 import SketchIcon from "../components/ui/SketchIcon.astro";
 import WhereNext from "../components/WhereNext.astro";
-import { getTimeline } from "../lib/content";
+import { getLatestNow, getProjects, getTimeline, getWriting } from "../lib/content";
 import { formatMonth, isoDate } from "../lib/format";
 import { contactHref, profile } from "../lib/site";
 
-const timeline = await getTimeline();
+const [timeline, projects, writing, now] = await Promise.all([
+  getTimeline(),
+  getProjects(),
+  getWriting(),
+  getLatestNow(),
+]);
+
+/** Door hints come from real content when there is some. */
+const building = projects.filter((p) => p.data.status === "building").length;
+const hints = {
+  projects: projects.length > 0 ? `${projects.length} so far, ${building} in progress` : undefined,
+  writing: writing[0] ? `Latest: ${writing[0].data.title}` : undefined,
+  now: now ? `Updated ${formatMonth(now.data.month)}` : undefined,
+  contact: `Remote, ${profile.timezone}`,
+};
 
 /** PRD §4 "Diferensiasi": data-based thinking, curiosity, sharing through open discussion. */
 const principles = [
@@ -34,13 +48,13 @@ const principles = [
 
 <BaseLayout
   title="About"
-  description="Zaidana is a Software Engineering student in Indonesia learning fullstack development and AI in public, open to remote internships."
+  description="Zaidana is a Software Engineering student in Indonesia learning fullstack development and AI in public, open to remote internships and junior roles."
 >
   <!-- ── Intro: story + photo ─────────────────────────────── -->
   <section class="intro wrap" aria-labelledby="about-title">
     <div class="story">
       <h1 id="about-title" class="page-title">
-        A student who writes things down.
+        Learning to build, and writing it down.
       </h1>
       <div class="prose">
         <p>
@@ -49,8 +63,8 @@ const principles = [
           in how young people use technology.
         </p>
         <p>
-          I'm not an expert, and this site doesn't pretend otherwise. It's where I build in public: projects
-          with notes on what went wrong, short write-ups of what I learn, and a{" "}
+          I'm early in my career, so this site shows the work while it's happening: projects with notes on
+          what I'd change, short write-ups of what I learn, and a{" "}
           <a class="link" href="/now">
             now page
           </a>{" "}
@@ -78,7 +92,7 @@ const principles = [
       <dl class="facts">
         <div>
           <dt>Role</dt>
-          <dd>{profile.seeking}, in fullstack or AI</dd>
+          <dd>Remote internships or junior roles in fullstack or AI</dd>
         </div>
         <div>
           <dt>Based in</dt>
@@ -149,7 +163,7 @@ const principles = [
     </section>
   )}
 
-  <WhereNext />
+  <WhereNext hints={hints} />
 </BaseLayout>
 
 <style>
@@ -193,12 +207,17 @@ const principles = [
     gap: 0.6rem;
     max-inline-size: 26rem;
   }
+  @media (min-width: 64rem) {
+    .photo-frame {
+      aspect-ratio: 4 / 5;
+    }
+  }
   .photo-frame {
     display: grid;
+    aspect-ratio: 4 / 3; /* shorter on phones so the facts below stay close */
     place-content: center;
     justify-items: center;
     gap: 0.75rem;
-    aspect-ratio: 4 / 5;
     border-radius: var(--radius-xl);
     background-color: var(--surface);
     background-image: radial-gradient(circle, var(--line-strong) 1px, transparent 1.5px);

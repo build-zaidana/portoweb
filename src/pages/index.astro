@@ -38,13 +38,13 @@ const tones = ["sage", "ink"] as const;
   <section class="story-section wrap" aria-label="In short">
     <StoryReveal
       parts={[
-        "I'm a Software Engineering student in Indonesia, learning to build",
+        "I'm learning to build",
         { icon: "build" },
         "fullstack apps and",
         { icon: "spark" },
         "AI tools that make people's work easier. I write down what I learn",
         { icon: "book" },
-        "in the open, so others can grow alongside me.",
+        "in the open, so others can learn with me.",
       ]}
     />
   </section>
@@ -56,7 +56,8 @@ const tones = ["sage", "ink"] as const;
           Things I'm building
         </h2>
         <p class="section-lead">
-          Small tools for students and learners, each with notes on what went wrong along the way.
+          Small tools for students and young learners. Each project page covers the problem, my approach, and
+          what I learned.
         </p>
       </div>
       <ProgressiveFade height="38%">
@@ -76,7 +77,7 @@ const tones = ["sage", "ink"] as const;
     <section class="writing wrap" aria-labelledby="writing-title">
       <div class="writing-intro">
         <h2 id="writing-title" class="section-title">
-          Notes from the way
+          Notes along the way
         </h2>
         <p class="section-lead">What I learn, written down while it's still fresh. Mistakes included.</p>
         <a class="link" href="/writing">
@@ -217,8 +218,10 @@ const tones = ["sage", "ink"] as const;
     }
   }
   .writing-intro .link {
-    display: inline-block;
-    margin-block-start: 1.25rem;
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.75rem;
+    margin-block-start: 0.75rem;
   }
   .writing-grid {
     display: grid;

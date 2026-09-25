@@ -9,6 +9,7 @@ import type { HeroCard } from "../../lib/hero";
 import { contactHref, profile } from "../../lib/site";
 import Button from "../ui/Button.astro";
 import Sticker from "../ui/Sticker.astro";
+import SampleBadge from "../ui/SampleBadge.astro";
 import SketchIcon from "../ui/SketchIcon.astro";
 import SkyBackdrop from "./SkyBackdrop.astro";
 import HeroStack from "./HeroStack.astro";
@@ -19,26 +20,29 @@ interface Props {
 
 const { cards } = Astro.props;
 const first = cards[0];
-const verbText = (verb: HeroCard["verb"]) => (verb === "writing" ? "writing about" : verb);
 ---
 
 <section class="hero wrap" aria-labelledby="hero-title">
   <div class="intro">
     <p class="who">
-      I'm Zaidana, a {profile.role} in {profile.country}.
+      I'm Zaidana, a {profile.role} in {profile.country}, focused on fullstack and AI.
     </p>
     <h1 id="hero-title" class="headline">
       Learning to build software that helps people.
     </h1>
     {first && (
       <p class="phrase" data-hero-phrase aria-live="polite">
-        Right now I'm <span data-phrase-verb>{verbText(first.verb)}</span>{" "}
+        Right now I'm <span data-phrase-verb>{first.verb}</span>{" "}
         <strong data-phrase-text>{first.phrase}</strong>.
+        {/* Sample content is labeled here too, so the sentence never states a placeholder as fact. */}
+        <span class="phrase-sample" data-phrase-sample hidden={!first.sample}>
+          <SampleBadge />
+        </span>
       </p>
     )}
 
     <div class="actions">
-      <Button variant="glass" size="lg" href={contactHref}>
+      <Button variant="primary" size="lg" href={contactHref}>
         Let's talk
       </Button>
       <Button variant="secondary" size="lg" href="/projects">
@@ -50,21 +54,21 @@ const verbText = (verb: HeroCard["verb"]) => (verb === "writing" ? "writing abou
       <div>
         <dt class="sr-only">Looking for</dt>
         <dd>
-          <span class="live" aria-hidden="true"></span>Open to remote internships and junior roles
+          <span class="live" aria-hidden="true"></span>Open to remote internships and junior roles in
+          fullstack and AI
         </dd>
       </div>
       <div>
         <dt class="sr-only">Time zone</dt>
-        <dd>
-          Based in {profile.country}, working in {profile.timezone}
-        </dd>
+        <dd>Time zone: UTC+7 (WIB, Jakarta)</dd>
       </div>
     </dl>
 
     <a class="proof" href={profile.github.href} target="_blank" rel="noopener">
       <SketchIcon name="build" size={18} />
       <span>
-        My code lives on <span class="proof-url">{profile.github.label}</span>
+        My code is public on <span class="proof-url">{profile.github.label}</span>
+        <span class="sr-only">(opens in a new tab)</span>
       </span>
     </a>
   </div>
@@ -76,8 +80,8 @@ const verbText = (verb: HeroCard["verb"]) => (verb === "writing" ? "writing abou
     </div>
     <Sticker
       class="hero-sticker"
-      text="Open to remote internships"
-      label="Open to remote internships"
+      text="Open to remote roles"
+      label="Open to remote internships and junior roles"
       icon="spark"
     />
   </div>
@@ -120,6 +124,14 @@ const verbText = (verb: HeroCard["verb"]) => (verb === "writing" ? "writing abou
     transition:
       opacity var(--dur-2) var(--ease-out),
       translate var(--dur-2) var(--ease-out);
+  }
+  .phrase-sample {
+    display: inline-block;
+    margin-inline-start: 0.35rem;
+    vertical-align: 0.15em;
+  }
+  .phrase-sample[hidden] {
+    display: none;
   }
   .phrase strong {
     color: var(--ink);
@@ -224,7 +236,8 @@ const verbText = (verb: HeroCard["verb"]) => (verb === "writing" ? "writing abou
 
   /* ── Opening moment, part 1: the words settle in before the cards are dealt. ── */
   @media (prefers-reduced-motion: no-preference) {
-    .intro > * {
+    /* Only who / headline / phrase settle in; actions and facts are simply there. */
+    .intro > :nth-child(-n + 3) {
       animation: hero-rise var(--dur-4) var(--ease-out) both;
     }
     .intro > :nth-child(2) {
@@ -232,9 +245,6 @@ const verbText = (verb: HeroCard["verb"]) => (verb === "writing" ? "writing abou
     }
     .intro > :nth-child(3) {
       animation-delay: 120ms;
-    }
-    .intro > :nth-child(n + 4) {
-      animation-delay: 180ms;
     }
   }
   @keyframes hero-rise {

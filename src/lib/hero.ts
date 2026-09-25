@@ -7,13 +7,19 @@ import { getLatestNow, getProjects, getWriting } from "./content";
 import { formatDate, formatMonth } from "./format";
 import { profile } from "./site";
 
-export type HeroVerb = "building" | "learning" | "writing";
+/** Verb in the hero sentence. Projects pick theirs from their status, so an idea is never "being built". */
+export type HeroVerb = "planning" | "building" | "improving" | "learning" | "writing about";
+
+const projectVerb = { idea: "planning", building: "building", shipped: "improving" } as const;
+
+/** Titles are quoted when used mid-sentence, so capitals and commas don't break the grammar. */
+const quoted = (title: string) => `“${title}”`;
 
 export interface HeroCard {
   id: string;
-  /** Drives the changing phrase under the headline: "Right now I'm {verb} …". */
+  /** Drives the changing sentence under the headline: "Right now I'm {verb} {phrase}." */
   verb: HeroVerb;
-  /** Object of the sentence under the headline, e.g. "TypeScript generics". */
+  /** Object of that sentence, e.g. "a quiz app for lecture notes" or "TypeScript generics". */
   phrase: string;
   kind: "project" | "learning" | "writing" | "site";
   title: string;
@@ -34,8 +40,8 @@ export async function getHeroCards(): Promise<HeroCard[]> {
   if (project) {
     cards.push({
       id: `project-${project.id}`,
-      verb: "building",
-      phrase: project.data.title,
+      verb: projectVerb[project.data.status],
+      phrase: project.data.phrase ?? quoted(project.data.title),
       kind: "project",
       title: project.data.title,
       body: project.data.summary,
@@ -67,8 +73,8 @@ export async function getHeroCards(): Promise<HeroCard[]> {
   if (post) {
     cards.push({
       id: `writing-${post.id}`,
-      verb: "writing",
-      phrase: post.data.title,
+      verb: "writing about",
+      phrase: post.data.phrase ?? quoted(post.data.title),
       kind: "writing",
       title: post.data.title,
       body: post.data.description,
@@ -85,7 +91,7 @@ export async function getHeroCards(): Promise<HeroCard[]> {
     verb: "building",
     phrase: "this website",
     kind: "site",
-    title: "This website",
+    title: "This site",
     body: "Designed and built step by step with Astro, TypeScript, and Tailwind. You're looking at it.",
     meta: profile.github.label,
     href: profile.github.href,

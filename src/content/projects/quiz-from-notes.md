@@ -1,5 +1,6 @@
 ---
 title: Quiz from my lecture notes
+phrase: a quiz app for lecture notes
 summary: Paste a page of class notes and get five practice questions, with the source sentence linked to each answer.
 status: building
 stack: [TypeScript, Astro, Hono, LLM API]

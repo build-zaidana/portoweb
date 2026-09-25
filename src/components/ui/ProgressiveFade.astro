@@ -10,12 +10,14 @@
 interface Props {
   /** Height of the fading band, e.g. "45%" or "14rem". */
   height?: string;
+  /** Band height on phones, where items stack and a % height would swallow a whole item. */
+  mobileHeight?: string;
   class?: string;
 }
-const { height = "42%", class: className } = Astro.props;
+const { height = "42%", mobileHeight = "10rem", class: className } = Astro.props;
 ---
 
-<div class:list={["fade-wrap", className]} style={`--fade-h: ${height}`}>
+<div class:list={["fade-wrap", className]} style={`--fade-h: ${height}; --fade-h-mobile: ${mobileHeight}`}>
   <slot />
   <div class="fade" aria-hidden="true">
     <span class="layer l1"></span>
@@ -38,6 +40,11 @@ const { height = "42%", class: className } = Astro.props;
     position: absolute;
     inset: auto 0 0;
     block-size: var(--fade-h);
+  }
+  @media (max-width: 47.99rem) {
+    .fade {
+      block-size: var(--fade-h-mobile);
+    }
     pointer-events: none;
     z-index: 2;
   }

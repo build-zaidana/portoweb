@@ -28,7 +28,7 @@ function random(seedValue: number) {
   };
 }
 const rand = random(seed * 9973);
-const stars = Array.from({ length: 46 }, () => ({
+const stars = Array.from({ length: 72 }, () => ({
   x: +(rand() * 520).toFixed(1),
   y: +(rand() * 460).toFixed(1), // keep stars in the upper sky
   r: +(0.5 + rand() * rand() * 1.4).toFixed(2), // mostly small, a few bright ones

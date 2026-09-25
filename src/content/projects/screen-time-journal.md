@@ -1,5 +1,6 @@
 ---
 title: Screen-time journal
+phrase: a screen-time journal
 summary: A private, offline journal where teens log how an app made them feel, not just how long they used it.
 status: idea
 stack: [TypeScript, IndexedDB, PWA]

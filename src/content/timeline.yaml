@@ -3,11 +3,11 @@
 - id: this-site
   date: 2026-09-24
   title: Started building this website in public
-  note: Astro, TypeScript, and Tailwind. Each phase is reviewed before the next one starts.
+  note: Astro, TypeScript, and Tailwind. I review each phase before starting the next.
 
 - id: github
   date: 2026-07-06
-  title: Opened my GitHub account
+  title: Created my GitHub account
   note: A home for practice repositories and small projects.
 
 - id: first-fullstack-app

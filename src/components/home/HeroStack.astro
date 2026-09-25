@@ -38,6 +38,7 @@ const kindLabel: Record<HeroCard["kind"], { text: string; icon: IconName }> = {
   aria-label="What I'm working on"
   style={`--total: ${total}`}
 >
+  <h2 class="sr-only">What I'm working on</h2>
   <div class="deck">
     {cards.map((card, i) => (
       <article
@@ -47,6 +48,7 @@ const kindLabel: Record<HeroCard["kind"], { text: string; icon: IconName }> = {
         data-pos={Math.min(i, 3)}
         data-verb={card.verb}
         data-phrase={card.phrase}
+        data-sample={card.sample ? "true" : "false"}
         role="group"
         aria-roledescription="slide"
         aria-label={`${i + 1} of ${total}`}
@@ -60,7 +62,7 @@ const kindLabel: Record<HeroCard["kind"], { text: string; icon: IconName }> = {
           </span>
           {card.sample && <SampleBadge />}
         </div>
-        <h2 class="title">
+        <h3 class="title">
           <a
             href={card.href}
             class="card-link"
@@ -69,7 +71,7 @@ const kindLabel: Record<HeroCard["kind"], { text: string; icon: IconName }> = {
           >
             {card.title}
           </a>
-        </h2>
+        </h3>
         <p class="body">{card.body}</p>
         <p class="meta">{card.meta}</p>
 
@@ -143,17 +145,25 @@ const kindLabel: Record<HeroCard["kind"], { text: string; icon: IconName }> = {
       });
       const front = cards[order[0] ?? 0];
       segments.forEach((segment, i) => segment.classList.toggle("is-active", i === order[0]));
-      if (front && phrase) updatePhrase(front.dataset.verb ?? "building", front.dataset.phrase ?? "");
+      if (front && phrase) {
+        updatePhrase(
+          front.dataset.verb ?? "building",
+          front.dataset.phrase ?? "",
+          front.dataset.sample === "true",
+        );
+      }
     }
 
-    function updatePhrase(verb: string, text: string) {
+    function updatePhrase(verb: string, text: string, sample: boolean) {
       if (!phrase) return;
       const verbEl = phrase.querySelector<HTMLElement>("[data-phrase-verb]");
       const textEl = phrase.querySelector<HTMLElement>("[data-phrase-text]");
+      const sampleEl = phrase.querySelector<HTMLElement>("[data-phrase-sample]");
       if (!verbEl || !textEl || textEl.textContent === text) return;
       const swap = () => {
-        verbEl.textContent = verb === "writing" ? "writing about" : verb;
+        verbEl.textContent = verb;
         textEl.textContent = text;
+        if (sampleEl) sampleEl.hidden = !sample;
       };
       if (reduceMotion()) {
         swap();
@@ -411,12 +421,19 @@ const kindLabel: Record<HeroCard["kind"], { text: string; icon: IconName }> = {
     font-size: var(--text-step--1);
     font-weight: 500;
   }
+  /* Text blocks keep their natural height; only the illustration gives way when space is short. */
+  .top,
+  .title,
+  .body,
+  .meta {
+    flex-shrink: 0;
+  }
   .title {
     margin-block-start: 0.35rem;
     font-size: var(--text-step-2);
     line-height: var(--text-step-2--line-height);
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
@@ -444,9 +461,14 @@ const kindLabel: Record<HeroCard["kind"], { text: string; icon: IconName }> = {
     font-size: 0.9375rem;
     line-height: 1.5;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+  @media (max-width: 29.99rem) {
+    .title {
+      font-size: 1.5rem;
+    }
   }
   .meta {
     font-size: var(--text-step--1);
@@ -455,8 +477,8 @@ const kindLabel: Record<HeroCard["kind"], { text: string; icon: IconName }> = {
 
   .art {
     position: relative;
-    flex: 1;
-    min-block-size: 6rem;
+    flex: 1 1 0;
+    min-block-size: 3rem;
     margin-inline: -1.25rem;
   }
   .art :global(.art) {

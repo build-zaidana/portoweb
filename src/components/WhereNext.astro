@@ -10,15 +10,16 @@ import { contactHref } from "../lib/site";
 interface Props {
   title?: string;
   lead?: string;
+  /** Real, current details shown under each door (pages pass them from content). Generic text otherwise. */
+  hints?: Partial<Record<"projects" | "writing" | "now" | "contact", string>>;
 }
-const { title = "Where to next", lead = "Pick a door. Each one shows a different side of the work." } =
-  Astro.props;
+const { title = "Where to next?", lead = "Four ways to see more of the work.", hints = {} } = Astro.props;
 
 const doors: { label: string; href: string; icon: IconName; hint: string }[] = [
-  { label: "Projects", href: "/projects", icon: "build", hint: "What I'm building" },
-  { label: "Writing", href: "/writing", icon: "book", hint: "What I've learned" },
-  { label: "Now", href: "/now", icon: "spark", hint: "This month" },
-  { label: "Contact", href: contactHref, icon: "cloud", hint: "Say hello" },
+  { label: "Projects", href: "/projects", icon: "build", hint: hints.projects ?? "What I'm building" },
+  { label: "Writing", href: "/writing", icon: "book", hint: hints.writing ?? "What I've learned" },
+  { label: "Now", href: "/now", icon: "spark", hint: hints.now ?? "This month" },
+  { label: "Contact", href: contactHref, icon: "cloud", hint: hints.contact ?? "Say hello" },
 ];
 ---
 
@@ -108,6 +109,10 @@ const doors: { label: string; href: string; icon: IconName; hint: string }[] = [
     font-weight: 500;
   }
   .door-hint {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
     font-size: var(--text-step--1);
     color: var(--ink-soft);
     transition: color var(--dur-3) var(--ease-out);

@@ -1,5 +1,6 @@
 ---
 title: Plain-words glossary
+phrase: a plain-words glossary
 summary: A small glossary that explains one software term at a time for readers aged 14–18, with a picture for each.
 status: idea
 stack: [Markdown, Astro content collections]

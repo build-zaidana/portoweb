@@ -1,5 +1,6 @@
 ---
 title: What an API is, explained with a restaurant menu
+phrase: what an API is
 description: A sample "How Things Work" style article used to test long-form typography.
 publishedAt: 2026-08-25
 tags: [how-things-work]

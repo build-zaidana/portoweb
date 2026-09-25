@@ -60,8 +60,8 @@
   --on-deep-soft: light-dark(#c4c7bd, #b3b7ac);
 
   /* ── Sky (hero backdrop): day clouds in light mode, a starry night in dark mode ── */
-  --sky-top: light-dark(#aecadb, #0f1a1c);
-  --sky-bottom: light-dark(#e7eeee, #19201b);
+  --sky-top: light-dark(#aecadb, #1c2d31);
+  --sky-bottom: light-dark(#e7eeee, #1d251f);
   --cloud: light-dark(#fdfcf9, transparent);
   --star: light-dark(transparent, rgb(236 234 228 / 0.85));
   --star-grid: light-dark(transparent, rgb(236 234 228 / 0.16));

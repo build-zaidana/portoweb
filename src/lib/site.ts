@@ -32,7 +32,7 @@ export interface NavItem {
 
 /** Primary navigation. Order follows what Rian needs first: proof, then thinking, then activity. */
 export const nav: readonly NavItem[] = [
-  { label: "Work", href: "/projects" },
+  { label: "Projects", href: "/projects" },
   { label: "Writing", href: "/writing" },
   { label: "Now", href: "/now" },
   { label: "About", href: "/about" },
