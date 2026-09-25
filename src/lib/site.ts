@@ -21,6 +21,11 @@ export const profile = {
   timezone: "WIB (UTC+7)",
   seeking: "Remote internships and junior software roles",
   github: { label: "github.com/build-zaidana", href: "https://github.com/build-zaidana" },
+  /**
+   * PRD §3 logistics. Start date and weekly hours aren't decided yet (Gate 4), so the site
+   * says so plainly instead of guessing. Replace with real values when known.
+   */
+  availability: "Start date and weekly hours: happy to discuss",
   /** PRD F7: placeholder until the real CV exists. Keep `placeholder: true` so the UI says so. */
   cv: { href: "/cv-placeholder.pdf", placeholder: true },
 } as const;
