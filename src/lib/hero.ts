@@ -55,12 +55,13 @@ export async function getHeroCards(): Promise<HeroCard[]> {
 
   const learning = now?.data.learning[0];
   if (now && learning) {
+    const topic = learning.split(",")[0] ?? learning;
     cards.push({
       id: `now-${now.id}`,
       verb: "learning",
-      phrase: learning.split(",")[0] ?? learning,
+      phrase: topic,
       kind: "learning",
-      title: learning.split(",")[0] ?? learning,
+      title: topic,
       body: learning,
       meta: `Updated ${formatMonth(now.data.month)}`,
       href: "/now",

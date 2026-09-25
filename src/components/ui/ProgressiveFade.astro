@@ -40,13 +40,13 @@ const { height = "42%", mobileHeight = "10rem", class: className } = Astro.props
     position: absolute;
     inset: auto 0 0;
     block-size: var(--fade-h);
+    pointer-events: none; /* the blurred items underneath stay clickable */
+    z-index: 2;
   }
   @media (max-width: 47.99rem) {
     .fade {
       block-size: var(--fade-h-mobile);
     }
-    pointer-events: none;
-    z-index: 2;
   }
   .layer,
   .tint {
@@ -72,11 +72,16 @@ const { height = "42%", mobileHeight = "10rem", class: className } = Astro.props
   .tint {
     background: linear-gradient(to bottom, transparent 20%, var(--paper) 96%);
   }
+  /* Full-width row only to center the button; clicks pass through except on the button itself. */
   .action {
     position: absolute;
     inset: auto 0 1.75rem;
     z-index: 3;
     display: flex;
     justify-content: center;
+    pointer-events: none;
+  }
+  .action > :global(*) {
+    pointer-events: auto;
   }
 </style>

@@ -207,11 +207,6 @@ const principles = [
     gap: 0.6rem;
     max-inline-size: 26rem;
   }
-  @media (min-width: 64rem) {
-    .photo-frame {
-      aspect-ratio: 4 / 5;
-    }
-  }
   .photo-frame {
     display: grid;
     aspect-ratio: 4 / 3; /* shorter on phones so the facts below stay close */
@@ -229,6 +224,12 @@ const principles = [
   @media (hover: hover) {
     .photo:hover .photo-frame {
       rotate: 0deg;
+    }
+  }
+  /* Desktop: taller portrait frame (must come after the base rule to win). */
+  @media (min-width: 64rem) {
+    .photo-frame {
+      aspect-ratio: 4 / 5;
     }
   }
   .photo-frame span {

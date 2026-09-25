@@ -31,20 +31,13 @@ const kindLabel: Record<HeroCard["kind"], { text: string; icon: IconName }> = {
 };
 ---
 
-<section
-  class="stack"
-  data-hero-stack
-  aria-roledescription="carousel"
-  aria-label="What I'm working on"
-  style={`--total: ${total}`}
->
+<section class="stack" data-hero-stack aria-roledescription="carousel" aria-label="What I'm working on">
   <h2 class="sr-only">What I'm working on</h2>
   <div class="deck">
     {cards.map((card, i) => (
-      <article
+      <div
         class="card"
         data-tint={card.tint}
-        data-kind={card.kind}
         data-pos={Math.min(i, 3)}
         data-verb={card.verb}
         data-phrase={card.phrase}
@@ -97,7 +90,7 @@ const kindLabel: Record<HeroCard["kind"], { text: string; icon: IconName }> = {
             </div>
           )}
         </div>
-      </article>
+      </div>
     ))}
   </div>
 
@@ -428,14 +421,18 @@ const kindLabel: Record<HeroCard["kind"], { text: string; icon: IconName }> = {
   .meta {
     flex-shrink: 0;
   }
-  .title {
-    margin-block-start: 0.35rem;
-    font-size: var(--text-step-2);
-    line-height: var(--text-step-2--line-height);
+  /* Title and body are clamped to two lines each. */
+  .title,
+  .body {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+  .title {
+    margin-block-start: 0.35rem;
+    font-size: var(--text-step-2);
+    line-height: var(--text-step-2--line-height);
   }
   .card-link {
     color: inherit;
@@ -460,10 +457,6 @@ const kindLabel: Record<HeroCard["kind"], { text: string; icon: IconName }> = {
     color: var(--ink-soft);
     font-size: 0.9375rem;
     line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
   }
   @media (max-width: 29.99rem) {
     .title {

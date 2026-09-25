@@ -166,6 +166,9 @@ const first = cards[0];
     color: var(--ink);
     font-weight: 500;
   }
+  .logistics div + div dd {
+    padding-inline-start: 1rem;
+  }
   /* Small "available" dot (useorigin). Color is a hint; the text says it. */
   .live {
     inline-size: 0.5rem;
@@ -173,9 +176,6 @@ const first = cards[0];
     border-radius: 999px;
     background-color: var(--sage);
     box-shadow: 0 0 0 3px color-mix(in oklab, var(--sage) 30%, transparent);
-  }
-  .logistics div + div dd {
-    padding-inline-start: 1rem;
   }
 
   .proof {
