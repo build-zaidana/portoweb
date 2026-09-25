@@ -21,9 +21,11 @@ interface Props {
   image?: string;
   /** Keep utility pages (e.g. /styleguide) out of search results. */
   noindex?: boolean;
+  /** Show the closing moment (floating cards + big CTA) above the footer. Home only. */
+  closing?: boolean;
 }
 
-const { title, description = site.description, image, noindex = false } = Astro.props;
+const { title, description = site.description, image, noindex = false, closing = false } = Astro.props;
 const fullTitle = title ? `${title} · ${site.name}` : site.title;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = image ? new URL(image, Astro.site).href : undefined;
@@ -72,7 +74,7 @@ const ogImage = image ? new URL(image, Astro.site).href : undefined;
     <main id="main" tabindex="-1" transition:name="page-main" transition:animate={pageTransition}>
       <slot />
     </main>
-    <SiteFooter />
+    <SiteFooter closing={closing} />
   </body>
 </html>
 

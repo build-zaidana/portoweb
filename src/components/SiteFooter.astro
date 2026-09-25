@@ -1,36 +1,303 @@
 ---
 /**
- * Minimal footer for now. Phase 2 turns it into the closing moment:
- * floating cards around "Let's talk" + the oversized ZAIDANA wordmark (cosmos.so).
+ * Site footer + the closing moment (cosmos.so reference, pair of the hero).
+ *
+ * Every page: link row + the oversized "Zaidana" wordmark, cut off by the bottom edge.
+ * With `closing` (Home): small cards from the hero scatter around a big "Let's talk" CTA.
+ *   - The scatter plays ONCE when the section first enters the viewport (IntersectionObserver).
+ *   - Afterwards the cards only drift a little with the pointer (user-triggered), and only
+ *     while the section is on screen. No loops.
+ *   - Reduced motion: cards sit still in their final places.
  */
-import { site } from "../lib/site";
+import { contactHref, nav, profile, site } from "../lib/site";
+import Button from "./ui/Button.astro";
 
+interface Props {
+  closing?: boolean;
+}
+const { closing = false } = Astro.props;
 const year = new Date().getFullYear();
+
+/**
+ * Floating card layout. x/y: final position in % of the section; r: rotation;
+ * depth: 0 = far (small, blurred, faint) → 1 = near (sharp). Kept clear of the center.
+ */
+const floaters = [
+  { x: 6, y: 14, r: -12, depth: 0.9, tint: "sky", w: 7.5 },
+  { x: 20, y: 62, r: 8, depth: 0.5, tint: "tan", w: 6 },
+  { x: 3, y: 78, r: 14, depth: 0.25, tint: "sage", w: 5 },
+  { x: 24, y: 6, r: 6, depth: 0.3, tint: "sage", w: 5 },
+  { x: 74, y: 8, r: 10, depth: 0.7, tint: "tan", w: 7 },
+  { x: 88, y: 40, r: -8, depth: 0.95, tint: "sage", w: 8 },
+  { x: 70, y: 70, r: -14, depth: 0.45, tint: "sky", w: 6 },
+  { x: 92, y: 82, r: 6, depth: 0.2, tint: "tan", w: 5 },
+  { x: 58, y: 88, r: 4, depth: 0.3, tint: "sage", w: 5 },
+  { x: 38, y: 90, r: -6, depth: 0.55, tint: "sky", w: 6 },
+] as const;
 ---
 
 <footer class="site-footer">
-  <div class="wrap row">
+  {closing && (
+    <section class="closing" data-closing aria-labelledby="closing-title">
+      <div class="floaters" aria-hidden="true">
+        {floaters.map((f, i) => (
+          <span
+            class="floater"
+            data-tint={f.tint}
+            style={`--x: ${f.x}%; --y: ${f.y}%; --r: ${f.r}deg; --depth: ${f.depth}; --w: ${f.w}rem; --i: ${i}`}
+          >
+            <i />
+            <i />
+          </span>
+        ))}
+      </div>
+      <div class="closing-inner">
+        <h2 id="closing-title" class="closing-title">
+          Have a question, a project, or an internship in mind?
+        </h2>
+        <Button variant="primary" size="lg" href={contactHref} class="closing-cta">
+          Let's talk
+        </Button>
+      </div>
+    </section>
+  )}
+
+  <div class="wrap links-row">
+    <nav aria-label="Footer">
+      <ul role="list">
+        {nav.map((item) => (
+          <li>
+            <a href={item.href}>{item.label}</a>
+          </li>
+        ))}
+        <li>
+          <a href={contactHref}>Contact</a>
+        </li>
+        <li>
+          <a href={profile.github.href} target="_blank" rel="noopener">
+            GitHub
+          </a>
+        </li>
+        <li>
+          <a href="/styleguide">Styleguide</a>
+        </li>
+      </ul>
+    </nav>
     <p>
       © {year} {site.name}. Built in public with Astro.
     </p>
-    <a class="link" href="/styleguide">
-      Styleguide
-    </a>
   </div>
+
+  <p class="wordmark" aria-hidden="true">
+    {site.name}
+  </p>
 </footer>
+
+<script>
+  function setupClosing() {
+    const section = document.querySelector<HTMLElement>("[data-closing]");
+    if (!section || section.dataset.bound) return;
+    section.dataset.bound = "true";
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
+      section.classList.add("is-open");
+      return;
+    }
+
+    let visible = false;
+    let frame = 0;
+    let mx = 0;
+    let my = 0;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        visible = Boolean(entry?.isIntersecting);
+        if (visible) section.classList.add("is-open"); // the scatter itself runs once (class stays)
+      },
+      { threshold: 0.25 },
+    );
+    observer.observe(section);
+
+    // Pointer drift: only while on screen, batched to one update per frame.
+    section.addEventListener("pointermove", (event) => {
+      if (!visible || event.pointerType !== "mouse") return;
+      const box = section.getBoundingClientRect();
+      mx = ((event.clientX - box.left) / box.width) * 2 - 1;
+      my = ((event.clientY - box.top) / box.height) * 2 - 1;
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        section.style.setProperty("--mx", mx.toFixed(3));
+        section.style.setProperty("--my", my.toFixed(3));
+        frame = 0;
+      });
+    });
+    section.addEventListener("pointerleave", () => {
+      section.style.setProperty("--mx", "0");
+      section.style.setProperty("--my", "0");
+    });
+
+    document.addEventListener("astro:before-swap", () => observer.disconnect(), { once: true });
+  }
+
+  document.addEventListener("astro:page-load", setupClosing);
+</script>
 
 <style>
   .site-footer {
-    margin-block-start: 7rem;
-    padding-block: 2rem 2.5rem;
-    border-block-start: 1px solid var(--line);
+    position: relative;
+    margin-block-start: clamp(5rem, 4rem + 4vw, 8rem);
+    overflow: hidden;
     color: var(--ink-soft);
     font-size: var(--text-step--1);
   }
-  .row {
+
+  /* ── Closing moment ─────────────────────────────────────── */
+  .closing {
+    --mx: 0;
+    --my: 0;
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-block-size: clamp(28rem, 22rem + 18vw, 38rem);
+    padding: 4rem var(--gutter);
+  }
+  .closing-inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    justify-items: center;
+    gap: 2rem;
+    max-inline-size: 36rem;
+    text-align: center;
+  }
+  .closing-title {
+    font-size: var(--text-step-4);
+    line-height: var(--text-step-4--line-height);
+    color: var(--ink);
+  }
+  /* Oversized pill CTA (cosmos): the one big button on the page. */
+  .closing-inner :global(.closing-cta) {
+    min-block-size: 4rem;
+    padding-inline: 2.5rem;
+    font-size: var(--text-step-1);
+  }
+
+  .floaters {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .floater {
+    --tone: var(--tint-sage);
+    position: absolute;
+    inset-inline-start: var(--x);
+    inset-block-start: var(--y);
+    display: grid;
+    align-content: start;
+    gap: 0.45rem;
+    inline-size: var(--w);
+    aspect-ratio: 4 / 3;
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+    background-color: var(--tone);
+    border: 1px solid var(--line);
+    box-shadow: 0 16px 30px -18px var(--shadow-tint);
+    /* Depth of field: far cards are smaller, softer, fainter. */
+    opacity: calc(0.35 + var(--depth) * 0.65);
+    filter: blur(calc((1 - var(--depth)) * 2.5px));
+    /* Resting place, plus a drift that follows the pointer (near cards move more). */
+    transform: rotate(var(--r)) scale(calc(0.75 + var(--depth) * 0.25));
+    translate: calc(var(--mx) * var(--depth) * 18px) calc(var(--my) * var(--depth) * 12px);
+    transition:
+      translate 600ms var(--ease-out),
+      transform var(--dur-4) var(--ease-spring),
+      opacity var(--dur-3) var(--ease-out);
+  }
+  .floater[data-tint="sky"] {
+    --tone: var(--tint-sky);
+  }
+  .floater[data-tint="tan"] {
+    --tone: var(--tint-tan);
+  }
+  .floater i {
+    display: block;
+    block-size: 0.35rem;
+    border-radius: 999px;
+    background-color: var(--line-strong);
+  }
+  .floater i:first-child {
+    inline-size: 70%;
+  }
+  .floater i:last-child {
+    inline-size: 45%;
+  }
+
+  /* Before the section is seen: cards wait, gathered near the CTA, invisible.
+     On first view they scatter out to their places, near cards last. */
+  @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+    .closing:not(.is-open) .floater {
+      opacity: 0;
+      inset-inline-start: 45%;
+      inset-block-start: 45%;
+      transform: rotate(0deg) scale(0.5);
+    }
+    .closing.is-open .floater {
+      transition:
+        inset-inline-start var(--dur-4) var(--ease-out),
+        inset-block-start var(--dur-4) var(--ease-out),
+        transform var(--dur-4) var(--ease-spring),
+        opacity var(--dur-3) var(--ease-out),
+        translate 600ms var(--ease-out);
+      transition-delay: calc(var(--depth) * 220ms);
+    }
+  }
+
+  /* Fewer, smaller cards on phones so the CTA keeps room. */
+  @media (max-width: 47.99rem) {
+    .floater:nth-child(n + 7) {
+      display: none;
+    }
+    .floater {
+      inline-size: calc(var(--w) * 0.7);
+    }
+  }
+
+  /* ── Link row ───────────────────────────────────────────── */
+  .links-row {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     justify-content: space-between;
-    gap: 0.75rem 2rem;
+    gap: 1rem 2rem;
+    padding-block: 2rem 1rem;
+    border-block-start: 1px solid var(--line);
+  }
+  .links-row ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.25rem;
+  }
+  .links-row a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.75rem;
+    color: var(--ink-soft);
+    text-decoration: none;
+    transition: color var(--dur-2) var(--ease-out);
+  }
+  .links-row a:hover {
+    color: var(--ink);
+  }
+
+  /* ── Wordmark: the full-width name, cut off by the page's bottom edge ── */
+  .wordmark {
+    font-family: var(--font-display);
+    font-size: clamp(6rem, 3rem + 21vw, 24rem);
+    line-height: 0.78;
+    letter-spacing: -0.035em;
+    text-align: center;
+    color: var(--ink);
+    margin-block-end: -0.12em;
+    user-select: none;
   }
 </style>
