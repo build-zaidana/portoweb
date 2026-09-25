@@ -16,6 +16,19 @@
 | Keyword | Topik | Dipakai di | Fase |
 |---|---|---|---|
 | `astro static output` | Astro | deploy ke Netlify tanpa adapter | 0 |
+| `astro fonts api` | Astro | astro.config.mjs (fonts) | 1 |
+| `fontProviders.fontshare` | Astro | General Sans | 1 |
+| `astro:env envField` | Astro | SHOW_SAMPLES | 1 |
+| `astro integration hooks` | Astro | integrations/sample-report.ts | 1 |
+| `astro:build:done` | Astro | integrations/sample-report.ts | 1 |
+| `astro content collections` | Astro | src/content.config.ts | 1 |
+| `glob() loader` | Astro | src/content.config.ts | 1 |
+| `astro/zod` | Astro | src/content.config.ts | 1 |
+| `ClientRouter` | Astro | BaseLayout.astro | 1 |
+| `astro:before-swap` | Astro | ThemeScript.astro | 1 |
+| `astro:page-load` | Astro | ThemeToggle, SiteHeader | 1 |
+| `astro scoped styles :global()` | Astro | cards, styleguide | 1 |
+| `vite ?raw import` | Astro / Vite | styleguide.astro (tokens.css?raw) | 1 |
 
 ## Tailwind / CSS
 
@@ -26,6 +39,17 @@
 | `css perspective` | CSS | card stack hero | 0 |
 | `cubic-bezier(0.22, 1, 0.36, 1)` | CSS | easing card stack (dari wabi) | 0 |
 | `background-size underline animation` | CSS | hover card Writing (dari integratedbio) | 0 |
+| `css light-dark()` | CSS | tokens.css | 1 |
+| `color-scheme` | CSS | tokens.css | 1 |
+| `tailwind @theme` | Tailwind | tokens.css (@theme static) | 1 |
+| `tailwind @theme inline` | Tailwind | global.css | 1 |
+| `tailwind @custom-variant` | Tailwind | global.css (dark) | 1 |
+| `css shape() function` | CSS | WritingCard.astro (notch) | 1 |
+| `css :has() selector` | CSS | ProjectCard, WritingCard (focus) | 1 |
+| `grid-template-rows 0fr 1fr transition` | CSS | SiteHeader (menu mobile) | 1 |
+| `backdrop-filter` | CSS | global.css (.glass) | 1 |
+| `box-decoration-break` | CSS | WritingCard (underline per baris) | 1 |
+| `css clamp()` | CSS | tokens.css (text-step-3..5) | 1 |
 
 ## Design / Typography
 
@@ -34,6 +58,10 @@
 | `font-display swap` | Typography | Instrument Serif, General Sans | 0 |
 | `self-host fonts` | Typography | folder font lokal | 0 |
 | `ITF Free Font License` | Typography | lisensi General Sans (Fontshare) | 0 |
+| `font preload` | Typography | BaseLayout (<Font preload>) | 1 |
+| `text-wrap balance` | Typography | global.css (h1–h3) | 1 |
+| `svg feTurbulence` | Illustration | SketchFilter.astro | 1 |
+| `feDisplacementMap` | Illustration | SketchFilter.astro | 1 |
 
 ## Accessibility
 
@@ -43,10 +71,30 @@
 | `aria-roledescription carousel` | A11y | card stack hero | 0 |
 | `aria-hidden` | A11y | lapisan efek scroll reveal | 0 |
 | `pointer events` | A11y / JS | drag card stack (pointerdown/move/up) | 0 |
+| `wcag 1.4.3 contrast` | A11y | scripts/contrast.ts | 1 |
+| `relative luminance` | A11y | src/lib/contrast.ts | 1 |
+| `stretched link pattern` | A11y | ProjectCard, WritingCard | 1 |
+| `skip link` | A11y | BaseLayout.astro | 1 |
+| `visually hidden clip-path inset(50%)` | A11y | BaseLayout (skip link) | 1 |
+| `disclosure pattern aria-expanded` | A11y | SiteHeader (menu mobile) | 1 |
+| `:focus-visible` | A11y | global.css | 1 |
+| `wcag 2.5.5 target size` | A11y | nav, tombol 44px | 1 |
 
 ## Animation
 
+| Keyword | Topik | Dipakai di | Fase |
+|---|---|---|---|
+| `View Transition API startViewTransition` | Animation | ThemeToggle.astro | 1 |
+| `prefers-reduced-motion` | Animation | tokens.css (--dur-* = 0ms) | 1 |
+
 ## Performance / SEO
+
+| Keyword | Topik | Dipakai di | Fase |
+|---|---|---|---|
+| `largest contentful paint` | Performance | trace Fase 1 (1.43 s) | 1 |
+| `render-blocking resources` | Performance | catatan Fase 6 | 1 |
+| `meta robots noindex` | SEO | /styleguide | 1 |
+| `open graph meta tags` | SEO | BaseLayout.astro | 1 |
 
 ## Deploy / Tooling
 
@@ -55,3 +103,10 @@
 | `netlify forms` | Deploy | form kontak | 0 |
 | `netlify.toml` | Deploy | konfigurasi deploy | 0 |
 | `GoatCounter` | Analytics | usulan analytics gratis (belum diputuskan) | 0 |
+| `prettier-plugin-astro` | Tooling | .prettierrc.mjs | 1 |
+| `prettier-plugin-tailwindcss` | Tooling | .prettierrc.mjs | 1 |
+| `.gitattributes eol=lf` | Git | .gitattributes | 1 |
+| `conventional commits` | Git | riwayat commit | 1 |
+| `node type stripping` | Tooling | scripts/contrast.ts | 1 |
+| `typescript types compiler option` | Tooling | tsconfig.json (TS 6) | 1 |
+

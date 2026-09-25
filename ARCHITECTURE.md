@@ -1,0 +1,237 @@
+# ARCHITECTURE — Zaidana Studio
+
+> **Bagaimana** situs ini dibangun. *Apa* dan *kenapa* ada di `PRD.md`. Dokumen ini dirawat Claude Code dan diperbarui di akhir setiap fase.
+> Terakhir diperbarui: Fase 1 (2026-09-25).
+
+## 1. Stack
+
+| Bagian | Pilihan | Versi (saat Fase 1) |
+|---|---|---|
+| Framework | Astro, output **static** | 7.3 |
+| Styling | Tailwind CSS 4 lewat `@tailwindcss/vite` + CSS scoped per komponen | 4.3 |
+| Bahasa | TypeScript `astro/tsconfigs/strict` (TS 6) | 6.0 |
+| Konten | Markdown + Content Collections (`glob()` loader, Zod 4 dari `astro/zod`) | — |
+| Font | Astro Fonts API (diunduh saat build, di-self-host) | — |
+| Format | Prettier + `prettier-plugin-astro` + `prettier-plugin-tailwindcss` | 3.9 |
+| Host | Netlify (Fase 6) | — |
+| Node | ≥ 22.12 (dev: 24) | — |
+
+## 2. Struktur folder
+
+```
+.
+├── astro.config.mjs        # site URL, Fonts API, env schema (SHOW_SAMPLES), integrasi, Tailwind
+├── integrations/
+│   └── sample-report.ts    # log build: daftar entri sample + apakah ikut build ini
+├── scripts/
+│   └── contrast.ts         # `npm run contrast`: tabel kontras WCAG dari tokens.css (exit 1 jika gagal)
+├── public/                 # file statis apa adanya (favicon.svg)
+├── src/
+│   ├── content.config.ts   # schema Zod untuk collections: projects, writing, now
+│   ├── content/            # SEMUA konten Markdown (lihat §5)
+│   │   ├── projects/
+│   │   ├── writing/
+│   │   └── now/
+│   ├── lib/                # TypeScript murni, tanpa UI
+│   │   ├── content.ts      # SATU-SATUNYA cara halaman membaca konten (guard sample + sort)
+│   │   ├── contrast.ts     # parser token + rumus kontras (dipakai /styleguide & script)
+│   │   ├── format.ts       # format tanggal
+│   │   └── site.ts         # nama situs, deskripsi, navigasi
+│   ├── styles/
+│   │   ├── tokens.css      # design tokens (sumber tunggal)
+│   │   └── global.css      # import Tailwind + mapping token → utility + base + komponen global
+│   ├── layouts/
+│   │   └── BaseLayout.astro  # <head> (meta/OG/font/tema/ClientRouter), header, main, footer
+│   ├── components/
+│   │   ├── ThemeScript.astro # script inline anti-flash
+│   │   ├── ThemeToggle.astro
+│   │   ├── SiteHeader.astro  # nav pil + menu mobile
+│   │   ├── SiteFooter.astro
+│   │   ├── ui/               # elemen kecil: Button, StatusChip, SampleBadge, SketchIcon
+│   │   └── cards/            # ProjectCard (craft), WritingCard (notch), CalmCard (letters)
+│   └── pages/              # routing berbasis file
+│       ├── index.astro     # placeholder sampai Fase 2
+│       └── styleguide.astro
+└── docs/                   # progress, keywords, referensi, screenshots per fase
+```
+
+**Aturan penempatan:** komponen yang dipakai di lebih dari 1 halaman → `components/`. Logika tanpa markup → `lib/`. Teks yang dipakai berulang (nama, nav) → `lib/site.ts`, bukan di-hardcode.
+
+## 3. Data flow konten
+
+```
+src/content/**/*.md
+   │  (glob loader, divalidasi schema Zod di content.config.ts; frontmatter salah = build gagal)
+   ▼
+astro:content  getCollection()
+   │
+   ▼
+src/lib/content.ts   getVisibleEntries() / getProjects() / getWriting() / getLatestNow()
+   │  • sample: true  → hanya tampil di `astro dev` atau jika SHOW_SAMPLES=true
+   │  • draft: true   → disembunyikan di production (writing)
+   │  • urutan default: terbaru dulu (projects: featured dulu)
+   ▼
+pages/*.astro  →  components/cards/*  →  HTML statis
+```
+
+Paralel dengan itu, `integrations/sample-report.ts` membaca frontmatter langsung dari disk saat `astro:build:done` dan mencetak daftar file sample yang masih ada (PRD F3).
+
+**Jangan** memanggil `getCollection()` langsung dari halaman: guard sample bisa terlewat.
+
+## 4. Design tokens
+
+Sumber tunggal: `src/styles/tokens.css`. Ada 2 jenis token:
+
+| Jenis | Ditulis di | Contoh | Kenapa |
+|---|---|---|---|
+| Berubah per tema (warna) | `:root { --x: light-dark(#light, #dark) }` | `--paper`, `--ink`, `--accent` | Satu deklarasi untuk dua mode. Tanpa JS pun ikut tema OS lewat `color-scheme: light dark` |
+| Statis | `@theme static { … }` | `--font-display`, `--text-step-3`, `--radius-lg`, `--ease-out` | Tailwind langsung membuat utility (`font-display`, `text-step-3`, `rounded-lg`) dan variabelnya tetap tersedia untuk CSS komponen |
+
+Warna dipetakan ke utility Tailwind di `global.css` lewat `@theme inline` (`bg-paper`, `text-ink-soft`, …). Durasi animasi (`--dur-1…4`) ada di `:root` dan otomatis **0ms** saat `prefers-reduced-motion: reduce`.
+
+### Palet
+
+| Peran | Token | Light | Dark |
+|---|---|---|---|
+| Halaman | `--paper` | `#f3f2ee` warm-neutral (bukan krem AI `#F4F1EA`) | `#161915` malam kehijauan |
+| Card calm | `--surface` | `#e9e7e1` | `#1f231e` |
+| Panel, nav | `--surface-raised` | `#fbfaf7` | `#292e28` |
+| Teks | `--ink` / `--ink-soft` | `#2a2a2a` / `#5c5a55` | `#eceae4` / `#a8a79e` |
+| Aksen teks (link, focus) | `--accent` | `#4a5d44` sage tua | `#aec2a5` sage muda |
+| Aksen permukaan | `--sage` `--sky` `--tan` | `#8b9d83` `#a8c5d6` `#c9a88c` | sama / sedikit lebih terang |
+| Teks di atas isian aksen | `--on-fill` | `#2a2a2a` | `#161915` |
+| Tint card proyek | `--tint-sage/sky/tan` | pastel terang | versi gelap berwarna |
+| Card tulisan gelap | `--deep-sage`, `--deep-ink` + `--on-deep(-soft)` | `#3e4b39`, `#2a2a2a` | `#33402f`, `#332c25` (selalu lebih terang dari halaman) |
+
+Sage = aksen utama, sky = pendukung, tan = isian hover yang hangat. **Tidak ada navy/biru tua.** `--sage`, `--sky`, dan `--tan` terlalu terang untuk teks, jadi hanya dipakai sebagai permukaan (sesuai CLAUDE.md).
+
+### Kontras (dihasilkan `npm run contrast`, juga tampil di `/styleguide`)
+
+| Mode | Text | Background | Ratio | AA | Usage |
+|---|---|---|---|---|---|
+| light | `--ink` | `--paper` | 12.81:1 | ✅ | Body text, headings |
+| light | `--ink-soft` | `--paper` | 6.15:1 | ✅ | Secondary text, meta |
+| light | `--accent` | `--paper` | 6.38:1 | ✅ | Links, focus ring |
+| light | `--ink` | `--surface` | 11.61:1 | ✅ | Text on calm cards |
+| light | `--ink-soft` | `--surface` | 5.57:1 | ✅ | Secondary text on calm cards |
+| light | `--ink` | `--surface-raised` | 13.75:1 | ✅ | Nav, raised panels |
+| light | `--ink` | `--tint-sage` | 11.39:1 | ✅ | Project card (sage) |
+| light | `--ink-soft` | `--tint-sage` | 5.47:1 | ✅ | Project card meta (sage) |
+| light | `--ink` | `--tint-sky` | 11.73:1 | ✅ | Project card (sky) |
+| light | `--ink-soft` | `--tint-sky` | 5.63:1 | ✅ | Project card meta (sky) |
+| light | `--ink` | `--tint-tan` | 11.45:1 | ✅ | Project card (tan) |
+| light | `--ink-soft` | `--tint-tan` | 5.50:1 | ✅ | Project card meta (tan) |
+| light | `--on-deep` | `--deep-sage` | 8.26:1 | ✅ | Writing card (deep sage) |
+| light | `--on-deep` | `--deep-ink` | 12.81:1 | ✅ | Writing card (charcoal) |
+| light | `--on-deep-soft` | `--deep-sage` | 5.40:1 | ✅ | Writing card meta (deep sage) |
+| light | `--on-deep-soft` | `--deep-ink` | 8.37:1 | ✅ | Writing card meta (charcoal) |
+| light | `--paper` | `--ink` | 12.81:1 | ✅ | Primary button label |
+| light | `--on-fill` | `--sage` | 4.95:1 | ✅ | Text on sage fill (hover states) |
+| light | `--on-fill` | `--sky` | 7.94:1 | ✅ | Arrow button on sky |
+| light | `--on-fill` | `--tan` | 6.47:1 | ✅ | Hover fill on tan |
+| dark | `--ink` | `--paper` | 14.74:1 | ✅ | Body text, headings |
+| dark | `--ink-soft` | `--paper` | 7.34:1 | ✅ | Secondary text, meta |
+| dark | `--accent` | `--paper` | 9.34:1 | ✅ | Links, focus ring |
+| dark | `--ink` | `--surface` | 13.25:1 | ✅ | Text on calm cards |
+| dark | `--ink-soft` | `--surface` | 6.59:1 | ✅ | Secondary text on calm cards |
+| dark | `--ink` | `--surface-raised` | 11.52:1 | ✅ | Nav, raised panels |
+| dark | `--ink` | `--tint-sage` | 12.29:1 | ✅ | Project card (sage) |
+| dark | `--ink-soft` | `--tint-sage` | 6.12:1 | ✅ | Project card meta (sage) |
+| dark | `--ink` | `--tint-sky` | 12.79:1 | ✅ | Project card (sky) |
+| dark | `--ink-soft` | `--tint-sky` | 6.37:1 | ✅ | Project card meta (sky) |
+| dark | `--ink` | `--tint-tan` | 12.71:1 | ✅ | Project card (tan) |
+| dark | `--ink-soft` | `--tint-tan` | 6.32:1 | ✅ | Project card meta (tan) |
+| dark | `--on-deep` | `--deep-sage` | 9.11:1 | ✅ | Writing card (deep sage) |
+| dark | `--on-deep` | `--deep-ink` | 11.43:1 | ✅ | Writing card (charcoal) |
+| dark | `--on-deep-soft` | `--deep-sage` | 5.37:1 | ✅ | Writing card meta (deep sage) |
+| dark | `--on-deep-soft` | `--deep-ink` | 6.73:1 | ✅ | Writing card meta (charcoal) |
+| dark | `--paper` | `--ink` | 14.74:1 | ✅ | Primary button label |
+| dark | `--on-fill` | `--sage` | 6.12:1 | ✅ | Text on sage fill (hover states) |
+| dark | `--on-fill` | `--sky` | 10.90:1 | ✅ | Arrow button on sky |
+| dark | `--on-fill` | `--tan` | 9.79:1 | ✅ | Hover fill on tan |
+
+Pasangan baru **wajib** ditambahkan ke `TEXT_PAIRS` di `src/lib/contrast.ts` sebelum dipakai. Jangan memakai `color-mix()` untuk warna **teks**, karena hasilnya tidak bisa diverifikasi skrip. `color-mix()` hanya boleh untuk latar dan dekorasi.
+
+### Tipografi
+
+| Token | Ukuran | Font | Dipakai untuk |
+|---|---|---|---|
+| `text-step-5` | 56 → 128px (fluid) | Instrument Serif | Hero, wordmark footer |
+| `text-step-4` | 44 → 76px | Instrument Serif | Judul halaman |
+| `text-step-3` | 32 → 44px | Instrument Serif | Judul section |
+| `text-step-2` | 26px | Instrument Serif | Judul card |
+| `text-step-1` | 20px | General Sans | Lead |
+| `text-step-0` | 17px / 1.6 | General Sans | Body |
+| `text-step--1` | 14px | General Sans | Meta, tombol, chip |
+
+Instrument Serif hanya punya satu bobot, jadi **tidak dipakai di bawah 26px**. JetBrains Mono **hanya untuk kode**, tidak untuk label (anti-slop).
+
+### Radius, elevasi, motion
+
+- Radius mengikuti hierarki: `sm` 8px (chip) · `md` 14px (mini-UI, tile) · `lg` 22px (card) · `xl` 32px (card calm/proyek) · pill (tombol, nav).
+- Elevasi: light mode memakai `--shadow-lift` (bayangan hangat, hanya untuk yang "terangkat"). Dark mode memakai kecerahan permukaan, dan `--shadow-tint` bernilai transparan.
+- Motion: `--ease-out` `cubic-bezier(.22,1,.36,1)` (diukur dari wabi.ai), `--ease-soft` (integratedbio). Durasi 150/220/320/400ms.
+- Efek kaca (`.glass`) **hanya** untuk nav pil dan CTA utama.
+
+## 5. Cara menambah konten
+
+**Artikel baru:** buat `src/content/writing/<slug>.md`. URL-nya akan menjadi `/writing/<slug>`.
+
+```md
+---
+title: Judul (maks 90 karakter)
+description: 1 kalimat (maks 180)
+publishedAt: 2026-10-01
+tags: [learning]
+draft: false # true = tidak tampil di production
+---
+
+Isi artikel…
+```
+
+**Proyek baru:** buat `src/content/projects/<slug>.md` dengan field `title`, `summary`, `status` (`idea | building | shipped`), `stack`, `startedAt`, `tint` (`sage | sky | tan`), dan opsional `updatedAt`, `repo`, `demo`, `featured`. Body memakai heading **Problem → Approach → Result → Learnings**.
+
+**Update /now:** buat file baru per bulan `src/content/now/YYYY-MM.md` (field `month`, `learning`, `building`, `reading`). Entri terbaru otomatis menjadi /now.
+
+**Mengganti konten sample:** hapus file dengan `sample: true` (daftarnya dicetak setiap `npm run build`), lalu tulis file asli **tanpa** field `sample`.
+
+## 6. Tema (light/dark)
+
+1. `ThemeScript.astro` (inline, di `<head>`) mengisi `<html data-theme>` dari `localStorage.theme`, atau dari preferensi OS jika belum ada pilihan, **sebelum** halaman digambar. Karena itu tidak ada flash.
+2. Saat navigasi ClientRouter, event `astro:before-swap` mengisi tema ke dokumen baru sebelum ditukar.
+3. `ThemeToggle.astro` menyimpan pilihan dan memakai `document.startViewTransition` untuk crossfade (dilewati saat reduced motion).
+4. Tanpa JS, `color-scheme: light dark` membuat `light-dark()` mengikuti OS.
+
+## 7. Konvensi
+
+- **Penamaan:** komponen `PascalCase.astro`; modul `lib/` `camelCase.ts`; token CSS `kebab-case`; slug konten `kebab-case` (menjadi URL).
+- **Styling:** Tailwind untuk layout/spacing sederhana di halaman. Efek kompleks (notch, glass, card) memakai `<style>` scoped di komponen dengan `var(--token)`. Hindari nama kelas yang bentrok dengan utility Tailwind (kasus nyata: `.underline`).
+- **Scan Tailwind:** Tailwind hanya memindai kode. `docs/`, `.claude/`, dan `*.md` di root dikecualikan dengan `@source not` di `global.css`, karena teks dokumentasi sempat menghasilkan ±2 KB kelas CSS yang tidak terpakai.
+- **Scoped CSS + komponen anak:** selector yang menargetkan root komponen anak butuh `:global()`. Untuk mengubah warna di dalam komponen anak, gunakan custom property (contoh: `--badge-fg` di `SampleBadge`), bukan selector dari luar.
+- **A11y:** satu gaya focus global (`:focus-visible`, outline `--focus`). Target sentuh ≥ 44px. Card yang bisa diklik memakai pola *stretched link* (satu `<a>` di judul, `::after` menutupi card). Skip link memakai pola *visually hidden* (clip).
+- **Copy UI:** sentence case, tanpa ALL CAPS, tanpa `→` di teks tombol.
+- **Commit:** Conventional Commits (`feat(ui): …`, `fix(tokens): …`, `docs: …`).
+
+## 8. Perintah
+
+| Perintah | Fungsi |
+|---|---|
+| `npm run dev` | Dev server (sample tampil). Alternatif background: `npx astro dev --background`, hentikan dengan `npx astro dev stop` |
+| `npm run build` | `astro check` (TypeScript strict), lalu build static ke `dist/` + laporan sample |
+| `SHOW_SAMPLES=true npm run build` | Build preview yang menyertakan sample |
+| `npm run contrast` | Tabel kontras WCAG, gagal jika ada pasangan < 4.5:1 |
+| `npm run format` / `format:check` | Prettier |
+
+## 9. Keputusan (ADR singkat)
+
+| # | Keputusan | Alasan | Alternatif yang ditolak |
+|---|---|---|---|
+| 001 | Astro static + Netlify | Situs konten, JS minimal, Netlify Forms untuk kontak tanpa backend | Vercel (form butuh serverless + layanan pihak ketiga) |
+| 002 | Tailwind 4 via Vite plugin, token di CSS | Cara resmi Astro ≥ 5.2; token tetap CSS biasa sehingga bisa dipakai di CSS scoped | Integrasi Tailwind 3 (legacy) |
+| 003 | `light-dark()` untuk token warna | Satu deklarasi per token, mode tanpa JS gratis, parser kontras sederhana | Blok `[data-theme=dark]` terpisah (duplikasi, mudah tidak sinkron) |
+| 004 | Astro Fonts API (Fontsource + Fontshare) | Self-host otomatis, preload, fallback metrik teroptimasi, tanpa request ke pihak ketiga | Unduh zip Fontshare manual / CDN Google Fonts |
+| 005 | Sample dikecualikan dari production (bukan build gagal) | v1 berisi dummy tetap bisa di-deploy; preview bisa menyertakan sample lewat `SHOW_SAMPLES` | Build gagal (versi PRD awal, memblokir rilis) |
+| 006 | Kontras dihitung dari `tokens.css` saat build | Angka di styleguide/dokumen tidak mungkin berbeda dari CSS asli | Tabel manual di dokumen |
+| 007 | Notch card memakai `clip-path: shape()` + `@supports` | Bentuk responsif tanpa SVG/ukuran tetap; browser lama mendapat card biasa | `clip-path: path()` (ukuran piksel tetap), mask berlapis (rumit) |
+| 008 | Dark `--deep-ink` coklat hangat, bukan hitam | Di dark mode, yang terangkat harus lebih terang dari halaman (prinsip origin) | Hitam pekat (terlihat seperti lubang) |
+| 009 | TS 6: `"types": ["node"]` di tsconfig | TS 6 tidak lagi memuat `@types/*` otomatis; dibutuhkan untuk `integrations/` dan `scripts/` | — |
