@@ -89,7 +89,7 @@ Paralel dengan itu, `integrations/sample-report.ts` membaca frontmatter langsung
 
 **Hero stack:** `getHeroCards()` mengambil proyek teratas, entri /now terbaru, dan tulisan terbaru, lalu selalu menambahkan card asli "This site". Kata kerja kalimat hero mengikuti status proyek (idea → planning, building → building, shipped → improving). Field opsional `phrase` di proyek/tulisan dipakai untuk kalimat, dengan fallback judul berkutip. Kalau card depan adalah sample, kalimatnya ikut berlabel Sample.
 
-**Isi card (notebook):** `HeroCardFace` menggambar isi spesifik per jenis card. Field opsional di konten: `heroNote` (catatan tangan, proyek/tulisan/now), `highlight` (frasa yang distabilo di paragraf pembuka artikel, diambil otomatis dari body), `snippet` (kode di entri /now). Tanpa field itu, card tetap tampil tanpa elemen tersebut.
+**Isi card (notebook):** card adalah halaman kertas dot-grid dengan garis margin berwarna aksen (`HeroStack`). `HeroCardFace` menggambar isi spesifik per jenis card sebagai "printout" lurus, ditambah checklist (progres situs dari `siteProgress` di `site.ts`, topik belajar lain dari /now) yang disembunyikan di layar < 768px. Field opsional di konten: `heroNote` (catatan tangan, proyek/tulisan/now), `highlight` (frasa yang distabilo di paragraf pembuka artikel, diambil otomatis dari body), `snippet` (kode di entri /now). Tanpa field itu, card tetap tampil tanpa elemen tersebut.
 
 ## 4. Design tokens
 
@@ -252,6 +252,7 @@ Card stack **tidak pernah autoplay**. Durasi 150–400ms. `prefers-reduced-motio
 ## 7. Konvensi
 
 - **Penamaan:** komponen `PascalCase.astro`; modul `lib/` `camelCase.ts`; token CSS `kebab-case`; slug konten `kebab-case` (menjadi URL).
+- **Urutan @media:** aturan `@media` yang menimpa harus ditulis **setelah** aturan dasarnya (specificity sama → yang terakhir menang). Bug ini sudah terjadi dua kali (foto About, checklist hero).
 - **Styling:** Tailwind untuk layout/spacing sederhana di halaman. Efek kompleks (notch, glass, card) memakai `<style>` scoped di komponen dengan `var(--token)`. Hindari nama kelas yang bentrok dengan utility Tailwind (kasus nyata: `.underline`).
 - **Scan Tailwind:** Tailwind hanya memindai kode. `docs/`, `.claude/`, dan `*.md` di root dikecualikan dengan `@source not` di `global.css`, karena teks dokumentasi sempat menghasilkan ±2 KB kelas CSS yang tidak terpakai.
 - **Scoped CSS + komponen anak:** selector yang menargetkan root komponen anak butuh `:global()`. Untuk mengubah warna di dalam komponen anak, gunakan custom property (contoh: `--badge-fg` di `SampleBadge`), bukan selector dari luar.

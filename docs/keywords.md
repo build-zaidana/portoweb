@@ -64,6 +64,9 @@
 | `css clip-path polygon` | CSS | HeroCardFace (selotip sobek) | 2 |
 | `repeating-linear-gradient` | CSS | HeroCardFace (selotip, kertas bergaris) | 2 |
 | `overflow: clip` | CSS | Hero (frame di mobile) | 2 |
+| `css radial-gradient pattern` | CSS | HeroStack (kertas dot-grid) | 2 |
+| `multiple backgrounds` | CSS | HeroStack (garis margin + titik + kertas) | 2 |
+| `css cascade source order` | CSS | HeroCardFace, about (bug urutan @media) | 2 |
 
 ## Design / Typography
 

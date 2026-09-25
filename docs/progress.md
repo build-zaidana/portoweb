@@ -27,7 +27,7 @@
 - 2026-09-25 — Hero: konsep **A (card stack) + baris logistik** dari C.
 - 2026-09-25 — Zona waktu **WIB (UTC+7)**. Jam/minggu & tanggal mulai **tidak ditampilkan** (belum pasti).
 - 2026-09-25 — Bukti non-sample di layar pertama: **github.com/build-zaidana**.
-- 2026-09-25 — Card hero bergaya **Notebook** (option 1 dari 2 mockup): isi spesifik per entri, catatan tangan, stabilo, selotip washi, tekstur kertas.
+- 2026-09-25 — Card hero bergaya **Notebook** (option 1 dari 2 mockup): kertas dot-grid + garis margin berwarna aksen, isi spesifik per entri, catatan tangan, stabilo. Selotip washi dihapus (user: kurang bagus).
 - 2026-09-25 — Font tulisan tangan **Caveat** (self-host, 1 bobot), hanya untuk catatan margin.
 - 2026-09-25 — Ikon "build" diganti **palu** (wrench terbaca seperti bulan sabit).
 - 2026-09-25 — Nav memakai "Projects" (bukan "Work") supaya konsisten dengan URL & tombol.
@@ -166,4 +166,15 @@ User: ikon wrench terlihat seperti bulan sabit bertangkai; card stack terlalu po
 - 🔑 Tekstur kertas tanpa gambar — svg feTurbulence data uri · mix-blend-mode multiply
 - 🔑 Selotip dengan ujung sobek — css clip-path polygon · repeating-linear-gradient
 - Catatan kerja: dev server kadang menahan CSS lama setelah file diedit lewat skrip; `touch <file>` memaksa watcher memuat ulang.
+
+#### Revisi kedua card hero (2026-09-25)
+User: "ada yang kurang pas", selotip jelek, minta tekstur. Diagnosis 4 masalah → semua dikerjakan:
+1. Setengah card kosong → card lebih pendek (3:3.85), kutipan artikel lebih panjang, checklist asli (progres situs dari `siteProgress`, topik belajar lain).
+2. Card pastel melebur dengan langit pastel → badan card = kertas (`--surface-raised`) + dot-grid + garis margin berwarna aksen; pastel pindah ke chip.
+3. Gaya/sudut bercampur → preview jadi "printout" lurus berbayangan tipis; hanya catatan tangan yang miring.
+4. Stiker berebut sudut dengan selotip → selotip dihapus; stiker di kanan bawah (desktop) / kanan atas (mobile, supaya tidak menutupi tombol Next).
+- Perbandingan: `docs/screenshots/fase-2/hero-cards-before-after.png`. Semua card utuh di 360/390/1440px, tanpa scroll horizontal.
+- 🔑 Kertas dot-grid tanpa gambar — css radial-gradient pattern · background-size · multiple backgrounds
+- 🔑 Aturan @media harus setelah aturan dasar yang ditimpa — css cascade source order · specificity
+- 🔑 Kutipan artikel dari beberapa paragraf — markdown excerpt · text truncation
 
