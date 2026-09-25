@@ -104,7 +104,11 @@
 
   /* ── Layout (not Tailwind namespaces, used in component CSS) ── */
   --measure: 66ch;
-  --gutter: clamp(1.25rem, 0.8rem + 2.2vw, 2.5rem);
+  /* Page edge: 20px on phones, growing with the screen (≈64px at 1440, capped at 96px). */
+  --gutter: clamp(1.25rem, 5vw - 0.5rem, 6rem);
+  /* Widest the page content gets. Wide monitors still get generous margins, but the
+     layout no longer floats in a narrow column (76rem left ~36% of a 1920px screen empty). */
+  --page-max: 88rem;
 
   /* ── Motion durations (zeroed for reduced motion below) ───── */
   --dur-1: 150ms; /* press down, color */

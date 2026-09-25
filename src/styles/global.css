@@ -119,7 +119,7 @@
 
   /* Page gutter + max width. Sections choose their own inner widths. */
   .wrap {
-    width: min(100% - 2 * var(--gutter), 76rem);
+    width: min(100% - 2 * var(--gutter), var(--page-max));
     margin-inline: auto;
   }
 

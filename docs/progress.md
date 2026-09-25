@@ -257,3 +257,9 @@ User: garis margin di card hero dihapus; warna card proyek "kurang pas"; minta m
 - 🔑 Tipe varian dari schema — astro CollectionEntry data type · zod enum
 
 **Sisa sample (dicetak setiap build):** entri /now 2026-09, 2 tulisan, 2 entri timeline. Diganti saat konten asli ditulis (Fase 6 melaporkan daftarnya).
+
+#### Revisi: lebar halaman (2026-09-25)
+User: kiri-kanan terlalu kosong. Terukur: di 1920px konten hanya 1216px (345px kosong tiap sisi).
+- `.wrap` sekarang `min(100% - 2 × --gutter, --page-max)` dengan `--page-max: 88rem` dan gutter cair (`clamp(1.25rem, 5vw - 0.5rem, 6rem)`): 1920px → konten 1408px (tepi 249px), 1440px → tepi 64px, HP tetap 20px.
+- Tanpa scroll horizontal di 360/390/768/1024/1280/1440/1920. Build 0 error.
+- 🔑 Lebar konten responsif — css min() · css clamp() · fluid gutter
