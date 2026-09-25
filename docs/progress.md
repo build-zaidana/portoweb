@@ -10,8 +10,8 @@
 | 1 | Fondasi | ✅ Selesai (Gate 1, 2026-09-25) |
 | 2 | Home + About | ✅ Selesai (Gate 2, 2026-09-25) |
 | 3 | Halaman lain | ✅ Selesai (Gate 3, 2026-09-25) |
-| 4 | Copywriting | 🟡 Selesai, menunggu "lanjut" (Gate 4) |
-| 5 | 3 proyek pertama | ⏳ |
+| 4 | Copywriting | ✅ Selesai (Gate 4, 2026-09-25) |
+| 5 | 3 proyek pertama | 🟡 Selesai, menunggu "lanjut" (Gate 5) |
 | 6 | Launch | ⏳ |
 
 ## Keputusan final
@@ -34,6 +34,8 @@
 - 2026-09-25 — Card proyek: **batu hangat** (`--surface`) untuk semua card. Hero: **strip label ketikan** menggantikan stiker. /now **tidak** bergaya jurnal.
 - 2026-09-25 — Contact: **tanpa email & sosial** (belum ada; muncul otomatis saat diisi di `site.ts`). Newsletter: **belum ada akun Buttondown**, tampil status jujur + RSS.
 - 2026-09-25 — Copy (Gate 4): semua rekomendasi ⭐ di `docs/copy-deck.md`; AI coding assistant **tidak disebut**; logistik = "Start date and weekly hours: happy to discuss".
+- 2026-09-25 — Waktu proyek **8–12 jam/minggu**; bahasa yang sedang dipelajari **Go, TypeScript, Python**; tema pertama **How Things Work**.
+- 2026-09-25 — 3 proyek asli (status `idea`) menggantikan sample: What your browser sends (Go) → Plain-words glossary (Python + Ollama) → Quiz from lecture notes (TypeScript + WebLLM). AI Rp 0: lokal/di browser.
 - 2026-09-25 — 5 usulan review PRD disetujui: sample dikecualikan dari production (flag `SHOW_SAMPLES`), bukti non-sample di layar pertama, logistik remote, analytics gratis tanpa cookie (F8), target 2 tulisan/bulan.
 
 ## Log
@@ -237,3 +239,21 @@ User: garis margin di card hero dihapus; warna card proyek "kurang pas"; minta m
 **Tertunda (butuh data dari user, tampil otomatis saat diisi di `src/lib/site.ts`):**
 - Jam overlap, tanggal mulai, jam per minggu (ganti `profile.availability`).
 - Foto About, CV asli, email kerja, X/Instagram, Buttondown.
+
+### Fase 5 — 3 proyek pertama (2026-09-25)
+
+**Selesai:**
+- Pertanyaan awal dijawab: 8–12 jam/minggu, Go + TypeScript + Python, tema How Things Work + bebas.
+- `docs/project-proposals.md`: 3 proyek dari yang paling mudah, masing-masing dengan masalah & pengguna, scope MVP 2–4 minggu, stack, skill, cara Rp 0, risiko, dan ide konten mingguan.
+  1. **What your browser sends** (Go + TS, tanpa AI, 2 minggu): request asli pengunjung dijelaskan baris per baris; batu loncatan ke "How Things Work".
+  2. **Plain-words glossary** (Python + Ollama lokal, 3 minggu): draf AI + pemeriksa terukur + review manusia, 20 istilah.
+  3. **Quiz from lecture notes** (TypeScript + WebLLM di browser, 4 minggu): 5 soal dengan kalimat sumber, catatan tidak pernah dikirim ke server.
+- 3 sample proyek diganti file asli berstatus `idea` (tanpa `sample`) → proyek kini tampil di production. Result/Learnings jujur: belum dibangun.
+- Status `idea` memakai label **"Added"** (bukan "Started"); chip card hero menampilkan status asli ("Idea"), bukan selalu "Building".
+- Ilustrasi mini-UI baru `request` (baris request HTTP + `200 OK`); tipe varian ilustrasi kini diambil dari schema (satu sumber).
+- Build production 12 halaman, 0 error; kontras 0 gagal; tanpa scroll horizontal di 390/1440. Screenshot: `docs/screenshots/fase-5/`.
+- 🔑 AI tanpa biaya — ollama local models · webllm webgpu · local-first
+- 🔑 Output AI yang bisa dicek — structured output json schema · zod validation · grounding
+- 🔑 Tipe varian dari schema — astro CollectionEntry data type · zod enum
+
+**Sisa sample (dicetak setiap build):** entri /now 2026-09, 2 tulisan, 2 entri timeline. Diganti saat konten asli ditulis (Fase 6 melaporkan daftarnya).

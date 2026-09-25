@@ -38,6 +38,7 @@
 | `astro <Code /> component` | Astro | /now (potongan kode) | 3 |
 | `shiki css-variables theme` | Astro | Blok kode Markdown (tokens.css) | 3 |
 | `getStaticPaths props` | Astro | Detail proyek & artikel (next/older/newer) | 3 |
+| `CollectionEntry data type` | Astro | ProjectArt, hero.ts (tipe varian dari schema) | 5 |
 
 ## Tailwind / CSS
 
@@ -176,4 +177,8 @@
 | `typescript types compiler option` | Tooling | tsconfig.json (TS 6) | 1 |
 | `netlify-honeypot` | Deploy | /contact (anti spam) | 3 |
 | `progressive enhancement form fetch` | Deploy | /contact | 3 |
+| `ollama local models` | AI | Proyek Plain-words glossary | 5 |
+| `webllm webgpu` | AI | Proyek Quiz from lecture notes | 5 |
+| `structured output json schema` | AI | Proyek Quiz (validasi Zod) | 5 |
+| `netlify functions go` | Deploy | Proyek What your browser sends | 5 |
 
