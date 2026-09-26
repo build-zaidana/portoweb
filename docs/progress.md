@@ -12,7 +12,7 @@
 | 3 | Halaman lain | ✅ Selesai (Gate 3, 2026-09-25) |
 | 4 | Copywriting | ✅ Selesai (Gate 4, 2026-09-25) |
 | 5 | 3 proyek pertama | ✅ Selesai (Gate 5, 2026-09-26) |
-| 6 | Launch | 🔄 Siap deploy, menunggu akun Netlify user |
+| 6 | Launch | ✅ Live di https://zaidana.netlify.app (2026-09-26) |
 
 ## Keputusan final
 
@@ -289,4 +289,4 @@ User: kiri-kanan terlalu kosong. Terukur: di 1920px konten hanya 1216px (345px k
 
 **Sisa sample (tidak tampil di production):** `now/2026-09.md`, `writing/reading-an-error-message.md`, `writing/what-an-api-is.md`, `timeline.yaml` (2 entri).
 
-**Menunggu user:** akun Netlify (deploy), pilihan analytics F8 (GoatCounter / Cloudflare Web Analytics).
+**Launch (2026-09-26):** repo public github.com/build-zaidana/portoweb → Netlify (deploy otomatis dari `main`, form detection aktif). GoatCounter `buildzaidana` aktif (kunjungan + klik CV/kontak/GitHub). Cek live: semua halaman 200, 404 benar, RSS/sitemap/robots/OG 200, header keamanan aktif, form Contact terdeteksi.
