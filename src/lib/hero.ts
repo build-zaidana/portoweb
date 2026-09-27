@@ -5,7 +5,7 @@
  */
 import type { CollectionEntry } from "astro:content";
 import { getLatestNow, getProjects, getWriting } from "./content";
-import { formatDate, formatMonth } from "./format";
+import { excerpt, formatDate, formatMonth, type Highlighted } from "./format";
 import { profile, siteProgress } from "./site";
 
 /** Verb in the hero sentence. Projects pick theirs from their status, so an idea is never "being built". */
@@ -15,48 +15,6 @@ const projectVerb = { idea: "planning", building: "building", shipped: "improvin
 
 /** Titles are quoted when used mid-sentence, so capitals and commas don't break the grammar. */
 const quoted = (title: string) => `“${title}”`;
-
-/** Text split around a highlighted phrase, for the marker effect on writing cards. */
-export interface Highlighted {
-  before: string;
-  mark: string;
-  after: string;
-}
-
-/**
- * Opening text of a Markdown body as plain text: the first real paragraphs (skips quotes,
- * headings, code, lists) joined up to `max` characters, optionally split around `highlight`.
- */
-export function excerpt(
-  markdown: string | undefined,
-  highlight?: string,
-  max = 300,
-): Highlighted | undefined {
-  const blocks = (markdown ?? "")
-    .split(/\r?\n\s*\r?\n/)
-    .map((block) => block.trim())
-    .filter((block) => block && !/^(>|#|```|[-*] |\d+\. )/.test(block));
-  if (blocks.length === 0) return undefined;
-  let text = "";
-  for (const block of blocks) {
-    if (text.length >= max) break;
-    text = text ? `${text} ${block}` : block;
-  }
-  text = text
-    .replace(/`([^`]+)`/g, "$1")
-    .replace(/\*\*?([^*]+)\*\*?/g, "$1")
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
-    .replace(/\s+/g, " ");
-  // Cut at a word boundary and drop trailing punctuation so we never print "word.…".
-  if (text.length > max)
-    text = `${text
-      .slice(0, max)
-      .replace(/\s+\S*$/, "")
-      .replace(/[\s.,;:!?]+$/, "")}…`;
-  const at = highlight ? text.indexOf(highlight) : -1;
-  if (!highlight || at < 0) return { before: text, mark: "", after: "" };
-  return { before: text.slice(0, at), mark: highlight, after: text.slice(at + highlight.length) };
-}
 
 export interface HeroCard {
   id: string;
