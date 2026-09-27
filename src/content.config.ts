@@ -12,6 +12,13 @@ import { z } from "astro/zod";
 /** Shared by every collection. */
 const sample = z.boolean().default(false);
 
+/**
+ * Optional field that also accepts an empty value. Browser editors (Pages CMS) save a
+ * cleared field as "" or null; without this, an empty date or URL would fail the build.
+ */
+const blank = <T extends z.ZodType>(schema: T) =>
+  z.preprocess((value) => (value === "" || value === null ? undefined : value), schema.optional());
+
 /** Pastel chip color on the hero card. Names match --tint-* tokens. */
 const cardTint = z.enum(["sage", "sky", "tan"]);
 
@@ -22,16 +29,16 @@ const projects = defineCollection({
     /** One sentence shown on cards: what it does and for whom. */
     summary: z.string().max(160),
     /** Short lowercase phrase for the hero sentence ("Right now I'm building …"). Falls back to the quoted title. */
-    phrase: z.string().max(60).optional(),
+    phrase: blank(z.string().max(60)),
     status: z.enum(["idea", "building", "shipped"]),
     stack: z.array(z.string()).min(1),
     startedAt: z.coerce.date(),
-    updatedAt: z.coerce.date().optional(),
-    repo: z.url().optional(),
-    demo: z.url().optional(),
+    updatedAt: blank(z.coerce.date()),
+    repo: blank(z.url()),
+    demo: blank(z.url()),
     tint: cardTint.default("sage"),
     /** Short handwritten margin note shown on the hero card (notebook style). */
-    heroNote: z.string().max(48).optional(),
+    heroNote: blank(z.string().max(48)),
     /** Placeholder mini-UI shown on the card until the project has a real screenshot. */
     art: z.enum(["form", "cards", "chart", "request"]).default("form"),
     /**
@@ -61,14 +68,14 @@ const writing = defineCollection({
     title: z.string().max(90),
     description: z.string().max(180),
     /** Short lowercase phrase for the hero sentence ("Right now I'm building …"). Falls back to the quoted title. */
-    phrase: z.string().max(60).optional(),
+    phrase: blank(z.string().max(60)),
     publishedAt: z.coerce.date(),
-    updatedAt: z.coerce.date().optional(),
+    updatedAt: blank(z.coerce.date()),
     tags: z.array(z.string()).default([]),
     /** Words from the first paragraph to mark with a highlighter on the hero card. */
-    highlight: z.string().max(80).optional(),
+    highlight: blank(z.string().max(80)),
     /** Short handwritten margin note shown on the hero card (notebook style). */
-    heroNote: z.string().max(48).optional(),
+    heroNote: blank(z.string().max(48)),
     draft: z.boolean().default(false),
     sample,
   }),
@@ -79,14 +86,14 @@ const now = defineCollection({
   loader: glob({ base: "./src/content/now", pattern: "**/*.md" }),
   schema: z.object({
     month: z.coerce.date(),
-    location: z.string().optional(),
+    location: blank(z.string()),
     learning: z.array(z.string()).min(1),
     building: z.array(z.string()).default([]),
     reading: z.array(z.string()).default([]),
     /** A few lines of real code from this month's learning, shown on the hero card. */
-    snippet: z.string().max(160).optional(),
+    snippet: blank(z.string().max(160)),
     /** Short handwritten margin note shown on the hero card (notebook style). */
-    heroNote: z.string().max(48).optional(),
+    heroNote: blank(z.string().max(48)),
     sample,
   }),
 });
@@ -97,7 +104,7 @@ const timeline = defineCollection({
   schema: z.object({
     date: z.coerce.date(),
     title: z.string().max(80),
-    note: z.string().max(160).optional(),
+    note: blank(z.string().max(160)),
     sample,
   }),
 });

@@ -1,0 +1,304 @@
+# Pages CMS (https://pagescms.org): a browser editor for the content in src/content.
+# It commits Markdown/YAML to this repo; Netlify rebuilds, and the Zod schemas in
+# src/content.config.ts still validate everything (a bad field fails the build, not the live site).
+# Field names, limits, and options here mirror that schema. Change both together.
+
+media:
+  input: public/media
+  output: /media
+  rename: safe
+  categories: [image]
+
+content:
+  # ── Writing ────────────────────────────────────────────────────────
+  - name: writing
+    label: Writing
+    type: collection
+    path: src/content/writing
+    format: yaml-frontmatter
+    filename:
+      template: "{primary}.md"
+      field: create
+    view:
+      fields: [title, publishedAt, draft]
+      primary: title
+      sort: [publishedAt, title]
+      default:
+        sort: publishedAt
+        order: desc
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+        options: { maxlength: 90 }
+      - name: description
+        label: One-sentence summary
+        description: Shown on cards, in RSS, and as the page description.
+        type: text
+        required: true
+        options: { maxlength: 180 }
+      - name: publishedAt
+        label: Published
+        type: date
+        required: true
+        options: { format: yyyy-MM-dd }
+      - name: updatedAt
+        label: Updated (optional)
+        type: date
+        default: ""
+        options: { format: yyyy-MM-dd }
+      - name: tags
+        label: Tags
+        description: Lowercase, use hyphens (e.g. how-things-work).
+        type: string
+        list: true
+      - name: phrase
+        label: Hero phrase (optional)
+        description: 'Short, lowercase, for "Right now I''m writing about …". Falls back to the quoted title.'
+        type: string
+        options: { maxlength: 60 }
+      - name: highlight
+        label: Highlighted words (optional)
+        description: Exact words from the first paragraph to mark on the hero card.
+        type: string
+        options: { maxlength: 80 }
+      - name: heroNote
+        label: Handwritten note (optional)
+        type: string
+        options: { maxlength: 48 }
+      - name: draft
+        label: Draft
+        description: Drafts never appear on the live site.
+        type: boolean
+        default: false
+      - name: sample
+        label: Sample (placeholder)
+        description: Only for dummy content. Samples never appear on the live site.
+        type: boolean
+        default: false
+      - name: body
+        label: Article
+        type: rich-text
+        options:
+          format: markdown
+          path: public/media/writing
+
+  # ── Projects ───────────────────────────────────────────────────────
+  - name: projects
+    label: Projects
+    type: collection
+    path: src/content/projects
+    format: yaml-frontmatter
+    filename:
+      template: "{primary}.md"
+      field: create
+    view:
+      fields: [title, status, startedAt]
+      primary: title
+      sort: [startedAt, title]
+      default:
+        sort: startedAt
+        order: desc
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+        options: { maxlength: 60 }
+      - name: summary
+        label: One-sentence summary
+        description: What it does and for whom.
+        type: text
+        required: true
+        options: { maxlength: 160 }
+      - name: status
+        label: Status
+        type: select
+        required: true
+        default: idea
+        options:
+          values:
+            - { name: idea, label: Idea }
+            - { name: building, label: Building }
+            - { name: shipped, label: Shipped }
+      - name: stack
+        label: Stack
+        type: string
+        list: { min: 1 }
+      - name: startedAt
+        label: Started (or added, for ideas)
+        type: date
+        required: true
+        options: { format: yyyy-MM-dd }
+      - name: updatedAt
+        label: Updated (optional)
+        type: date
+        default: ""
+        options: { format: yyyy-MM-dd }
+      - name: repo
+        label: Repository URL (optional)
+        type: string
+      - name: demo
+        label: Live demo URL (optional)
+        type: string
+      - name: art
+        label: Placeholder illustration
+        description: Used until the project has a real screenshot.
+        type: select
+        default: form
+        options:
+          values:
+            - { name: form, label: "Form (paste text, get results)" }
+            - { name: cards, label: "Cards (a stack of term cards)" }
+            - { name: chart, label: "Chart (a week of daily marks)" }
+            - { name: request, label: "Request (an HTTP request and response)" }
+      - name: tint
+        label: Hero chip color
+        type: select
+        default: sage
+        options:
+          values: [sage, sky, tan]
+      - name: phrase
+        label: Hero phrase (optional)
+        description: 'Short, lowercase, for "Right now I''m building …".'
+        type: string
+        options: { maxlength: 60 }
+      - name: heroNote
+        label: Handwritten note (optional)
+        type: string
+        options: { maxlength: 48 }
+      - name: featured
+        label: Featured (first on Home)
+        type: boolean
+        default: false
+      - name: callouts
+        label: Notes on the picture (2–4)
+        type: object
+        list:
+          max: 4
+          collapsible:
+            collapsed: true
+            summary: "{label}"
+        fields:
+          - name: label
+            type: string
+            required: true
+            options: { maxlength: 32 }
+          - name: note
+            type: text
+            required: true
+            options: { maxlength: 120 }
+          - name: x
+            label: Dot position across (0–100)
+            type: number
+            required: true
+            options: { min: 0, max: 100 }
+          - name: y
+            label: Dot position down (0–100)
+            type: number
+            required: true
+            options: { min: 0, max: 100 }
+          - name: side
+            label: Card side
+            type: select
+            default: right
+            options:
+              values: [left, right]
+      - name: sample
+        label: Sample (placeholder)
+        description: Only for dummy content. Samples never appear on the live site.
+        type: boolean
+        default: false
+      - name: body
+        label: Write-up
+        description: Use the headings Problem, Approach, Result, Learnings.
+        type: rich-text
+        options:
+          format: markdown
+          path: public/media/projects
+
+  # ── Now (one file per month, e.g. 2026-10.md) ──────────────────────
+  - name: now
+    label: Now
+    type: collection
+    path: src/content/now
+    format: yaml-frontmatter
+    filename:
+      template: "{year}-{month}.md"
+      field: create
+    view:
+      fields: [month]
+      primary: month
+      default:
+        sort: month
+        order: desc
+    fields:
+      - name: month
+        label: Month
+        description: Pick the first day of the month.
+        type: date
+        required: true
+        options: { format: yyyy-MM-dd }
+      - name: location
+        label: Location (optional)
+        type: string
+      - name: learning
+        label: Learning
+        type: string
+        list: { min: 1 }
+      - name: building
+        label: Building
+        type: string
+        list: true
+      - name: reading
+        label: Reading
+        type: string
+        list: true
+      - name: snippet
+        label: Code snippet (optional)
+        type: code
+        options: { format: typescript }
+      - name: heroNote
+        label: Handwritten note (optional)
+        type: string
+        options: { maxlength: 48 }
+      - name: sample
+        label: Sample (placeholder)
+        type: boolean
+        default: false
+      - name: body
+        label: Also this month (optional)
+        type: rich-text
+        options:
+          format: markdown
+          media: false
+
+  # ── Learning timeline on /about ────────────────────────────────────
+  - name: timeline
+    label: Learning timeline
+    type: file
+    path: src/content/timeline.yaml
+    format: yaml
+    list: true
+    fields:
+      - name: id
+        label: ID
+        description: Unique, lowercase, hyphens (e.g. first-go-test).
+        type: string
+        required: true
+      - name: date
+        type: date
+        required: true
+        options: { format: yyyy-MM-dd }
+      - name: title
+        type: string
+        required: true
+        options: { maxlength: 80 }
+      - name: note
+        type: text
+        options: { maxlength: 160 }
+      - name: sample
+        label: Sample (placeholder)
+        type: boolean
+        default: false
