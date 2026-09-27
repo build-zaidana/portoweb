@@ -8,6 +8,14 @@ updates:
     groups:
       npm:
         patterns: ["*"]
+    ignore:
+      # @astrojs/check (used by `npm run build`) supports TypeScript ^5 || ^6 only.
+      # Remove this once a release of @astrojs/check allows TypeScript 7.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
+      # Types follow the Node major we run on (22, see netlify.toml and ci.yml).
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
     schedule:

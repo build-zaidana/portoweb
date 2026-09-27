@@ -299,3 +299,4 @@ User: kiri-kanan terlalu kosong. Terukur: di 1920px konten hanya 1216px (345px k
 - 🔑 Test helper murni — vitest · pure functions · test isolation
 - 🔑 Gerbang kualitas otomatis — github actions workflow · npm ci · dependabot groups
 - 🔑 Editor konten tanpa server — git-based CMS · pages cms .pages.yml · zod z.preprocess
+- Dependabot PR #3 (TypeScript 7, @types/node 26) gagal `npm ci`: `@astrojs/check` 0.9.10 hanya mendukung TypeScript ^5 || ^6. Dependabot kini mengabaikan update mayor `typescript` dan `@types/node` (lihat komentar di `.github/dependabot.yml`). PR #1/#2 (actions/checkout & setup-node v7) lolos CI.
