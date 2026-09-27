@@ -39,6 +39,7 @@
 | `shiki css-variables theme` | Astro | Blok kode Markdown (tokens.css) | 3 |
 | `getStaticPaths props` | Astro | Detail proyek & artikel (next/older/newer) | 3 |
 | `CollectionEntry data type` | Astro | ProjectArt, hero.ts (tipe varian dari schema) | 5 |
+| `zod z.preprocess` | Astro | content.config.ts (blank()) | 7 |
 
 ## Tailwind / CSS
 
@@ -191,4 +192,8 @@
 | `structured output json schema` | AI | Proyek Quiz (validasi Zod) | 5 |
 | `netlify functions go` | Deploy | Proyek What your browser sends | 5 |
 | `netlify deploy preview environment` | Deploy | netlify.toml (SHOW_SAMPLES) | 6 |
+| `vitest` | Tooling | tests/*.test.ts | 7 |
+| `github actions workflow` | Tooling | .github/workflows/ci.yml | 7 |
+| `dependabot groups` | Tooling | .github/dependabot.yml | 7 |
+| `git-based CMS` | Tooling | .pages.yml (Pages CMS) | 7 |
 

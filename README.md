@@ -30,7 +30,18 @@ Kalau dev server terlihat memakai konten atau CSS lama setelah file diedit, hent
 
 ## Menambah dan mengubah konten
 
-Semua konten ada di `src/content/` dan divalidasi otomatis: kalau ada field yang salah, `npm run build` gagal dan memberi tahu di mana salahnya.
+Semua konten ada di `src/content/` dan divalidasi otomatis: kalau ada field yang salah, `npm run build` gagal dan memberi tahu di mana salahnya. Situs live tetap aman karena Netlify hanya menayangkan build yang berhasil.
+
+### Cara termudah: editor di browser (Pages CMS)
+
+1. Buka [app.pagescms.org](https://app.pagescms.org) → **Sign in with GitHub** (akun build-zaidana).
+2. Pilih repo **portoweb** (izinkan akses kalau diminta).
+3. Menu kiri berisi **Writing**, **Projects**, **Now**, **Learning timeline**. Klik **Add an entry**, isi form, lalu **Save**.
+4. Setiap Save = satu commit ke `main` → Netlify deploy ulang otomatis (±1–2 menit).
+
+Form-nya diatur di `.pages.yml` dan mengikuti schema di `src/content.config.ts` (ubah keduanya bersamaan). Gambar yang diunggah tersimpan di `public/media/`.
+
+Atau tulis file Markdown langsung, seperti di bawah.
 
 ### Tulisan baru → `src/content/writing/<slug>.md`
 
@@ -148,7 +159,10 @@ npx netlify-cli deploy --build --prod
 
 ## Sebelum setiap rilis
 
+- [ ] `npm test` lolos (unit test helper di `src/lib`)
 - [ ] `npm run build` tanpa error
 - [ ] `npm run contrast`: semua ✅
 - [ ] Cek tampilan di `npm run preview` (light & dark, HP & desktop)
 - [ ] Tidak ada sample yang tidak sengaja ikut (lihat log build)
+
+Semua cek di atas (kecuali tampilan) juga dijalankan otomatis oleh **GitHub Actions** di setiap push dan pull request (`.github/workflows/ci.yml`). Lihat hasilnya di tab **Actions** repo. **Dependabot** membuka pull request mingguan untuk update dependency.

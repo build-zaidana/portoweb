@@ -290,3 +290,12 @@ User: kiri-kanan terlalu kosong. Terukur: di 1920px konten hanya 1216px (345px k
 **Sisa sample (tidak tampil di production):** `now/2026-09.md`, `writing/reading-an-error-message.md`, `writing/what-an-api-is.md`, `timeline.yaml` (2 entri).
 
 **Launch (2026-09-26):** repo public github.com/build-zaidana/portoweb → Netlify (deploy otomatis dari `main`, form detection aktif). GoatCounter `buildzaidana` aktif (kunjungan + klik CV/kontak/GitHub). Cek live: semua halaman 200, 404 benar, RSS/sitemap/robots/OG 200, header keamanan aktif, form Contact terdeteksi.
+
+### Setelah launch — CI, test, CMS (2026-09-27)
+- **Vitest**: 18 unit test untuk `excerpt`, `readingTime`, `isoDate`, `navMotion`, kontras (termasuk semua pasangan token lolos AA). `excerpt` dipindah dari `hero.ts` ke `format.ts` supaya bebas import Astro.
+- **GitHub Actions** (`.github/workflows/ci.yml`): format → test → kontras → build di setiap push/PR. **Dependabot** mingguan (npm + actions).
+- **Pages CMS** (`.pages.yml`): Writing, Projects (termasuk callouts), Now, Learning timeline; upload gambar ke `public/media`. PRD diubah: CMS bukan lagi non-goal (persetujuan user).
+- Schema: field opsional menerima `""`/`null` (`blank()`), diuji dengan entri bergaya editor (tanggal/URL kosong) → build lolos, frasa hero kembali ke judul berkutip.
+- 🔑 Test helper murni — vitest · pure functions · test isolation
+- 🔑 Gerbang kualitas otomatis — github actions workflow · npm ci · dependabot groups
+- 🔑 Editor konten tanpa server — git-based CMS · pages cms .pages.yml · zod z.preprocess

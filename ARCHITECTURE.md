@@ -284,6 +284,7 @@ Card stack **tidak pernah autoplay**. Durasi 150–400ms. `prefers-reduced-motio
 | `npm run build` | `astro check` (TypeScript strict), lalu build static ke `dist/` + laporan sample |
 | `SHOW_SAMPLES=true npm run build` | Build preview yang menyertakan sample |
 | `npm run contrast` | Tabel kontras WCAG, gagal jika ada pasangan < 4.5:1 |
+| `npm test` / `test:watch` | Vitest: unit test helper murni di `src/lib` (`tests/*.test.ts`) |
 | `npm run format` / `format:check` | Prettier |
 
 ## 9. Keputusan (ADR singkat)
@@ -316,6 +317,8 @@ Card stack **tidak pernah autoplay**. Durasi 150–400ms. `prefers-reduced-motio
 | 024 | Newsletter & kontak tidak menampilkan yang belum ada (email, sosial, form Buttondown) | Jujur: tidak ada form yang tidak mengirim ke mana-mana | Form placeholder "coming soon" |
 | 025 | Proyek asli berstatus `idea` menggantikan sample; label "Added" untuk ide; chip hero memakai status asli | Situs production punya isi nyata tanpa mengklaim pekerjaan yang belum dimulai | Menunggu proyek selesai dulu (situs kosong), tetap memakai sample |
 | 026 | AI di proyek dijalankan lokal (Ollama) atau di browser (WebLLM) | Rp 0 dan privasi (catatan pengguna tidak dikirim ke server) | API berbayar, free tier penyedia yang batasnya berubah |
+| 031 | Pages CMS (`.pages.yml`) untuk mengedit konten dari browser; field opsional menerima `""`/`null` lewat helper `blank()` di content.config.ts | Menulis dari HP tanpa server; situs tetap statis; schema Zod tetap jadi penjaga | Decap/Sveltia (setup OAuth), CMS headless ber-database |
+| 030 | CI GitHub Actions (format, test, kontras, build) + Dependabot; helper teks (`excerpt`) dipindah ke `format.ts` supaya murni dan bisa dites | Kualitas terlihat di repo public; regresi tertangkap sebelum deploy | Hanya mengandalkan build Netlify (gagal diam-diam di dashboard) |
 | 029 | Transisi antar halaman top-level mengikuti urutan nav: halaman lama bergeser ke arah asal + blur (180ms), halaman baru masuk dari sisi berlawanan, section-nya bertahap 70ms (`--nav-x`, `data-nav-stagger`, diputuskan di `astro:before-swap` lewat `navMotion()` di lib/motion.ts) | Halaman tanpa elemen bersama tetap terasa menyambung dan punya arah (feedback user) | Fade saja (terasa putus), slide penuh selebar layar (terlalu dramatis untuk nada situs) |
 | 028 | Shared element transition: judul proyek/tulisan dan ilustrasi proyek berpindah dari daftar ke detail (`transition:name` + `view-transition-class: morph`); pasangan hanya menampilkan snapshot baru yang diskalakan, elemen tanpa pasangan pudar mengikuti ritme halaman | Transisi terasa menyambung dan bisa diikuti mata; tanpa bayangan ganda | Hanya fade `<main>` (terasa putus), crossfade bawaan (teks ganda saat ukuran berubah) |
 | 027 | Lebar konten maks `--page-max: 88rem` + `--gutter: clamp(1.25rem, 5vw - 0.5rem, 6rem)` | Di 1920px, batas lama 76rem menyisakan ±36% layar kosong (feedback user); tepi tetap lega di 1440 (64px) dan 20px di HP | Tetap 76rem, full-bleed tanpa batas |

@@ -17,7 +17,9 @@ Website personal branding untuk Zaidana, mahasiswa Software Engineering (21, Ind
 | G2 | Menjadi pusat konten & perjalanan belajar | ≥ 2 tulisan per bulan terbit; halaman Now diperbarui tiap bulan; tanggal terbit/update terlihat jelas di setiap halaman |
 | G3 | Membangun jejaring | Subscriber newsletter bertambah; ada balasan/diskusi |
 
-**Non-goals (v1):** komentar blog, login, CMS, multi-bahasa, analytics berbayar, e-commerce.
+**Non-goals (v1):** komentar blog, login, multi-bahasa, analytics berbayar, e-commerce.
+
+*(Diubah 2026-09-27 atas persetujuan user: CMS dikeluarkan dari non-goals. Dipakai **Pages CMS**, CMS berbasis Git tanpa server: editor di browser yang meng-commit Markdown ke repo, jadi situs tetap statis dan Rp 0.)*
 
 ## 3. Persona
 
