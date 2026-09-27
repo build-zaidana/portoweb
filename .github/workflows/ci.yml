@@ -1,0 +1,40 @@
+# Checks every push and pull request: formatting, unit tests, text contrast, type check + build.
+# Netlify deploys on its own; this workflow is the quality gate a reviewer can see on GitHub.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Formatting
+        run: npm run format:check
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Text contrast (WCAG AA)
+        run: npm run contrast
+
+      - name: Type check and build
+        run: npm run build
